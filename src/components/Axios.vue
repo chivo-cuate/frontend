@@ -1,5 +1,5 @@
 <template>
-  <span v-show="false"></span>
+  <span></span>
 </template>
 
 <script>
@@ -8,16 +8,13 @@ import axios from 'axios'
 export default {
   data() {
     return {
-      loading: false,
       requestInfo: {}
     }
   },
   methods: {
     submit(config) {
       this.requestInfo = config
-      this.requestInfo.url = `${this.requestInfo.api === 'ea' ? process.env.VUE_APP_EA_API : process.env.VUE_APP_BASE_API}${
-        this.requestInfo.url
-      }`
+      this.requestInfo.url = `${process.env.VUE_APP_BASE_API}${encodeURI(this.requestInfo.url)}`
 
       if (!this.requestInfo.headers) {
         this.requestInfo.headers = {}
@@ -35,6 +32,9 @@ export default {
       this.requestInfo.headers['Authorization'] = `Bearer ${
         this.$store.getters.getJWT
       }`
+
+      this.requestInfo.headers['Content-Type'] = 'application/json'
+      this.requestInfo.headers['Access-Control-Allow-Credentials'] = '*'
 
       //this.requestInfo.onUploadProgress = function(progressEvent) {}
 
@@ -73,7 +73,7 @@ export default {
       return new Promise((resolve, reject) => {
         var fullUrl = `${this.requestInfo.url}${
           this.requestInfo.params.XDEBUG_SESSION_START
-            ? '?XDEBUG_SESSION_START=netbeans-xdebug'
+            ? '&XDEBUG_SESSION_START=netbeans-xdebug'
             : ''
         }`
 

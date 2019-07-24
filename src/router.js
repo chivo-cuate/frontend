@@ -28,12 +28,12 @@ let routes = [{
     path: '/',
     name: 'root',
     component: function () {
-      return import('@/components/PublicAuth')
+      return import('@/components/Home')
     }
   },
   {
-    path: '/home',
-    name: 'home',
+    path: '/inicio',
+    name: 'inicio',
     component: function () {
       return import('@/components/Home')
     }
@@ -46,44 +46,55 @@ let routes = [{
     }
   },
   {
-    path: '/auth/:action',
-    name: 'auth',
+    path: '/acceso/:action',
+    name: 'acceso',
     meta: {
       requiresAnon: true
     },
     component: function () {
-      return import('@/components/PublicAuth')
+      return import('@/components/Auth')
     }
   },
   {
-    path: '/dsa/:dsa_slug/:action/:parameter?/:id?',
-    name: 'dsa',
+    path: '/perfil',
+    name: 'perfil',
     meta: {
-      requiresAuth: false
-    },
-    component: function () {
-      return import('@/components/dsa/DSA')
-    }
-  },
-  {
-    path: '/my-profile',
-    name: 'my-profile',
-    meta: {
-      requiresAuth: true,
-      roles: ['do']
+      requiresAuth: true
     },
     component: function () {
       return import('@/components/MyProfile')
     }
   },
   {
-    path: '/dashboard',
-    name: 'dashboard',
+    path: '/pedidos',
+    name: 'pedidos',
     meta: {
       requiresAuth: true
     },
     component: function () {
-      return import('@/components/Dashboard')
+      return import('@/components/Orders')
+    }
+  },
+  {
+    path: '/admin/:action',
+    name: 'admin',
+    meta: {
+      requiresAuth: true,
+      roles: ['Administrador']
+    },
+    component: function () {
+      return import('@/components/admin/Admin')
+    }
+  },
+  {
+    path: '/seguridad/:action',
+    name: 'security',
+    meta: {
+      requiresAuth: true,
+      roles: ['Administrador']
+    },
+    component: function () {
+      return import('@/components/security/Security')
     }
   },
   {
@@ -95,139 +106,6 @@ let routes = [{
     component: function () {
       return import('@/components/ActivateAccount')
     }
-  },
-  {
-    path: '/assessment-centre/calendar',
-    name: 'ac-calendar',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac', 'na', 'student']
-    },
-    component: function () {
-      return import('@/components/ac/ACCalendar')
-    }
-  },
-  {
-    path: '/assessment-centre/submitted-forms',
-    name: 'submitted-forms',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac', 'student']
-    },
-    component: function () {
-      return import('@/components/ac/ACSubmittedForms')
-    }
-  },
-  {
-    path: '/assessment-centre/students',
-    name: 'ac-students',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac']
-    },
-    component: function () {
-      return import('@/components/ac/ACStudents')
-    }
-  },
-  {
-    path: '/assessment-centre/settings',
-    name: 'ac-settings',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac', 'na']
-    },
-    component: function () {
-      return import('@/components/ac/ACSettings')
-    }
-  },
-  {
-    path: '/assessment-centre/needs-assessors',
-    name: 'ac-needs-assessors',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac']
-    },
-    component: function () {
-      return import('@/components/ac/ACAssessors')
-    }
-  },
-  {
-    path: '/assessment-centre/services',
-    name: 'ac-services',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac']
-    },
-    component: function () {
-      return import('@/components/ac/ACServices')
-    }
-  },
-  {
-    path: '/assessment-centre/submitted-forms/:token',
-    name: 'submitted-form',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac', 'student']
-    },
-    component: function () {
-      return import('@/components/ac/ACSubmittedForm')
-    }
-  },
-  {
-    path: '/assessment-centre/student/:token/:tab?',
-    name: 'student-page',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac', 'na', 'student']
-    },
-    component: function () {
-      return import('@/components/ac/ACStudentPage')
-    }
-  },
-  {
-    path: '/assessment-centre/application',
-    name: 'ac-application',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac']
-    },
-    component: function () {
-      return import('@/components/ac/application/Application')
-    }
-  },
-  {
-    path: '/assessment-centre/files',
-    name: 'ac-files',
-    meta: {
-      requiresAuth: true,
-      roles: ['student']
-    },
-    component: function () {
-      return import('@/components/AttachedFiles')
-    },
-    props: { targetType: 'ac' }
-  },
-  {
-    path: '/invoicing',
-    name: 'invoicing',
-    meta: {
-      requiresAuth: true,
-      roles: ['ac', 'nmh']
-    },
-    component: function () {
-      return import('@/components/Invoicing')
-    }
-  },
-  {
-    path: '/assessment-centre/:slug/:action/:token?',
-    name: 'ac',
-    meta: {
-      requiresAuth: false,
-      roles: ['na', 'student']
-    },
-    component: function () {
-      return import('@/components/ac/AC')
-    }
   }
 ]
 
@@ -238,7 +116,6 @@ let router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  //let payload = store._modules.root._rawModule.state.payload;
   if (to.meta.requiresAuth) {
     if (store.getters.isGuest) {
       store.commit('setAuthRouteRequested', to.path)

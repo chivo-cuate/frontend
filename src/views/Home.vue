@@ -1,18 +1,13 @@
 <template>
-  <HomeComp />
+  <HelloWorld />
 </template>
 
 <script>
-import HomeComp from '@/components/HomeComp.vue'
+import HelloWorld from '../components/HelloWorld';
 
 export default {
-  data() {
-    return {
-      
-    };
-  },
   components: {
-    HomeComp
-  }
+    HelloWorld,
+  },
 };
 </script>

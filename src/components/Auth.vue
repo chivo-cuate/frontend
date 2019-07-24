@@ -1,47 +1,47 @@
 <template>
   <v-flex xs12>
     <v-layout justify-center class="animated fadeIn">
-      <v-flex md10>
-        <v-toolbar tabs color="indigo">
+      <v-flex md6>
+        <v-toolbar tabs :color="$store.getters.getThemeColor">
           <v-toolbar-title class="white--text">
-            <v-icon class="white--text">school</v-icon>
-            {{ parentName }}
+            <v-icon class="white--text">lock</v-icon>
+            Introduzca sus datos
           </v-toolbar-title>
         </v-toolbar>
         <v-card>
           <v-tabs v-model="activeTab" centered color="transparent" icons-and-text>
-            <v-tabs-slider color="indigo"></v-tabs-slider>
-            <v-tab @click="redirect('login')" href="#tab-login">
-              Log in
+            <v-tabs-slider :color="$store.getters.getThemeColor"></v-tabs-slider>
+            <v-tab @click="redirect('iniciar-sesion')" href="#tab-iniciar-sesion">
+              Iniciar sesi&oacute;n
               <v-icon>verified_user</v-icon>
             </v-tab>
-            <v-tab v-if="target !== 'public'" @click="redirect('signup')" href="#tab-signup">
-              Sign up
+            <!--<v-tab @click="redirect('signup')" href="#tab-signup">
+              Registrarse
               <v-icon>account_circle</v-icon>
-            </v-tab>
-            <v-tab @click="redirect('reset-password')" href="#tab-reset-password">
-              Reset password
+            </v-tab>-->
+            <v-tab @click="redirect('restablecer-contrasena')" href="#tab-restablecer-contrasena">
+              Restablecer contrase&ntilde;a
               <v-icon>email</v-icon>
             </v-tab>
 
-            <v-tab-item value="tab-login">
+            <v-tab-item value="tab-iniciar-sesion">
               <v-layout align-center justify-center>
-                <v-flex md6 mt-3>
+                <v-flex md8 mt-3>
                   <v-card-text>
                     <v-form v-model="loginValidationStatus" ref="loginForm">
                       <v-layout row>
                         <v-flex lg12>
                           <v-text-field
-                            validate-on-blur
                             @keyup.enter="login()"
-                            v-model="email"
-                            prepend-icon="mail"
-                            name="email"
-                            label="Email"
+                            v-model="username"
+                            ref="txt_username"
+                            prepend-icon="person"
+                            name="username"
+                            label="Nombre de usuario"
                             type="text"
                             required
-                            :rules="emailRules"
-                            hint="Enter your registered email address"
+                            :rules="usernameRules"
+                            hint="Introduzca su nombre de usuario"
                           ></v-text-field>
                           <v-text-field
                             ref="loginPassword"
@@ -50,11 +50,11 @@
                             v-model="password"
                             prepend-icon="lock"
                             name="password"
-                            label="Password"
+                            label="Contraseña"
                             type="password"
                             required
                             :rules="passwordRules"
-                            hint="Enter your password"
+                            hint="Introduzca su clave"
                           ></v-text-field>
                         </v-flex>
                       </v-layout>
@@ -63,31 +63,33 @@
                   <v-card-actions class="pb-5">
                     <v-spacer></v-spacer>
                     <v-tooltip bottom :color="loginValidationColor">
-                      <v-btn
-                        :disabled="loading"
-                        v-on:click="login()"
-                        class="white--text mr-3"
-                        :class="{ red: !loginValidationStatus, indigo: loginValidationStatus }"
-                        slot="activator"
-                      >
-                        <v-progress-circular
-                          v-if="loading"
-                          :width="2"
-                          size="18"
-                          indeterminate
-                          class="gray--text fa"
-                        ></v-progress-circular>
-                        <v-icon size="22" v-if="!loading && loginValidationStatus">done</v-icon>
-                        <v-icon size="22" v-if="!loading && !loginValidationStatus">error_outline</v-icon>&nbsp;Log in
-                      </v-btn>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          :disabled="loading"
+                          @click="login()"
+                          class="white--text mr-3"
+                          :class="loginValidationStatus ? $store.getters.getThemeColor : 'red' "
+                          v-on="on"
+                        >
+                          <v-progress-circular
+                            v-if="loading"
+                            :width="2"
+                            size="18"
+                            indeterminate
+                            class="gray--text fa"
+                          ></v-progress-circular>
+                          <v-icon size="22" v-if="!loading && loginValidationStatus">done</v-icon>
+                          <v-icon size="22" v-if="!loading && !loginValidationStatus">error_outline</v-icon>&nbsp;Aceptar
+                        </v-btn>
+                      </template>
                       <span>{{loginValidationMessage}}</span>
                     </v-tooltip>
                   </v-card-actions>
                 </v-flex>
               </v-layout>
             </v-tab-item>
-
-            <v-tab-item value="tab-signup" v-if="target !== 'public'">
+            <!--
+            <v-tab-item value="tab-signup">
               <v-layout justify-center>
                 <v-flex xs10 mt-3>
                   <v-card-text>
@@ -131,13 +133,11 @@
                             :append-icon="e2 ? 'visibility' : 'visibility_off'"
                             @click:append="() => (e2 = !e2)"
                             :type="e2 ? 'password' : 'text'"
-                            hint="Re-type your password"
+                            hint="Repita su contraseña"
                           ></v-text-field>
                         </v-flex>
                         <v-flex sm12 md11 lg6>
                           <v-text-field
-                            :disabled="emailDisabled"
-                            validate-on-blur
                             v-model="email"
                             prepend-icon="email"
                             name="email"
@@ -183,7 +183,7 @@
                         @click="signup()"
                         :disabled="loading"
                         class="white--text mr-3"
-                        :class="{ red: !signupValidationStatus, indigo: signupValidationStatus }"
+                        :class="signupValidationStatus ? $store.getters.getThemeColor : 'red'"
                         slot="activator"
                       >
                         <v-icon size="22" v-if="!loading && signupValidationStatus">done</v-icon>
@@ -209,10 +209,11 @@
                 </v-flex>
               </v-layout>
             </v-tab-item>
+            -->
 
-            <v-tab-item value="tab-reset-password">
+            <v-tab-item value="tab-restablecer-contrasena">
               <v-layout align-center justify-center row>
-                <v-flex xs6 mt-3>
+                <v-flex xs8 mt-3>
                   <v-card-text>
                     <v-form v-model="resetPasswordValidationStatus" ref="resetPasswordForm">
                       <v-layout row>
@@ -221,10 +222,9 @@
                             v-model="email"
                             ref="resetPasswordEmail"
                             @keyup.enter="requestPasswordReset()"
-                            validate-on-blur
                             prepend-icon="email"
                             name="email"
-                            label="Email"
+                            label="Cuenta de correo"
                             type="email"
                             :rules="emailRules"
                           ></v-text-field>
@@ -235,26 +235,28 @@
                   <v-card-actions class="pb-5">
                     <v-spacer></v-spacer>
                     <v-tooltip bottom :color="resetPasswordValidationColor">
-                      <v-btn
-                        :disabled="loading"
-                        v-on:click="requestPasswordReset()"
-                        class="white--text mr-3"
-                        :class="{ red: !resetPasswordValidationStatus, indigo: resetPasswordValidationStatus }"
-                        slot="activator"
-                      >
-                        <v-progress-circular
-                          v-if="loading"
-                          :width="2"
-                          size="18"
-                          indeterminate
-                          class="gray--text fa"
-                        ></v-progress-circular>
-                        <v-icon size="22" v-if="!loading && resetPasswordValidationStatus">done</v-icon>
-                        <v-icon
-                          size="22"
-                          v-if="!loading && !resetPasswordValidationStatus"
-                        >error_outline</v-icon>&nbsp;Send request
-                      </v-btn>
+                      <template v-slot:activator="{ on }">
+                          <v-btn
+                          :disabled="loading"
+                          @click="requestPasswordReset()"
+                          class="white--text mr-3"
+                          :class="resetPasswordValidationStatus ? $store.getters.getThemeColor : 'red'"
+                          v-on="on"
+                        >
+                          <v-progress-circular
+                            v-if="loading"
+                            :width="2"
+                            size="18"
+                            indeterminate
+                            class="gray--text fa"
+                          ></v-progress-circular>
+                          <v-icon size="22" v-if="!loading && resetPasswordValidationStatus">done</v-icon>
+                          <v-icon
+                            size="22"
+                            v-if="!loading && !resetPasswordValidationStatus"
+                          >error_outline</v-icon>&nbsp;Enviar
+                        </v-btn>
+                      </template>
                       <span>{{resetPasswordValidationMessage}}</span>
                     </v-tooltip>
                   </v-card-actions>
@@ -266,15 +268,33 @@
       </v-flex>
     </v-layout>
 
+    <v-snackbar
+      :timeout="10000"
+      :bottom="true"
+      :right="true"
+      v-model="snackbar"
+      :color="operationMessageType"
+    >
+      <v-icon small class="white--text fa">info</v-icon>
+      {{ operationMessage }}
+      <v-btn text @click.native="snackbar = false">
+        <v-icon>close</v-icon>
+      </v-btn>
+    </v-snackbar>
+
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)"/>
   </v-flex>
 </template>
 
 <script>
+import { setTimeout } from 'timers';
 
 export default {
   data() {
     return {
+      operationMessage: "",
+      operationMessageType: "error",
+      snackbar: false,
       e1: true,
       e2: true,
       capsLockAlert: false,
@@ -287,58 +307,66 @@ export default {
       password: "",
       password_confirm: "",
       email: "",
+      username: "",
       telephone: "",
       address: "",
       postcode: "",
       loginValidationStatus: false,
       signupValidationStatus: false,
       resetPasswordValidationStatus: false,
-      nameRules: [v => !!v || "This field is required"],
-      lastNameRules: [v => !!v || "This field is required"],
+      nameRules: [v => !!v || "Este dato es obligatorio"],
+      lastNameRules: [v => !!v || "Este dato es obligatorio"],
       passwordRules: [
-        v => !!v || "This field is required"
+        v => !!v || "Este dato es obligatorio"
         //v => (v && v.length > 5) || "Password requires at least 6 characters"
       ],
+      usernameRules: [
+        v => !!v || "Este dato es obligatorio",
+        v => (v && v.length > 1) || "Debe introducir al menos 2 caracteres"
+      ],
       passwordConfirmRules: [
-        v => !!v || "This field is required",
-        v => v === this.password || "Passwords do not match"
+        v => !!v || "Este dato es obligatorio",
+        v => v === this.password || "Las contraseñas no coinciden"
       ],
       emailRules: [
-        v => !!v || "E-mail is required",
+        v => !!v || "Este dato es obligatorio",
         v =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-          "E-mail must be valid"
+          "Introduzca una dirección válida"
       ],
-      addressRules: [v => !!v || "This field is required"],
+      addressRules: [v => !!v || "Este dato es obligatorio"],
       activeTab: null,
-      emailDisabled: false
-    };
-  },
-  props: [
-    "parentName",
-    "apiUrls",
-    "slug",
-    "currTab",
-    "target",
-    "emailProp",
-    "invitationToken"
-  ],
-  mounted() {
-    this.activeTab = this.currTab;
-    if (this.emailProp) {
-      this.email = this.emailProp;
-      this.emailDisabled = true;
+      apiUrls: {
+        login: 'auth/login',
+        resetPassword: 'acceso/restablecer-contrasena'
+      },
     }
+  },
+  mounted() {
+    this.activeTab = `tab-${this.$route.params.action}`;
+  },
+  afterRouteUpdate() {
+    this.activeTab = `tab-${this.$route.params.action}`;
   },
   methods: {
     redirect(action) {
-      this.$router.push(`${this.$store.getters.getHomeUrl}/${action}`)
+      this.$router.push(`/acceso/${action}`)
     },
     handleHttpResponse(event) {
       this.loading = false;
       if (event.data.result.code !== 500) {
-        var response = event.data.result.response;
-        this.$emit("finish", event);
+        var response = event.data.result.response
+        this.operationMessage = response.msg
+        this.operationMessageType = response.code
+        if (response.code === "success") {
+            this.$store.commit("updatePayload", response.data)
+            var redirect = this.$store.getters.getAuthRouteRequested
+            this.$store.commit('setAuthRouteRequested', null)
+            this.$router.push(redirect ? redirect : "/inicio")
+          } else {
+            this.snackbar = true
+            this.$store.commit("logout")
+          }
       } else {
         alert(event.data.result.response.message);
       }
@@ -357,15 +385,13 @@ export default {
           url: this.apiUrls.login,
           method: "post",
           params: {
-            slug: this.slug,
-            email: this.email,
+            username: this.username,
             password: this.password,
-            target: this.target
           }
         };
         this.$refs.axios.submit(config);
       }
-    },
+    },/*
     signup() {
       if (this.$refs.signupForm.validate()) {
         this.loading = true;
@@ -384,29 +410,27 @@ export default {
             name: this.name,
             last_name: this.last_name,
             email: this.email,
+            username: this.username,
             telephone: this.telephone,
             password: this.password,
             address: this.address,
             postcode: this.postcode,
             activation_url: activationUrl,
             home_url: homeUrl,
-            slug: this.slug,
             redirect_url: this.$store.getters.getAuthRouteRequested
               ? this.$store.getters.getAuthRouteRequested
               : homeUrl,
-            target: this.target,
-            invitation_token: this.invitationToken
           }
         };
         this.$refs.axios.submit(config);
       }
-    },
+    },*/
     requestPasswordReset() {
       if (this.$refs.resetPasswordForm.validate()) {
         this.loading = true;
         var activationUrl = window.location.href.replace(
           this.$route.path,
-          "/reset-password"
+          "/restablecer-contrasena"
         );
         var config = {
           url: this.apiUrls.resetPassword,
@@ -414,10 +438,7 @@ export default {
           params: {
             email: this.email,
             activation_url: activationUrl,
-            home_url: window.location.href.replace(
-              this.$route.path,
-              this.$store.getters.getHomeUrl
-            )
+            home_url: window.location.href
           }
         };
         this.$refs.axios.submit(config);
@@ -433,22 +454,22 @@ export default {
   computed: {
     loginValidationMessage: function() {
       return this.loginValidationStatus
-        ? "Good to go!"
-        : "Verify your information";
+        ? "¡Todo listo!"
+        : "Verifique sus datos";
     },
     loginValidationColor: function() {
-      return this.loginValidationStatus ? "indigo" : "red";
+      return this.loginValidationStatus ? this.$store.getters.getColorTheme : "red";
     },
     signupValidationMessage: function() {
-      return this.signupValidationStatus ? "Good to go!" : "Verify your data";
+      return this.signupValidationStatus ? "¡Todo listo!" : "Verifique los datos";
     },
     signupValidationColor: function() {
       return this.signupValidationStatus ? "indigo" : "red";
     },
     resetPasswordValidationMessage: function() {
       return this.resetPasswordValidationStatus
-        ? "Good to go!"
-        : "Verify your data";
+        ? "¡Todo listo!"
+        : "Verifique los datos";
     },
     resetPasswordValidationColor: function() {
       return this.resetPasswordValidationStatus ? "indigo" : "red";
@@ -456,3 +477,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .v-tab--active {
+    color: #689F38!important;
+}
+</style>

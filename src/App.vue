@@ -1,19 +1,20 @@
 <template>
   <v-app>
-    <Toolbar/>
-    <v-container mt-5 pt-5>
+    <Toolbar />
+    <v-container fill-height mt-12 pt-12>
       <v-layout row wrap class="animated fadeIn">
-        <router-view/>
+        <v-flex xs10 offset-xs1>
+          <router-view />
+        </v-flex>
       </v-layout>
     </v-container>
   </v-app>
 </template>
 
 <script>
-import Toolbar from './views/Toolbar'
-import Vue from 'vue'
-import animate from 'animate.css'
-//import { scrypt } from 'crypto';
+import Toolbar from "./views/Toolbar";
+import Vue from "vue";
+import animate from "animate.css";
 Vue.use(animate);
 
 export default {

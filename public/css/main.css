@@ -163,3 +163,12 @@
 .has-error {
   border-color: red!important;
 }
+
+.v-application a {
+  color: #689F38!important;
+}
+
+.dropdown-menu-item:hover {
+  color: #fff !important;
+  background-color: #689f38 !important;
+}
