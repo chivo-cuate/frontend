@@ -4,7 +4,8 @@ import store from './store.js'
 
 Vue.use(Router)
 
-let routes = [{
+let routes = [
+  {
     path: '*',
     name: 'not-found',
     meta: {
@@ -29,6 +30,16 @@ let routes = [{
     name: 'root',
     component: function () {
       return import('@/components/Home')
+    }
+  },
+  {
+    path: '/test',
+    name: 'test',
+    meta: {
+      requiresAuth: false
+    },
+    component: function () {
+      return import('@/components/Test')
     }
   },
   {
@@ -66,24 +77,24 @@ let routes = [{
     }
   },
   {
-    path: '/pedidos',
-    name: 'pedidos',
+    path: '/ordenes',
+    name: 'ordenes',
     meta: {
       requiresAuth: true
     },
     component: function () {
-      return import('@/components/Orders')
+      return import('@/components/orders/OrdersIndex')
     }
   },
   {
-    path: '/admin/:action',
-    name: 'admin',
+    path: '/sucursal/:action',
+    name: 'sucursal',
     meta: {
       requiresAuth: true,
-      roles: ['Administrador']
+      roles: ['Gerente']
     },
     component: function () {
-      return import('@/components/admin/Admin')
+      return import('@/components/branch/Branch')
     }
   },
   {

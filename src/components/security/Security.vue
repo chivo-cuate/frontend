@@ -20,11 +20,14 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 sm8 text-center pt-5>
+      <v-flex xs12 sm8 text-center>
         <v-flex sm11 offset-sm1>
           <v-card class="elevation-0">
+            <p class="text-center uppercase white--text" :class="$store.getters.getThemeColor">{{ $route.params.action }}</p>
             <Index v-if="currAction === 'inicio'" />
-            <Permissions v-if="currAction === 'permisos'" />
+            <Branches v-if="currAction === 'sucursales'" />
+            <Roles v-if="currAction === 'roles'" />
+            <Usuarios v-if="currAction === 'usuarios'" />
           </v-card>
         </v-flex>
       </v-flex>
@@ -34,7 +37,9 @@
 
 <script>
 import Index from "@/components/security/Index";
-import Permissions from "@/components/security/Permissions";
+import Branches from "@/components/security/Branches";
+import Roles from "@/components/security/Roles";
+import Usuarios from "@/components/security/Users";
 
 export default {
   data: () => ({
@@ -47,7 +52,7 @@ export default {
       { action: "usuarios", title: "Usuarios", icon: "supervisor_account" },
     ]
   }),
-  components: { Index, Permissions },
+  components: { Index, Branches, Roles, Usuarios },
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
     next();

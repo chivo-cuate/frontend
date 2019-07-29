@@ -6,7 +6,7 @@
           <v-list dense>
             <v-list-item
               v-for="(item, index) in actions"
-              :to="`/admin/${item.action}`"
+              :to="`/sucursal/${item.action}`"
               :key="`action-${index}`"
             >
               <v-list-item-action>
@@ -20,10 +20,12 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 sm8 text-center pt-5>
+      <v-flex xs12 sm8 text-center>
         <v-flex sm11 offset-sm1>
           <v-card class="elevation-0">
+            <p class="text-center uppercase white--text" :class="$store.getters.getThemeColor">{{ $route.params.action }}</p>
             <Index v-if="currAction === 'inicio'" />
+            <Ingredients v-else-if="currAction === 'ingredientes'" />
           </v-card>
         </v-flex>
       </v-flex>
@@ -32,7 +34,8 @@
 </template>
 
 <script>
-import Index from "@/components/admin/Index";
+import Index from "@/components/branch/Index";
+import Ingredients from "@/components/branch/Ingredients";
 
 export default {
   data: () => ({
@@ -40,13 +43,13 @@ export default {
     currAction: null,
     actions: [
       { action: "inicio", title: "Inicio", icon: "home" },
-      { action: "productos", title: "Productos", icon: "shopping_cart" },
       { action: "ingredientes", title: "Ingredientes", icon: "assignment" },
       { action: "almacen", title: "Almacén", icon: "store" },
+      { action: "productos", title: "Productos", icon: "shopping_cart" },
       { action: "menu-diario", title: "Menú diario", icon: "local_dining" }
     ]
   }),
-  components: { Index },
+  components: { Index, Ingredients },
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
     next();

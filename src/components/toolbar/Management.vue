@@ -12,7 +12,7 @@
       </v-btn>
     </template>
     <v-list>
-      <v-list-item v-if="$store.getters.isManager" to="/admin/inicio" class="dropdown-menu-item">
+      <v-list-item v-if="$store.getters.isManager && $store.getters.getCurrBranch" to="/sucursal/inicio" class="dropdown-menu-item">
         <v-icon class="fa">domain</v-icon>
         <span>Sucursal activa</span>
       </v-list-item>

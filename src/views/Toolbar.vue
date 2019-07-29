@@ -4,7 +4,7 @@
 
 <script>
 
-import ToolbarComp from '@/components/Toolbar'
+import ToolbarComp from '@/components/toolbar/Toolbar'
 
 export default {
   data() {

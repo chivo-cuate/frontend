@@ -5,7 +5,7 @@
         <v-list dense nav class="py-0">
           <v-list-item two-line>
             <v-list-item-avatar>
-              <img :src="require('../assets/img/logo_color.png')" alt="El Chivo Cuate" />
+              <img :src="require('../../assets/img/logo_color.png')" alt="El Chivo Cuate" />
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>Taquer&iacute;a</v-list-item-title>
@@ -29,12 +29,12 @@
           <template v-else>
             <BranchSelector color="success--text" />
 
-            <v-btn text to="/pedidos">
+            <v-btn text to="/ordenes">
               <v-icon class="success--text fa">room_service</v-icon>
               <span class="success--text">&Oacute;rdenes</span>
             </v-btn>
 
-            <ManageDropdown color="success--text" />
+            <Management color="success--text" />
 
             <Notifications />
           </template>
@@ -52,12 +52,12 @@
           <router-link to="/inicio" tag="span" style="cursor: pointer">
             <img
               class="hidden-sm-and-down"
-              :src="require('../assets/img/logo_text.png')"
+              :src="require('../../assets/img/logo_text.png')"
               alt="El Chivo Cuate"
             />
             <img
               class="hidden-md-and-up"
-              :src="require('../assets/img/logo_color.png')"
+              :src="require('../../assets/img/logo_color.png')"
               alt="El Chivo Cuate"
             />
           </router-link>
@@ -76,12 +76,12 @@
           <template v-else>
             <BranchSelector color="white--text" />
 
-            <v-btn text to="/pedidos">
+            <v-btn text to="/ordenes">
               <v-icon class="white--text">room_service</v-icon>
               <span class="white--text">&Oacute;rdenes</span>
             </v-btn>
 
-            <ManageDropdown color="white--text" />
+            <Management color="white--text" />
 
             <Notifications />
 
@@ -116,9 +116,9 @@
 <script>
 import classList from "classlist";
 import { mapGetters } from "vuex";
-import Notifications from "@/components/Notifications";
-import BranchSelector from "@/components/BranchSelector";
-import ManageDropdown from "@/components/ManageDropdown";
+import Notifications from "@/components/toolbar/Notifications";
+import BranchSelector from "@/components/toolbar/BranchSelector";
+import Management from "@/components/toolbar/Management";
 
 export default {
   data() {
@@ -126,8 +126,10 @@ export default {
       drawer: false
     };
   },
-  components: { Notifications, BranchSelector, ManageDropdown },
-  mounted() {},
+  components: { Notifications, BranchSelector, Management },
+  mounted() {
+    
+  },
   methods: {
     logout() {
       this.$store.commit("logout");

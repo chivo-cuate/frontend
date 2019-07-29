@@ -3,7 +3,7 @@
     <Toolbar />
     <v-container fill-height mt-12 pt-12>
       <v-layout row wrap class="animated fadeIn">
-        <v-flex xs10 offset-xs1>
+        <v-flex xs12>
           <router-view />
         </v-flex>
       </v-layout>

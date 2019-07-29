@@ -10,37 +10,35 @@
               <v-layout row wrap>
                 <v-flex sm5 md5>
                   <v-text-field
-                    v-model="userData.name"
+                    v-model="userData.first_name"
                     name="name"
                     label="Nombres"
                     type="text"
                     :rules="nameRules"
                   ></v-text-field>
                   <v-text-field
-                    v-model="userData.lastname"
+                    v-model="userData.last_name"
                     name="last_name"
                     label="Apellidos"
                     type="text"
                     :rules="lastNameRules"
                   ></v-text-field>
+                </v-flex>
+                <v-flex offset-sm2 sm5>
                   <v-text-field
                     v-model="userData.email"
                     name="email"
                     label="Correo electrónico"
-                    id="email"
                     type="email"
                     :rules="emailRules"
                   ></v-text-field>
-                </v-flex>
-                <v-flex offset-sm2 sm5>
-                  <v-textarea
-                    v-model="userData.address"
+                  <v-text-field
+                    v-model="userData.username"
                     name="address"
-                    label="Dirección"
-                    id="address"
+                    label="Nombre de usuario"
                     type="text"
-                    :rules="addressRules"
-                  ></v-textarea>
+                    :rules="nameRules"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
 
@@ -92,7 +90,7 @@
               <v-dialog width="400" v-model="dlgChangePassword" persistent>
                 <v-card>
                   <v-card-title class="headline grey lighten-2">Cambiar contrase&ntilde;a</v-card-title>
-                  <v-container pa-5>
+                  <v-container pt-5 pr-10 pb-5 pl-10>
                     <v-form v-model="passwordValidationStatus" ref="passwordForm">
                       <v-layout row wrap>
                         <v-text-field
@@ -150,7 +148,7 @@
                 </v-card>
               </v-dialog>
 
-              <v-dialog width="500" v-model="uploadDlg" persistent>
+              <!--<v-dialog width="500" v-model="uploadDlg" persistent>
                 <v-card>
                   <v-card-title class="headline grey lighten-2">
                     Upload file
@@ -163,7 +161,7 @@
                     
                   </v-container>
                 </v-card>
-              </v-dialog>
+              </v-dialog>-->
             </v-form>
           </v-container>
         </v-card>
@@ -240,26 +238,12 @@ export default {
     this.getProfileInfo();
   },
   methods: {
-    cancelRegistration() {
-      this.loading = true;
-      this.snackbar = false;
-
-      var config = {
-        url: "cancel-registration",
-        method: "post",
-        params: {
-          type: this.$store.getters.getPayload.institute.type,
-          slug: this.$store.getters.getPayload.institute.slug
-        }
-      };
-      this.$refs.axios.submit(config);
-    },
     updateProfile() {
       if (this.$refs.form.validate()) {
         this.loading = true;
         let config = {
           method: "form",
-          url: "update-user-profile",
+          url: "auth/update-profile",
           params: new FormData(),
           headers: {
             "Content-Type": "multipart/form-data"
@@ -276,7 +260,7 @@ export default {
       if (this.$refs.passwordForm.validate()) {
         this.loading = true;
         var config = {
-          url: "change-password",
+          url: "auth/change-password",
           method: "post",
           params: {
             current_password: this.userData.current_password,
@@ -296,7 +280,7 @@ export default {
     getProfileInfo() {
       this.loadingInitialElements = true;
       let config = {
-        url: "get-profile-info",
+        url: "auth/get-profile",
         params: {}
       };
       this.$refs.axios.submit(config);
@@ -313,24 +297,6 @@ export default {
     showUpload() {
       this.uploadDialog = true;
     },
-    setSignatureFromUpload(event) {
-      this.userData.signature = event;
-      if (event) {
-        this.uploadDialog = false;
-      }
-    },
-    uploadSignature() {
-      if (!this.uploadingImage) {
-        this.uploadingImage = true;
-
-        let config = {
-          method: "post",
-          url: "upload-signature",
-          params: { file: this.userData.signature }
-        };
-        this.$refs.axios.submit(config);
-      }
-    },
     handleHttpResponse(event) {
       this.loading = false;
       this.loadingInitialElements = false;
@@ -345,7 +311,7 @@ export default {
             this.snackbar = true;
             this.uploadingImage = false;
             break;
-          case "get-profile-info":
+          case "get-profile":
             if (response.code === "success") {
               this.userData = response.data;
             } else {

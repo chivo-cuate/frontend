@@ -15,10 +15,6 @@
               Iniciar sesi&oacute;n
               <v-icon>verified_user</v-icon>
             </v-tab>
-            <!--<v-tab @click="redirect('signup')" href="#tab-signup">
-              Registrarse
-              <v-icon>account_circle</v-icon>
-            </v-tab>-->
             <v-tab @click="redirect('restablecer-contrasena')" href="#tab-restablecer-contrasena">
               Restablecer contrase&ntilde;a
               <v-icon>email</v-icon>
@@ -26,7 +22,7 @@
 
             <v-tab-item value="tab-iniciar-sesion">
               <v-layout align-center justify-center>
-                <v-flex md8 mt-3>
+                <v-flex md10 mt-3>
                   <v-card-text>
                     <v-form v-model="loginValidationStatus" ref="loginForm">
                       <v-layout row>

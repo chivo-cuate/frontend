@@ -140,19 +140,24 @@ export default {
       notificationsCount: 0,
       notifications: [],
       selectedNotifications: [],
-      audioPlayer: null
+      audioPlayer: null,
+      axios: null
     };
   },
+  props: ['axiosComp'],
   mounted() {
-    //this.toggleGetNotifications(this.$store.getters.isGuest);
+    /*this.toggleGetNotifications(this.$store.getters.isGuest);
     this.$store.watch(
       (state, getters) => getters.isGuest,
       (newValue, oldValue) => {
         this.toggleGetNotifications(newValue);
       }
-    );
+    );*/
   },
   methods: {
+    setAxios(axios){
+      this.axios = axios
+    },
     toggleGetNotifications(isGuest) {
       this.clearNotifications();
       if (isGuest) {
@@ -249,7 +254,7 @@ export default {
             break;
         }
       } else {
-        this.operationMessage = "Your request could not be executed.";
+        this.operationMessage = "La solicitud no pudo ser procesada.";
         this.operationMessageType = "error";
         this.snackbar = true;
       }
@@ -270,7 +275,7 @@ export default {
         url: "delete-notifications",
         params: { data: params }
       };
-      this.$refs.axios.submit(config);
+      this.axios.submit(config);
     },
     selectNotification(index) {
       const i = this.selectedNotifications.indexOf(index);
@@ -286,7 +291,7 @@ export default {
         url: "get-notifications",
         params: {}
       };
-      this.$refs.axios.submit(config);
+      this.axios.submit(config);
     },
     clearNotifications() {
       this.notifications = [];
