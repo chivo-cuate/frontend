@@ -8,7 +8,7 @@
     </template>
     <v-list>
       <v-list-item v-for="item in $store.getters.getBranches" :key="`branch-${item.id}`" @click="setCurrBranch(item)" class="dropdown-menu-item">
-        <v-icon small>group_work</v-icon>
+        <v-icon>group_work</v-icon>
         <span>{{ item.name }}</span>
       </v-list-item>
     </v-list>

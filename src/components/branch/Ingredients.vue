@@ -3,192 +3,251 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :options.sync="options"
-      :server-items-length="totalItems"
+      :page.sync="page"
       :items-per-page="10"
-      :loading="loading"
+      :loading="loadingItems"
+      :footer-props="{
+        itemsPerPageText: 'Elementos por página',
+        itemsPerPageOptions: [
+          {value: 5, text: '5'},
+          {value: 10, text: '10'},
+          {value: 20, text: '20'},
+          {value: 9999999999, text: 'Todos'},
+        ],
+        showFirstLastPage: false
+    }"
       class="elevation-1"
+      @page-count="pageCount = $event"
+      item-key="name"
     >
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.nombre }}</td>
-        <td class="text-left">
-          <v-tooltip bottom color="black">
+      <template v-slot:top>
+        <v-toolbar flat color="white">
+          <v-toolbar-title class="success--text">INGREDIENTES</v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+
+          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
-                @click="reviewForm(props.item.route)"
-                :disabled="props.item.status === 3"
-                small
-                text
+                :disabled="loadingItems || updatingItem"
+                :color="$store.getters.getThemeColor"
+                dark
+                class="mb-2"
                 v-on="on"
-                class="btn-sm"
-                color="warning"
+                @click="addItem()"
               >
-                <v-icon small>edit</v-icon>
+                <v-icon small>add</v-icon>Adicionar
               </v-btn>
             </template>
-            <span>Review</span>
-          </v-tooltip>
-        </td>
-      </template>
+            <v-card>
+              <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container grid-list-md>
+                  <v-form ref="form" v-model="validForm">
+                    <v-layout wrap>
+                      <v-flex xs12>
+                        <v-text-field
+                          :rules="requiredRules"
+                          outlined
+                          v-model="editedItem.name"
+                          label="Nombre"
+                        ></v-text-field>
+                      </v-flex>
+                    </v-layout>
+                  </v-form>
+                </v-container>
+              </v-card-text>
+              <v-card-actions class="mr-5">
+                <v-spacer></v-spacer>
+                <v-btn
+                  :disabled="!validForm || updatingItem"
+                  :color="$store.getters.getThemeColor"
+                  text
+                  @click="save()"
+                >
+                  <v-icon v-if="!updatingItem" small>check</v-icon>
+                  <v-progress-circular
+                    v-else
+                    :size="15"
+                    :width="1"
+                    indeterminate
+                    :color="$store.getters.getThemeColor"
+                    class="v-icon"
+                  ></v-progress-circular>
+                  <span>Aceptar</span>
+                </v-btn>
+                <v-btn color="error" text @click="dlgUpdateItem = false">Cancelar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
 
-      <v-alert
-        slot="no-results"
-        :value="true"
-        class="black--text"
-        color="default"
-      >Your search for "{{ search }}" found no results.</v-alert>
-
-      <template slot="no-data">
-        <v-alert :value="true" class="black--text text-center" color="default">
-          <v-progress-circular v-if="loading" :width="2" indeterminate class="primary--text"></v-progress-circular>
-          <span v-else>No se han encontrado elementos.</span>
-        </v-alert>
+          <v-dialog v-model="dlgDeleteItem" max-width="300px" persistent>
+            <v-card>
+              <v-card-title>
+                <span class="headline">Eliminar elemento</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container grid-list-md>
+                  <v-layout wrap>
+                    <v-flex xs12>
+                      <p>¿Seguro que desea eliminar el elemento {{ editedItem.name }}?</p>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+              <v-card-actions class="mr-5">
+                <v-spacer></v-spacer>
+                <v-btn
+                  :disabled="deletingItem"
+                  :color="$store.getters.getThemeColor"
+                  text
+                  @click="remove()"
+                >
+                  <v-icon v-if="!updatingItem" small>check</v-icon>
+                  <v-progress-circular
+                    v-else
+                    :size="15"
+                    :width="1"
+                    indeterminate
+                    :color="$store.getters.getThemeColor"
+                    class="v-icon"
+                  ></v-progress-circular>
+                  <span>Aceptar</span>
+                </v-btn>
+                <v-btn color="error" text @click="dlgDeleteItem = false">Cancelar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-toolbar>
       </template>
+      <template v-slot:item.action="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              class="mr-2"
+              :color="$store.getters.getThemeColor"
+              @click="editItem(item)"
+              v-on="on"
+            >edit</v-icon>
+          </template>
+          <span>Editar</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon color="warning" @click="deleteItem(item)" v-on="on">delete</v-icon>
+          </template>
+          <span>Eliminar</span>
+        </v-tooltip>
+      </template>
+      <template v-slot:loading>
+        <VProgress class="text-center" />
+      </template>
+      <template v-slot:no-data>No se han encontrado elementos.</template>
     </v-data-table>
 
-    <v-dialog width="500" v-model="approveDialog" persistent>
-      <v-card>
-        <v-card-title class="headline grey lighten-2">
-          Approve Form
-          <v-spacer></v-spacer>
-          <a @click="approveDialog = false">
-            <v-icon small>close</v-icon>
-          </a>
-        </v-card-title>
-        <v-container>
-          <h3 class="text-xs-center">Are you sure you want to approve this form?</h3>
-          <div class="text-xs-center">
-            <v-btn :disabled="approvingForm" @click="approveForm()" color="info">
-              <v-icon v-if="!approvingForm" small >thumb_up</v-icon>
-              <v-progress-circular v-else :width="2" size="18" indeterminate class="gray--text fa"></v-progress-circular>Yes
-            </v-btn>
-            <v-btn @click="approveDialog = false" color="error">
-              <v-icon small>thumb_down</v-icon>Not yet
-            </v-btn>
-          </div>
-        </v-container>
-      </v-card>
-    </v-dialog>
+    <!--<div class="text-center pt-2">
+      <v-pagination v-model="page" :length="pageCount" :color="$store.getters.getThemeColor" next-icon="chevron_right" prev-icon="chevron_left" class="mt-2"></v-pagination>
+      <v-flex lg2 offset-lg5>
+      </v-flex>
+    </div>-->
 
     <v-snackbar
       :timeout="5000"
       :bottom="true"
       :right="true"
+      :absolute="true"
       v-model="snackbar"
       :color="operationMessageType"
     >
-      <v-icon small>info</v-icon>
+      <v-icon small class="white--text">info</v-icon>
       {{ operationMessage }}
-      <v-btn text @click.native="snackbar = false">
+      <v-btn text @click="snackbar = false">
         <v-icon small>close</v-icon>
       </v-btn>
     </v-snackbar>
 
-    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)"/>
+    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
-      options: {},
-      search: "",
-      formIndex: null,
-      formId: null,
-      totalItems: 0,
+      dlgUpdateItem: false,
+      dlgDeleteItem: false,
+      page: 1,
+      pageCount: 0,
+      loadingItems: true,
+      editedIndex: -1,
+      editedItem: {},
+      validForm: false,
+      requiredRules: [v => !!v || "Este dato es obligatorio"],
       items: [],
-      loading: true,
-      approvingForm: false,
-      downloading: false,
-      currFileName: null,
-      approveDialog: false,
+      updatingItem: false,
+      deletingItem: false,
       operationMessage: "",
       operationMessageType: "error",
       snackbar: false,
-      pagination: {},
       headers: [
-        { text: "Nombre", value: "name" },
-        { text: "Descripcion", value: "description" },
-        { text: "Acciones", value: "acciones" }
+        { text: "Nombre", value: "name", align: "left" },
+        { text: "Acciones", value: "action", align: "left", sortable: false }
       ]
     };
   },
-  watch: {
-      options: {
-        handler () {
-          this.getDataFromApi()
-        },
-        deep: true,
-      }
-    },
+  computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? "Adicionar" : "Editar";
+    }
+  },
   mounted() {
-    //this.getDataFromApi();
+    this.getDataFromApi();
   },
   methods: {
     handleHttpResponse(event) {
-      this.loading = false;
+      this.loadingItems = false;
+      let action = event.url.substring(event.url.lastIndexOf("/") + 1);
 
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
         this.operationMessage = response.msg;
         this.operationMessageType = response.code;
 
-        switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
-          case "do-some":
+        switch (action) {
+          case "crear":
+          case "editar":
+          case "eliminar":
             this.snackbar = true;
-            this.approvingForm = false;
-            this.approveDialog = false;
+            this.dlgUpdateItem = false;
+            this.dlgDeleteItem = false;
+            this.updatingItem = false;
+            this.deletingItem = false;
             if (response.code === "success") {
-              this.items[this.formIndex].status = response.data;
-              this.items[this.formIndex].filename = response.filename;
+              this.items = response.data;
             }
             break;
           case "listar":
-            const { sortBy, descending, page, rowsPerPage } = this.pagination;
             this.items = response.data;
-            this.totalItems = response.data.length;
             break;
           default:
             this.snackbar = true;
             break;
         }
       } else {
-        this.operationMessage = "Your request could not be executed.";
+        this.operationMessage = event.data.result.response.response.data.message;
         this.operationMessageType = "error";
         this.snackbar = true;
+        this.dlgUpdateItem = false;
+        this.dlgDeleteItem = false;
+        this.updatingItem = false;
+        this.deletingItem = false;
       }
     },
-    approveForm() {
-      if (!this.approvingForm && this.formId) {
-        this.approvingForm = true;
 
-        var config = {
-          method: "post",
-          url: "do-approve-form",
-          params: {
-            form_id: this.formId
-          }
-        };
-        this.$refs.axios.submit(config);
-      }
-    },
-    reviewForm(route) {
-      this.$router.push(route);
-    },
-    showApproveDialog(formId, index) {
-      this.formId = formId;
-      this.formIndex = index;
-      this.approveDialog = true;
-    },
-    searchItems() {
-      if (!this.loading) {
-        this.getDataFromApi();
-      }
-    },
     getDataFromApi() {
-      this.loading = true;
+      this.loadingItems = true;
       var config = {
         url: "ingredientes/listar",
         params: {
@@ -196,6 +255,61 @@ export default {
         }
       };
       this.$refs.axios.submit(config);
+    },
+
+    editItem(item) {
+      this.editedIndex = this.items.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dlgUpdateItem = true;
+    },
+
+    addItem() {
+      let item = {
+        id: -1,
+        name: null,
+        description: null,
+        manager_id: null,
+        manager_name: null
+      };
+      this.editedItem = Object.assign({}, item);
+      this.dlgUpdateItem = true;
+    },
+
+    deleteItem(item) {
+      this.editedIndex = this.items.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dlgDeleteItem = true;
+    },
+
+    remove() {
+      if (!this.deletingItem) {
+        this.deletingItem = true;
+        var config = {
+          method: "post",
+          url: "ingredientes/eliminar",
+          params: {
+            id: this.editedItem.id
+          }
+        };
+        this.$refs.axios.submit(config);
+      }
+    },
+
+    save() {
+      if (!this.updatingItem) {
+        this.updatingItem = true;
+        var config = {
+          method: "post",
+          url:
+            this.editedItem.id === -1
+              ? "ingredientes/crear"
+              : "ingredientes/editar",
+          params: {
+            item: this.editedItem
+          }
+        };
+        this.$refs.axios.submit(config);
+      }
     }
   }
 };

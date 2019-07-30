@@ -84,6 +84,15 @@ export default new Vuex.Store({
       });
       return res;
     },
+    getOrdersPermissions: state => {
+      let res = [];
+      state.payload.permissions.forEach(element => {
+        if (element.name === "Órdenes") {
+          res = element.subModules
+        }
+      });
+      return res;
+    },
     getCurrBranch: state => {
       return state.payload.curr_branch
     },

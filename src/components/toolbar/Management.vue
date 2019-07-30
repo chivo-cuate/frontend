@@ -13,11 +13,11 @@
     </template>
     <v-list>
       <v-list-item v-if="branchPerms > 0 && $store.getters.getCurrBranch" to="/sucursal/inicio" class="dropdown-menu-item">
-        <v-icon small>domain</v-icon>
+        <v-icon>domain</v-icon>
         <span>Sucursal activa</span>
       </v-list-item>
       <v-list-item v-if="securityPerms > 0" to="/seguridad/inicio" class="dropdown-menu-item">
-        <v-icon small>security</v-icon>
+        <v-icon>security</v-icon>
         <span>Seguridad</span>
       </v-list-item>
     </v-list>

@@ -362,6 +362,7 @@ export default {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.editedPermissions = Object.assign({}, item.modules);
+      console.log(this.editedPermissions);
       this.dlgPermissions = true;
     },
 

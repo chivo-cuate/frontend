@@ -29,7 +29,7 @@
           <template v-else>
             <BranchSelector color="success--text" />
 
-            <v-btn text to="/ordenes">
+            <v-btn v-if="$store.getters.getOrdersPermissions.length > 0" text to="/ordenes">
               <v-icon class="success--text fa">room_service</v-icon>
               <span class="success--text">&Oacute;rdenes</span>
             </v-btn>
@@ -76,7 +76,7 @@
           <template v-else>
             <BranchSelector color="white--text" />
 
-            <v-btn text to="/ordenes">
+            <v-btn v-if="$store.getters.getOrdersPermissions.length > 0" text to="/ordenes">
               <v-icon class="white--text">room_service</v-icon>
               <span class="white--text">&Oacute;rdenes</span>
             </v-btn>

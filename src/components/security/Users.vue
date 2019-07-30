@@ -26,7 +26,7 @@
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
-          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
+          <v-dialog v-model="dlgUpdateItem" max-width="700px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
                 :disabled="loadingItems || updatingItem"
@@ -46,19 +46,112 @@
               <v-card-text>
                 <v-container grid-list-md>
                   <v-form ref="form" v-model="validForm">
+                    
                     <v-layout wrap>
-                      <v-flex xs12>
+                      <v-flex xs12 sm4>
                         <v-text-field
                           :rules="requiredRules"
                           outlined
-                          v-model="editedItem.name"
+                          v-model="editedItem.first_name"
                           label="Nombre"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <v-text-field
+                          :rules="requiredRules"
+                          outlined
+                          v-model="editedItem.last_name"
+                          label="Apellidos"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <v-text-field
+                          :rules="requiredRules"
+                          outlined
+                          v-model="editedItem.ine"
+                          label="INE"
+                        ></v-text-field>
+                      </v-flex>
+                    </v-layout>
+
+                    <v-layout wrap>
+                      <v-flex xs12 sm4>
+                        <v-text-field
+                          :rules="requiredRules"
+                          outlined
+                          v-model="editedItem.username"
+                          label="Usuario"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <v-text-field
+                          :rules="emailRules"
+                          outlined
+                          v-model="editedItem.email"
+                          label="Correo"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <v-text-field outlined v-model="editedItem.phone_number" label="Teléfono"></v-text-field>
+                      </v-flex>
+                    </v-layout>
+
+                    <v-layout wrap>
+                      <v-flex xs12 sm3>
+                        <v-select
+                          outlined
+                          :items="[{value: 'M', text: 'Masculino'}, {value: 'F', text: 'Femenino'}]"
+                          v-model="editedItem.sex"
+                          label="Sexo"
+                        ></v-select>
+                      </v-flex>
+                      <v-flex xs12 sm9>
+                        <v-text-field outlined v-model="editedItem.address" label="Dirección"></v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    
+                    <v-layout wrap>
+                      <v-flex xs12 sm6>
+                        <v-text-field
+                          :rules="passwordRules"
+                          outlined
+                          v-model="editedItem.password"
+                          type="password"
+                          label="Contraseña"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 sm6>
+                        <v-text-field
+                          :rules="passwordConfirmRules"
+                          outlined
+                          v-model="editedItem.password_confirm"
+                          type="password"
+                          label="Confirmar contraseña"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
                     <v-layout wrap>
-                      <v-flex xs12>
-                        <v-textarea outlined v-model="editedItem.description" label="Descripción"></v-textarea>
+                      <v-flex xs12 sm6>
+                        <v-select
+                          outlined
+                          :items="roles"
+                          v-model="editedRoles"
+                          item-text="name"
+                          item-value="id"
+                          label="Roles"
+                          multiple
+                        ></v-select>
+                      </v-flex>
+                      <v-flex xs12 sm6>
+                        <v-select
+                          outlined
+                          :items="branches"
+                          v-model="editedBranches"
+                          item-text="name"
+                          item-value="id"
+                          label="Sucursales"
+                          multiple
+                        ></v-select>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -84,52 +177,6 @@
                   <span>Aceptar</span>
                 </v-btn>
                 <v-btn color="error" text @click="dlgUpdateItem = false">
-                  <v-icon>close</v-icon>Cancelar
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <v-dialog v-model="dlgRoles" max-width="500px" persistent>
-            <v-card>
-              <v-card-title>
-                <span class="headline">Roles de {{ editedItem.username }}</span>
-              </v-card-title>
-              <v-card-text>
-                <v-container grid-list-md>
-                  <v-layout row wrap>
-                    <v-select
-                      outlined
-                      :items="roles"
-                      v-model="editedRoles"
-                      item-text="name"
-                      item-value="id"
-                      :menu-props="{ maxHeight: '400' }"
-                      multiple
-                    ></v-select>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
-              <v-card-actions class="mr-5">
-                <v-spacer></v-spacer>
-                <v-btn
-                  :disabled="deletingItem"
-                  :color="$store.getters.getThemeColor"
-                  text
-                  @click="savePermissions()"
-                >
-                  <v-icon v-if="!updatingItem" small>check</v-icon>
-                  <v-progress-circular
-                    v-else
-                    :size="15"
-                    :width="1"
-                    indeterminate
-                    :color="$store.getters.getThemeColor"
-                    class="v-icon"
-                  ></v-progress-circular>
-                  <span>Aceptar</span>
-                </v-btn>
-                <v-btn color="error" text @click="dlgRoles = false">
                   <v-icon>close</v-icon>Cancelar
                 </v-btn>
               </v-card-actions>
@@ -178,7 +225,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <template v-if="item.name !== 'Administrador del Sistema'">
+        <template v-if="item.username !== 'admin'">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
@@ -189,12 +236,6 @@
               >edit</v-icon>
             </template>
             <span>Editar</span>
-          </v-tooltip>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-icon :color="'success'" @click="showRolesDlg(item)" v-on="on">assignment_ind</v-icon>
-            </template>
-            <span>Roles</span>
           </v-tooltip>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -241,13 +282,14 @@ export default {
     return {
       dlgUpdateItem: false,
       dlgDeleteItem: false,
-      dlgRoles: false,
       page: 1,
       pageCount: 0,
       loadingItems: true,
       editedIndex: -1,
       editedItem: {},
+      editedBranches: [],
       roles: [],
+      branches: [],
       validForm: false,
       requiredRules: [v => !!v || "Este dato es obligatorio"],
       items: [],
@@ -263,6 +305,19 @@ export default {
         { text: "Nombre de usuario", value: "username", align: "left" },
         { text: "Email", value: "email", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
+      ],
+      emailRules: [
+        v => !!v || "Este dato es obligatorio",
+        v =>
+          /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
+          "Formato incorrecto"
+      ],
+      passwordRules: [
+        /*v => (v && v.length > 5) || "Password requires at least 6 characters",
+        v => v === this.editedItem.password_confirm || "Las contraseñas no coinciden"*/
+      ],
+      passwordConfirmRules: [
+        v => v === this.editedItem.password || "Las contraseñas no coinciden"
       ]
     };
   },
@@ -277,35 +332,38 @@ export default {
   methods: {
     handleHttpResponse(event) {
       this.loadingItems = false;
+      let action = event.url.substring(event.url.lastIndexOf("/") + 1);
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
         this.operationMessage = response.msg;
         this.operationMessageType = response.code;
 
-        switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
-          case "editar-permisos":
-            this.snackbar = true;
-            this.dlgRoles = false;
-            this.updatingItem = false;
-            if (response.code === "success") {
-              this.items = response.data;
-            }
-            break;
-          case "eliminar":
+        switch (action) {
+          case "crear":
           case "editar":
             this.snackbar = true;
             this.dlgUpdateItem = false;
-            this.dlgDeleteItem = false;
             this.updatingItem = false;
+            if (response.code === "success") {
+              this.items = response.data[0];
+              this.roles = response.data[1];
+              this.branches = response.data[2];
+            }
+            break;
+          case "eliminar":
+            this.snackbar = true;
+            this.dlgDeleteItem = false;
             this.deletingItem = false;
             if (response.code === "success") {
               this.items = response.data[0];
               this.roles = response.data[1];
+              this.branches = response.data[2];
             }
             break;
           case "listar":
             this.items = response.data[0];
             this.roles = response.data[1];
+            this.branches = response.data[2];
             break;
           default:
             this.snackbar = true;
@@ -315,6 +373,8 @@ export default {
         this.operationMessage = "Your request could not be executed.";
         this.operationMessageType = "error";
         this.snackbar = true;
+        this.updatingItem = false;
+        this.deletingItem = false;
       }
     },
 
@@ -330,29 +390,20 @@ export default {
     showEditDlg(item) {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      this.editedRoles = item.roles;
+      this.editedBranches = item.branches;
       this.dlgUpdateItem = true;
-      console.log(this.editedItem);
     },
 
     showAddDlg() {
       let item = {
-        id: -1,
-        name: null,
-        description: null,
-        manager_id: null,
-        manager_name: null
+        id: -1
       };
+      this.editedIndex = -1;
       this.editedItem = Object.assign({}, item);
+      this.editedRoles = [];
+      this.editedBranches = [];
       this.dlgUpdateItem = true;
-    },
-
-    showRolesDlg(item) {
-      this.editedIndex = this.items.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.editedRoles = Object.assign({}, item.roles);
-      this.editedRoles = [1, 2, 3];
-      console.log(this.editedRoles);
-      this.dlgRoles = true;
     },
 
     deleteItem(item) {
@@ -382,32 +433,9 @@ export default {
           method: "post",
           url: this.editedItem.id === -1 ? "usuarios/crear" : "usuarios/editar",
           params: {
-            item: this.editedItem
-          }
-        };
-        this.$refs.axios.submit(config);
-      }
-    },
-
-    savePermissions() {
-      if (!this.updatingItem) {
-        this.updatingItem = true;
-        let activePerms = [];
-
-        /*for (let i in this.editedRoles) {
-          this.editedRoles[i].subModules.forEach(element => {
-            if (element.active.length > 0) {
-              activePerms.push(element.active);
-            }
-          });
-        }*/
-
-        let config = {
-          method: "post",
-          url: "usuarios/editar-permisos",
-          params: {
-            id: this.editedItem.id,
-            items: editedRoles
+            item: this.editedItem,
+            roles: this.editedRoles,
+            branches: this.editedBranches
           }
         };
         this.$refs.axios.submit(config);
