@@ -18,12 +18,12 @@
                 @click="reviewForm(props.item.route)"
                 :disabled="props.item.status === 3"
                 small
-                flat
+                text
                 v-on="on"
                 class="btn-sm"
                 color="warning"
               >
-                <v-icon small class="fa">edit</v-icon>
+                <v-icon small>edit</v-icon>
               </v-btn>
             </template>
             <span>Review</span>
@@ -52,18 +52,18 @@
           Approve Form
           <v-spacer></v-spacer>
           <a @click="approveDialog = false">
-            <v-icon small class="fa">close</v-icon>
+            <v-icon small>close</v-icon>
           </a>
         </v-card-title>
         <v-container>
           <h3 class="text-xs-center">Are you sure you want to approve this form?</h3>
           <div class="text-xs-center">
             <v-btn :disabled="approvingForm" @click="approveForm()" color="info">
-              <v-icon v-if="!approvingForm" small class="fa">thumb_up</v-icon>
+              <v-icon v-if="!approvingForm" small >thumb_up</v-icon>
               <v-progress-circular v-else :width="2" size="18" indeterminate class="gray--text fa"></v-progress-circular>Yes
             </v-btn>
             <v-btn @click="approveDialog = false" color="error">
-              <v-icon small class="fa">thumb_down</v-icon>Not yet
+              <v-icon small>thumb_down</v-icon>Not yet
             </v-btn>
           </div>
         </v-container>
@@ -77,10 +77,10 @@
       v-model="snackbar"
       :color="operationMessageType"
     >
-      <v-icon small class="fa">info</v-icon>
+      <v-icon small>info</v-icon>
       {{ operationMessage }}
-      <v-btn flat @click.native="snackbar = false">
-        <v-icon small class="fa">close</v-icon>
+      <v-btn text @click.native="snackbar = false">
+        <v-icon small>close</v-icon>
       </v-btn>
     </v-snackbar>
 
@@ -145,7 +145,7 @@ export default {
               this.items[this.formIndex].filename = response.filename;
             }
             break;
-          case "get-ingredients":
+          case "listar":
             const { sortBy, descending, page, rowsPerPage } = this.pagination;
             this.items = response.data;
             this.totalItems = response.data.length;
@@ -190,7 +190,7 @@ export default {
     getDataFromApi() {
       this.loading = true;
       var config = {
-        url: "ingredient/get-ingredients",
+        url: "ingredientes/listar",
         params: {
           branch_id: this.$store.getters.getCurrBranch.id
         }

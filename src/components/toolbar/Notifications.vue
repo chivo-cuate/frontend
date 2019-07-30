@@ -94,7 +94,7 @@
               <v-layout>
                 <v-flex lg6>
                   <v-btn small text color="info" style="margin-top: 10px;">
-                    <v-icon small class="fa">room_service</v-icon>View all
+                    <v-icon small>room_service</v-icon>View all
                   </v-btn>
                 </v-flex>
               </v-layout>

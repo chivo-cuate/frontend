@@ -91,7 +91,7 @@ let routes = [
     name: 'sucursal',
     meta: {
       requiresAuth: true,
-      roles: ['Gerente']
+      //roles: ['Gerente']
     },
     component: function () {
       return import('@/components/branch/Branch')
@@ -102,7 +102,7 @@ let routes = [
     name: 'security',
     meta: {
       requiresAuth: true,
-      roles: ['Administrador']
+      //roles: ['Administrador del Sistema']
     },
     component: function () {
       return import('@/components/security/Security')

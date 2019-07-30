@@ -20,6 +20,7 @@ export default new Vuex.Store({
       curr_branch: null,
       branches: [],
       jwt: null,
+      permissions: [],
       roles: [],
     }
   },
@@ -29,11 +30,6 @@ export default new Vuex.Store({
     },
     setCurrBranch(state, branch) {
       state.payload.curr_branch = branch
-      /*let curr_branch_array = []
-      for (let i = 1; i <= branch.tables; i ++) {
-        curr_branch_array.push(i)
-      }
-      state.payload.curr_branch_array = curr_branch_array*/
     },
     setAuthRouteRequested(state, authRouteRequested) {
       state.authRouteRequested = authRouteRequested
@@ -45,6 +41,7 @@ export default new Vuex.Store({
         curr_branch: null,
         branches: [],
         jwt: null,
+        permissions: [],
         roles: [],
       }
     }
@@ -55,16 +52,37 @@ export default new Vuex.Store({
       return state.payload.roles.length === 0
     },
     isAdmin: state => {
-      return state.payload.roles.includes("Administrador")
+      return state.payload.roles.includes("Administrador del Sistema")
     },
     isManager: state => {
-      return state.payload.roles.includes("Gerente")
+      return state.payload.roles.includes("Gerente de Sucursal")
     },
     isWaiter: state => {
       return state.payload.roles.includes("Mesero")
     },
     isCook: state => {
       return state.payload.roles.includes("Elaborador")
+    },
+    getUserPermissions: state => {
+      return state.payload.permissions
+    },
+    getSecurityPermissions: state => {
+      let res = [];
+      state.payload.permissions.forEach(element => {
+        if (element.name === "Seguridad") {
+          res = element.subModules
+        }
+      });
+      return res;
+    },
+    getBranchPermissions: state => {
+      let res = [];
+      state.payload.permissions.forEach(element => {
+        if (element.name === "Administración de Sucursal") {
+          res = element.subModules
+        }
+      });
+      return res;
     },
     getCurrBranch: state => {
       return state.payload.curr_branch
@@ -77,10 +95,7 @@ export default new Vuex.Store({
     },
     getPayload: state => {
       return state.payload
-    },/*
-    getCurrBranchArray: state => {
-      return state.payload.curr_branch_array
-    },*/
+    },
     getAuthRouteRequested: state => {
       return state.authRouteRequested
     },

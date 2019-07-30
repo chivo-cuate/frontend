@@ -1,6 +1,6 @@
 <template>
   <v-menu
-    v-if="$store.getters.isAdmin || $store.getters.isManager"
+    v-if="securityPerms + branchPerms > 0 "
     offset-y
     transition="fade-transition"
     bottom
@@ -12,12 +12,12 @@
       </v-btn>
     </template>
     <v-list>
-      <v-list-item v-if="$store.getters.isManager && $store.getters.getCurrBranch" to="/sucursal/inicio" class="dropdown-menu-item">
-        <v-icon class="fa">domain</v-icon>
+      <v-list-item v-if="branchPerms > 0 && $store.getters.getCurrBranch" to="/sucursal/inicio" class="dropdown-menu-item">
+        <v-icon small>domain</v-icon>
         <span>Sucursal activa</span>
       </v-list-item>
-      <v-list-item v-if="$store.getters.isAdmin" to="/seguridad/inicio" class="dropdown-menu-item">
-        <v-icon class="fa">security</v-icon>
+      <v-list-item v-if="securityPerms > 0" to="/seguridad/inicio" class="dropdown-menu-item">
+        <v-icon small>security</v-icon>
         <span>Seguridad</span>
       </v-list-item>
     </v-list>
@@ -29,8 +29,13 @@
 export default {
   data() {
     return {
-      
+      securityPerms: 0,
+      branchPerms: 0,
     };
+  },
+  created(){
+    this.securityPerms = this.$store.getters.getSecurityPermissions.length
+    this.branchPerms = this.$store.getters.getBranchPermissions.length
   },
   props: ['color']
 };

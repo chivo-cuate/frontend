@@ -94,12 +94,12 @@
               </template>
               <v-list>
                 <v-list-item to="/perfil" class="dropdown-menu-item">
-                  <v-icon class="fa">person</v-icon>
+                  <v-icon>person</v-icon>
                   <span>Mi perfil</span>
                 </v-list-item>
 
                 <v-list-item v-on:click="logout()" class="dropdown-menu-item">
-                  <v-icon class="fa">power_settings_new</v-icon>
+                  <v-icon>power_settings_new</v-icon>
                   <span>Salir</span>
                 </v-list-item>
               </v-list>

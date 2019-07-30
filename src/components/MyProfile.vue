@@ -63,12 +63,12 @@
                       <v-icon
                         v-else-if="!loading && profileValidationStatus"
                         small
-                        class="fa"
+                        
                       >check</v-icon>
                       <v-icon
                         v-else-if="!loading && !profileValidationStatus"
                         small
-                        class="fa"
+                        
                       >error_outline</v-icon>Actualizar perfil
                     </v-btn>
                     </template>
@@ -133,14 +133,14 @@
                             indeterminate
                             class="gray--text fa"
                           ></v-progress-circular>
-                          <v-icon v-else size="22" class="fa">done</v-icon>Aceptar
+                          <v-icon v-else size="22" >done</v-icon>Aceptar
                         </v-btn>
                         <v-btn
                           v-on:click="closePasswordDlg()"
                           class="white--text ml-1"
                           color="error"
                         >
-                          <v-icon class="fa" size="22">cancel</v-icon>Cancelar
+                          <v-icon  size="22">cancel</v-icon>Cancelar
                         </v-btn>
                       </v-layout>
                     </v-form>
@@ -154,7 +154,7 @@
                     Upload file
                     <v-spacer></v-spacer>
                     <a @click="uploadDlg = false">
-                      <v-icon small class="fa">close</v-icon>
+                      <v-icon small>close</v-icon>
                     </a>
                   </v-card-title>
                   <v-container>
@@ -178,7 +178,7 @@
       <v-icon small class="white--text fa">info</v-icon>
       {{ operationMessage }}
       <v-btn text @click.native="snackbar = false">
-        <v-icon small class="fa">close</v-icon>
+        <v-icon small>close</v-icon>
       </v-btn>
     </v-snackbar>
 

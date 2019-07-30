@@ -5,15 +5,15 @@
         <v-card>
           <v-list dense>
             <v-list-item
-              v-for="(item, index) in actions"
-              :to="`/seguridad/${item.action}`"
+              v-for="(item, index) in $store.getters.getSecurityPermissions"
+              :to="item.slug"
               :key="`action-${index}`"
             >
               <v-list-item-action>
                 <v-icon :color="$store.getters.getThemeColor">{{item.icon}}</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>{{item.title}}</v-list-item-title>
+                <v-list-item-title>{{item.name}}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -44,32 +44,28 @@ import Usuarios from "@/components/security/Users";
 export default {
   data: () => ({
     drawer: null,
-    currAction: null,
-    actions: [
-      { action: "inicio", title: "Inicio", icon: "home" },
-      { action: "sucursales", title: "Sucursales", icon: "domain" },
-      { action: "roles", title: "Roles", icon: "assignment_ind" },
-      { action: "usuarios", title: "Usuarios", icon: "supervisor_account" },
-    ]
+    currAction: null
   }),
   components: { Index, Branches, Roles, Usuarios },
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
     next();
+    
   },
   mounted() {
     this.verifyAction(this.$route.params.action);
   },
   methods: {
     verifyAction(action) {
-      let validAction = this.actions.find(obj => {
+      this.currAction = action;
+      /*let validAction = this.actions.find(obj => {
         return obj.action === action;
       });
       if (validAction) {
         this.currAction = validAction.action;
       } else {
         this.$router.push("/404");
-      }
+      }*/
     }
   }
 };

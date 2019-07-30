@@ -43,10 +43,10 @@ export default {
     currAction: null,
     actions: [
       { action: "inicio", title: "Inicio", icon: "home" },
-      { action: "ingredientes", title: "Ingredientes", icon: "assignment" },
+      { action: "ingredientes", title: "Ingredientes", icon: "local_library" },
       { action: "almacen", title: "Almacén", icon: "store" },
       { action: "productos", title: "Productos", icon: "shopping_cart" },
-      { action: "menu-diario", title: "Menú diario", icon: "local_dining" }
+      { action: "menu-diario", title: "Menú diario", icon: "assignment" }
     ]
   }),
   components: { Index, Ingredients },

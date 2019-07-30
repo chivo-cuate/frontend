@@ -199,7 +199,7 @@
                       class="white--text warning ml-2 mr-3"
                       slot="activator"
                     >
-                      <v-icon class="fa" size="22">cancel</v-icon>Reset
+                      <v-icon  size="22">cancel</v-icon>Reset
                     </v-btn>
                   </v-card-actions>
                 </v-flex>

@@ -8,6 +8,11 @@
         </v-flex>
       </v-layout>
     </v-container>
+    <v-footer class="font-weight-medium white--text text-right animated slideInUp" :color="$store.getters.getThemeColor">
+      <v-card-text>
+        {{ new Date().getFullYear() }} — Taquer&iacute;a <strong>"El Chivo Cuate"</strong>
+      </v-card-text>
+    </v-footer>
   </v-app>
 </template>
 

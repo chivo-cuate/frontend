@@ -5,7 +5,7 @@
       <span class="title">Tu solicitud se ha perdido en el espacio.</span><br />
       <router-link to="/">
         <v-btn color="primary" class="mt-2">
-          <v-icon class="fa">home</v-icon>Ve al inicio
+          <v-icon small>home</v-icon>Ve al inicio
         </v-btn>
       </router-link>
     </v-flex>
