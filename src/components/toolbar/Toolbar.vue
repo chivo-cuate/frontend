@@ -83,8 +83,6 @@
 
             <Management color="white--text" />
 
-            <Notifications />
-
             <v-menu offset-y transition="fade-transition" bottom>
               <template v-slot:activator="{ on }">
                 <v-btn color="primary" class="white--text" text v-on="on">

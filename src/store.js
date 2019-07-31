@@ -78,7 +78,16 @@ export default new Vuex.Store({
     getBranchPermissions: state => {
       let res = [];
       state.payload.permissions.forEach(element => {
-        if (element.name === "Administración de Sucursal") {
+        if (element.name === "Mi Sucursal") {
+          res = element.subModules
+        }
+      });
+      return res;
+    },
+    getBranchesPermissions: state => {
+      let res = [];
+      state.payload.permissions.forEach(element => {
+        if (element.name === "Sucursales") {
           res = element.subModules
         }
       });

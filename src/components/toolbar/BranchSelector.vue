@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-if="$store.getters.getBranches.length > 0" offset-y transition="fade-transition" right>
+  <v-menu v-if="$store.getters.getBranches.length > 1" offset-y transition="fade-transition" right>
     <template v-slot:activator="{ on }">
       <v-btn color="primary" text v-on="on">
         <v-icon :class="`${color} fa`">domain</v-icon>

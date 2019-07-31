@@ -22,11 +22,11 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text">INGREDIENTES</v-toolbar-title>
+          <v-toolbar-title class="success--text">MENU DIARIO</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
-          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
+          <v-dialog v-model="dlgUpdateItem" max-width="400px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
                 :disabled="loadingItems || updatingItem"
@@ -48,12 +48,36 @@
                   <v-form ref="form" v-model="validForm">
                     <v-layout wrap>
                       <v-flex xs12>
+                        <v-autocomplete
+                          outlined
+                          :rules="requiredRules"
+                          v-model="editedItem.ingredient_id"
+                          :items="ingredients"
+                          item-text="name"
+                          item-value="id"
+                          label="Ingrediente"
+                        ></v-autocomplete>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout wrap>
+                      <v-flex xs12 md4>
                         <v-text-field
                           :rules="requiredRules"
                           outlined
-                          v-model="editedItem.name"
-                          label="Nombre"
+                          v-model="editedItem.quantity"
+                          label="Cantidad"
                         ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 md8>
+                        <v-select
+                          outlined
+                          :rules="requiredRules"
+                          v-model="editedItem.measure_unit_id"
+                          :items="measureUnits"
+                          item-value="id"
+                          item-text="name"
+                          label="Unidad de medida"
+                        ></v-select>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -92,7 +116,10 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12>
-                      <p>¿Seguro que desea eliminar el elemento {{ editedItem.name }}?</p>
+                      <p>
+                        ¿Seguro que desea eliminar
+                        <b>{{ editedItem.ingredient_name }}</b>?
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -180,15 +207,19 @@ export default {
       validForm: false,
       requiredRules: [v => !!v || "Este dato es obligatorio"],
       items: [],
+      ingredients: [],
       updatingItem: false,
       deletingItem: false,
       operationMessage: "",
       operationMessageType: "error",
       snackbar: false,
       headers: [
-        { text: "Nombre", value: "name", align: "left" },
+        { text: "Ingrediente", value: "ingredient_name", align: "left" },
+        { text: "Cantidad", value: "quantity", align: "left" },
+        { text: "Unidad de medida", value: "measure_unit_name", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
-      ]
+      ],
+      measureUnits: []
     };
   },
   computed: {
@@ -219,18 +250,23 @@ export default {
             this.updatingItem = false;
             this.deletingItem = false;
             if (response.code === "success") {
-              this.items = response.data;
+              this.items = response.data[0];
+              this.ingredients = response.data[1];
+              this.measureUnits = response.data[2];
             }
             break;
           case "listar":
-            this.items = response.data;
+            this.items = response.data[0];
+            this.ingredients = response.data[1];
+            this.measureUnits = response.data[2];
             break;
           default:
             this.snackbar = true;
             break;
         }
       } else {
-        this.operationMessage = event.data.result.response.response.data.message;
+        this.operationMessage =
+          event.data.result.response.response.data.message;
         this.operationMessageType = "error";
         this.snackbar = true;
         this.dlgUpdateItem = false;
@@ -243,7 +279,7 @@ export default {
     getDataFromApi() {
       this.loadingItems = true;
       var config = {
-        url: "ingredientes/listar",
+        url: "menu-diario/listar",
         params: {
           branch_id: this.$store.getters.getCurrBranch.id
         }
@@ -260,7 +296,9 @@ export default {
     addItem() {
       let item = {
         id: -1,
-        name: null,
+        quantity: null,
+        measure_unit_id: null,
+        ingredient_id: null,
         branch_id: this.$store.getters.getCurrBranch.id
       };
       this.editedItem = Object.assign({}, item);
@@ -278,10 +316,10 @@ export default {
         this.deletingItem = true;
         var config = {
           method: "post",
-          url: "ingredientes/eliminar",
+          url: "menu-diario/eliminar",
           params: {
             id: this.editedItem.id,
-            branch_id: this.$store.getters.getCurrBranch.id,
+            branch_id: this.$store.getters.getCurrBranch.id
           }
         };
         this.$refs.axios.submit(config);
@@ -293,13 +331,10 @@ export default {
         this.updatingItem = true;
         var config = {
           method: "post",
-          url:
-            this.editedItem.id === -1
-              ? "ingredientes/crear"
-              : "ingredientes/editar",
+          url: this.editedItem.id === -1 ? "menu-diario/crear" : "menu-diario/editar",
           params: {
             item: this.editedItem,
-            branch_id: this.$store.getters.getCurrBranch.id,
+            branch_id: this.$store.getters.getCurrBranch.id
           }
         };
         this.$refs.axios.submit(config);

@@ -1,7 +1,7 @@
 <template>
   <v-flex xs12>
     <v-layout justify-center class="animated fadeIn">
-      <v-flex md6>
+      <v-flex md5>
         <v-toolbar tabs :color="$store.getters.getThemeColor">
           <v-toolbar-title class="white--text">
             <v-icon class="white--text">lock</v-icon>
@@ -22,7 +22,7 @@
 
             <v-tab-item value="tab-iniciar-sesion">
               <v-layout align-center justify-center>
-                <v-flex md10 mt-3>
+                <v-flex md8 mt-3>
                   <v-card-text>
                     <v-form v-model="loginValidationStatus" ref="loginForm">
                       <v-layout row>
@@ -75,7 +75,7 @@
                             class="gray--text fa"
                           ></v-progress-circular>
                           <v-icon size="22" v-if="!loading && loginValidationStatus">done</v-icon>
-                          <v-icon size="22" v-if="!loading && !loginValidationStatus">error_outline</v-icon>&nbsp;Aceptar
+                          <v-icon size="22" v-if="!loading && !loginValidationStatus">error_outline</v-icon>Aceptar
                         </v-btn>
                       </template>
                       <span>{{loginValidationMessage}}</span>
@@ -250,7 +250,7 @@
                           <v-icon
                             size="22"
                             v-if="!loading && !resetPasswordValidationStatus"
-                          >error_outline</v-icon>&nbsp;Enviar
+                          >error_outline</v-icon>Aceptar
                         </v-btn>
                       </template>
                       <span>{{resetPasswordValidationMessage}}</span>

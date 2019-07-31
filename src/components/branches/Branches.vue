@@ -5,7 +5,7 @@
         <v-card>
           <v-list dense>
             <v-list-item
-              v-for="(item, index) in $store.getters.getSecurityPermissions"
+              v-for="(item, index) in $store.getters.getBranchesPermissions"
               :to="item.slug"
               :key="`action-${index}`"
             >
@@ -24,9 +24,8 @@
         <v-flex sm11 offset-sm1>
           <v-card class="elevation-0">
             <p class="text-center uppercase white--text" :class="$store.getters.getThemeColor">{{ $route.params.action }}</p>
-            <Index v-if="currAction === 'inicio'" class="animated fadeIn" />
-            <Roles v-if="currAction === 'roles'" class="animated fadeIn" />
-            <Usuarios v-if="currAction === 'usuarios'" class="animated fadeIn" />
+            <Index v-if="currAction === 'inicio'" />
+            <BranchesManagement v-if="currAction === 'sucursales'" class="animated fadeIn" />
           </v-card>
         </v-flex>
       </v-flex>
@@ -35,16 +34,15 @@
 </template>
 
 <script>
-import Index from "@/components/security/Index";
-import Roles from "@/components/security/Roles";
-import Usuarios from "@/components/security/Users";
+import Index from "@/components/branches/Index";
+import BranchesManagement from "@/components/branches/BranchesManagement";
 
 export default {
   data: () => ({
     drawer: null,
     currAction: null
   }),
-  components: { Index, Roles, Usuarios },
+  components: { Index, BranchesManagement },
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
     next();
@@ -55,14 +53,6 @@ export default {
   methods: {
     verifyAction(action) {
       this.currAction = action;
-      /*let validAction = this.actions.find(obj => {
-        return obj.action === action;
-      });
-      if (validAction) {
-        this.currAction = validAction.action;
-      } else {
-        this.$router.push("/404");
-      }*/
     }
   }
 };

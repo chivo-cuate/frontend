@@ -98,6 +98,17 @@ let routes = [
     }
   },
   {
+    path: '/sucursales/:action',
+    name: 'sucursales',
+    meta: {
+      requiresAuth: true,
+      //roles: ['Gerente']
+    },
+    component: function () {
+      return import('@/components/branches/Branches')
+    }
+  },
+  {
     path: '/seguridad/:action',
     name: 'security',
     meta: {

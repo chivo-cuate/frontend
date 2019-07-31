@@ -22,11 +22,11 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text">SUCURSALES</v-toolbar-title>
+          <v-toolbar-title class="success--text">ALMACEN</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
-          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
+          <v-dialog v-model="dlgUpdateItem" max-width="400px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
                 :disabled="loadingItems || updatingItem"
@@ -47,39 +47,36 @@
                 <v-container grid-list-md>
                   <v-form ref="form" v-model="validForm">
                     <v-layout wrap>
-                      <v-flex xs12 sm6>
-                        <v-text-field
-                          :rules="requiredRules"
-                          outlined
-                          v-model="editedItem.name"
-                          label="Nombre"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm6>
-                        <v-text-field
-                          type="number"
-                          :rules="requiredRules"
-                          outlined
-                          v-model="editedItem.tables"
-                          label="Mesas"
-                        ></v-text-field>
-                      </v-flex>
-                    </v-layout>
-                    <v-layout wrap>
                       <v-flex xs12>
-                        <v-textarea outlined v-model="editedItem.description" label="Descripción"></v-textarea>
-                      </v-flex>
-                    </v-layout>
-                    <v-layout wrap>
-                      <v-flex xs12>
-                        <v-select
-                          :rules="requiredRules"
+                        <v-autocomplete
                           outlined
-                          v-model="editedItem.manager_id"
-                          :items="managers"
-                          item-text="username"
+                          :rules="requiredRules"
+                          v-model="editedItem.ingredient_id"
+                          :items="ingredients"
+                          item-text="name"
                           item-value="id"
-                          label="Gerente"
+                          label="Ingrediente"
+                        ></v-autocomplete>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout wrap>
+                      <v-flex xs12 md4>
+                        <v-text-field
+                          :rules="requiredRules"
+                          outlined
+                          v-model="editedItem.quantity"
+                          label="Cantidad"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs12 md8>
+                        <v-select
+                          outlined
+                          :rules="requiredRules"
+                          v-model="editedItem.measure_unit_id"
+                          :items="measureUnits"
+                          item-value="id"
+                          item-text="name"
+                          label="Unidad de medida"
                         ></v-select>
                       </v-flex>
                     </v-layout>
@@ -119,7 +116,10 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12>
-                      <p>¿Seguro que desea eliminar el elemento {{ editedItem.name }}?</p>
+                      <p>
+                        ¿Seguro que desea eliminar
+                        <b>{{ editedItem.ingredient_name }}</b>?
+                      </p>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -174,12 +174,6 @@
       <template v-slot:no-data>No se han encontrado elementos.</template>
     </v-data-table>
 
-    <!--<div class="text-center pt-2">
-      <v-pagination v-model="page" :length="pageCount" :color="$store.getters.getThemeColor" next-icon="chevron_right" prev-icon="chevron_left" class="mt-2"></v-pagination>
-      <v-flex lg2 offset-lg5>
-      </v-flex>
-    </div>-->
-
     <v-snackbar
       :timeout="5000"
       :bottom="true"
@@ -210,21 +204,22 @@ export default {
       loadingItems: true,
       editedIndex: -1,
       editedItem: {},
-      managers: [],
       validForm: false,
       requiredRules: [v => !!v || "Este dato es obligatorio"],
       items: [],
+      ingredients: [],
       updatingItem: false,
       deletingItem: false,
       operationMessage: "",
       operationMessageType: "error",
       snackbar: false,
       headers: [
-        { text: "Nombre", value: "name", align: "left" },
-        { text: "Mesas", value: "tables", align: "left" },
-        { text: "Gerente", value: "manager_name", align: "left" },
+        { text: "Ingrediente", value: "ingredient_name", align: "left" },
+        { text: "Cantidad", value: "quantity", align: "left" },
+        { text: "Unidad de medida", value: "measure_unit_name", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
-      ]
+      ],
+      measureUnits: []
     };
   },
   computed: {
@@ -255,20 +250,23 @@ export default {
             this.updatingItem = false;
             this.deletingItem = false;
             if (response.code === "success") {
-              this.items = response.data.items;
-              this.managers = response.data.managers;
+              this.items = response.data[0];
+              this.ingredients = response.data[1];
+              this.measureUnits = response.data[2];
             }
             break;
           case "listar":
-            this.items = response.data.items;
-            this.managers = response.data.managers;
+            this.items = response.data[0];
+            this.ingredients = response.data[1];
+            this.measureUnits = response.data[2];
             break;
           default:
             this.snackbar = true;
             break;
         }
       } else {
-        this.operationMessage = event.data.result.response.response.data.message;
+        this.operationMessage =
+          event.data.result.response.response.data.message;
         this.operationMessageType = "error";
         this.snackbar = true;
         this.dlgUpdateItem = false;
@@ -281,8 +279,10 @@ export default {
     getDataFromApi() {
       this.loadingItems = true;
       var config = {
-        url: "sucursales/listar",
-        params: {}
+        url: "almacen/listar",
+        params: {
+          branch_id: this.$store.getters.getCurrBranch.id
+        }
       };
       this.$refs.axios.submit(config);
     },
@@ -296,10 +296,10 @@ export default {
     addItem() {
       let item = {
         id: -1,
-        name: null,
-        description: null,
-        manager_id: null,
-        manager_name: null
+        quantity: null,
+        measure_unit_id: null,
+        ingredient_id: null,
+        branch_id: this.$store.getters.getCurrBranch.id
       };
       this.editedItem = Object.assign({}, item);
       this.dlgUpdateItem = true;
@@ -316,9 +316,10 @@ export default {
         this.deletingItem = true;
         var config = {
           method: "post",
-          url: "sucursales/eliminar",
+          url: "almacen/eliminar",
           params: {
-            id: this.editedItem.id
+            id: this.editedItem.id,
+            branch_id: this.$store.getters.getCurrBranch.id
           }
         };
         this.$refs.axios.submit(config);
@@ -330,12 +331,10 @@ export default {
         this.updatingItem = true;
         var config = {
           method: "post",
-          url:
-            this.editedItem.id === -1
-              ? "sucursales/crear"
-              : "sucursales/editar",
+          url: this.editedItem.id === -1 ? "almacen/crear" : "almacen/editar",
           params: {
-            item: this.editedItem
+            item: this.editedItem,
+            branch_id: this.$store.getters.getCurrBranch.id
           }
         };
         this.$refs.axios.submit(config);

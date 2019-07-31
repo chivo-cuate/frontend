@@ -22,7 +22,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text">INGREDIENTES</v-toolbar-title>
+          <v-toolbar-title class="success--text">PRODUCTOS</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
@@ -136,6 +136,16 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
+            <v-icon
+              class="mr-2"
+              color="grey"
+              v-on="on"
+            >local_library</v-icon>
+          </template>
+          <span>Ingredientes (preguntar)</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
             <v-icon color="warning" @click="deleteItem(item)" v-on="on">delete</v-icon>
           </template>
           <span>Eliminar</span>
@@ -243,7 +253,7 @@ export default {
     getDataFromApi() {
       this.loadingItems = true;
       var config = {
-        url: "ingredientes/listar",
+        url: "productos/listar",
         params: {
           branch_id: this.$store.getters.getCurrBranch.id
         }
@@ -278,7 +288,7 @@ export default {
         this.deletingItem = true;
         var config = {
           method: "post",
-          url: "ingredientes/eliminar",
+          url: "productos/eliminar",
           params: {
             id: this.editedItem.id,
             branch_id: this.$store.getters.getCurrBranch.id,
@@ -295,8 +305,8 @@ export default {
           method: "post",
           url:
             this.editedItem.id === -1
-              ? "ingredientes/crear"
-              : "ingredientes/editar",
+              ? "productos/crear"
+              : "productos/editar",
           params: {
             item: this.editedItem,
             branch_id: this.$store.getters.getCurrBranch.id,

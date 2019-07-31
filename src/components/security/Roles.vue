@@ -105,21 +105,34 @@
                       >
                         <v-expansion-panel-header>{{ module.name }}</v-expansion-panel-header>
                         <v-expansion-panel-content>
-                          <div
-                            v-for="(subModule, subModuleIndex) in module.subModules"
-                            :key="`sad-${subModuleIndex}`"
-                          >
-                            <span v-html="subModule.name" class="success--text"></span>
-                            <v-select
-                              outlined
-                              :items="subModule.perms"
-                              v-model="subModule.active"
-                              item-text="name"
-                              item-value="id"
-                              :menu-props="{ maxHeight: '400' }"
-                              multiple
-                            ></v-select>
-                          </div>
+                          <v-layout wrap>
+                            <v-flex
+                              sm6
+                              v-for="(subModule, subModuleIndex) in module.subModules"
+                              :key="`sad-${subModuleIndex}`"
+                            >
+                              <span v-html="subModule.name" class="success--text"></span>
+                              <v-select
+                                outlined
+                                :items="subModule.perms"
+                                v-model="subModule.active"
+                                item-text="name"
+                                item-value="id"
+                                :menu-props="{ maxHeight: '400' }"
+                                multiple
+                              >
+                                <template v-slot:selection="{ item, index }">
+                                  <v-chip v-if="index === 0">
+                                    <span>{{ item.name }}</span>
+                                  </v-chip>
+                                  <span
+                                    v-if="index === 1"
+                                    class="grey--text caption"
+                                  >({{ subModule.active.length - 1 }} m&aacute;s)</span>
+                                </template>
+                              </v-select>
+                            </v-flex>
+                          </v-layout>
                         </v-expansion-panel-content>
                       </v-expansion-panel>
                     </v-expansion-panels>
@@ -343,7 +356,6 @@ export default {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dlgUpdateItem = true;
-      console.log(this.editedItem);
     },
 
     showAddDlg() {
@@ -362,7 +374,6 @@ export default {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.editedPermissions = Object.assign({}, item.modules);
-      console.log(this.editedPermissions);
       this.dlgPermissions = true;
     },
 
@@ -418,7 +429,7 @@ export default {
           url: "roles/editar-permisos",
           params: {
             id: this.editedItem.id,
-            items: activePerms,
+            items: activePerms
           }
         };
         this.$refs.axios.submit(config);

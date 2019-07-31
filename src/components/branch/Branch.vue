@@ -25,7 +25,10 @@
           <v-card class="elevation-0">
             <p class="text-center uppercase white--text" :class="$store.getters.getThemeColor">{{ $route.params.action }}</p>
             <Index v-if="currAction === 'inicio'" />
-            <Ingredients v-if="currAction === 'ingredientes'" />
+            <Ingredients v-if="currAction === 'ingredientes'" class="animated fadeIn" />
+            <Stock v-if="currAction === 'almacen'" class="animated fadeIn" />
+            <Products v-if="currAction === 'productos'" class="animated fadeIn" />
+            <DailyMenu v-if="currAction === 'menu-diario'" class="animated fadeIn" />
           </v-card>
         </v-flex>
       </v-flex>
@@ -36,13 +39,18 @@
 <script>
 import Index from "@/components/branch/Index";
 import Ingredients from "@/components/branch/Ingredients";
+import Stock from "@/components/branch/Stock";
+import Products from "@/components/branch/Products";
+import DailyMenu from "@/components/branch/DailyMenu";
 
 export default {
   data: () => ({
     drawer: null,
     currAction: null
   }),
-  components: { Index, Ingredients },
+  
+  components: { Index, Ingredients, Stock, Products, DailyMenu },
+
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
     next();
