@@ -72,7 +72,7 @@
                     </v-layout>
                     <v-layout wrap>
                       <v-flex xs12>
-                        <v-select
+                        <v-autocomplete
                           outlined
                           clearable
                           v-model="editedItem.manager_id"
@@ -80,7 +80,8 @@
                           item-text="username"
                           item-value="id"
                           label="Gerente"
-                        ></v-select>
+                          no-data-text="No hay resultados"
+                        ></v-autocomplete>
                       </v-flex>
                     </v-layout>
                   </v-form>

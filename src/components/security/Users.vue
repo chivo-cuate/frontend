@@ -97,12 +97,13 @@
 
                     <v-layout wrap>
                       <v-flex xs12 sm3>
-                        <v-select
+                        <v-autocomplete
                           outlined
                           :items="[{value: 'M', text: 'Masculino'}, {value: 'F', text: 'Femenino'}]"
                           v-model="editedItem.sex"
                           label="Sexo"
-                        ></v-select>
+                          no-data-text="No hay resultados"
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm9>
                         <v-text-field outlined v-model="editedItem.address" label="Dirección"></v-text-field>
@@ -131,13 +132,14 @@
                     </v-layout>
                     <v-layout wrap>
                       <v-flex xs12 sm6>
-                        <v-select
+                        <v-autocomplete
                           outlined
                           :items="roles"
                           v-model="editedRoles"
                           item-text="name"
                           item-value="id"
                           label="Roles"
+                          no-data-text="No hay resultados"
                           multiple
                         >
                           <template v-slot:selection="{ item, index }">
@@ -146,16 +148,17 @@
                             </v-chip>
                             <span v-if="index === 1" class="grey--text caption">({{ editedRoles.length - 1 }} m&aacute;s)</span>
                           </template>
-                        </v-select>
+                        </v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm6>
-                        <v-select
+                        <v-autocomplete
                           outlined
                           :items="branches"
                           v-model="editedBranches"
                           item-text="name"
                           item-value="id"
                           label="Sucursales"
+                          no-data-text="No hay resultados"
                           multiple
                         >
                           <template v-slot:selection="{ item, index }">
@@ -164,7 +167,7 @@
                             </v-chip>
                             <span v-if="index === 1" class="grey--text caption">({{ editedBranches.length - 1 }} m&aacute;s)</span>
                           </template>
-                        </v-select>
+                        </v-autocomplete>
                       </v-flex>
                     </v-layout>
                   </v-form>

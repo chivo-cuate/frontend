@@ -26,7 +26,7 @@
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
-          <v-dialog v-model="dlgUpdateItem" max-width="400px" persistent>
+          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
                 :disabled="loadingItems || updatingItem"
@@ -47,29 +47,30 @@
                 <v-container grid-list-md>
                   <v-form ref="form" v-model="validForm">
                     <v-layout wrap>
-                      <v-flex xs12>
+                      <v-flex xs12 sm8>
                         <v-autocomplete
                           outlined
                           :rules="requiredRules"
-                          v-model="editedItem.ingredient_id"
-                          :items="ingredients"
+                          v-model="editedItem.asset_id"
+                          :items="assets"
                           item-text="name"
                           item-value="id"
-                          label="Ingrediente"
+                          label="Recurso"
+                          no-data-text="No hay resultados"
                         ></v-autocomplete>
                       </v-flex>
-                    </v-layout>
-                    <v-layout wrap>
-                      <v-flex xs12 md4>
+                      <v-flex xs12 sm4>
                         <v-text-field
                           :rules="requiredRules"
                           outlined
-                          v-model="editedItem.quantity"
-                          label="Cantidad"
+                          v-model="editedItem.price_in"
+                          label="Precio ent"
                         ></v-text-field>
                       </v-flex>
-                      <v-flex xs12 md8>
-                        <v-select
+                    </v-layout>
+                    <v-layout wrap>
+                      <v-flex xs12 sm8>
+                        <v-autocomplete
                           outlined
                           :rules="requiredRules"
                           v-model="editedItem.measure_unit_id"
@@ -77,7 +78,15 @@
                           item-value="id"
                           item-text="name"
                           label="Unidad de medida"
-                        ></v-select>
+                        ></v-autocomplete>
+                      </v-flex>
+                      <v-flex xs12 sm4>
+                        <v-text-field
+                          :rules="requiredRules"
+                          outlined
+                          v-model="editedItem.quantity"
+                          label="Cantidad"
+                        ></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -118,7 +127,7 @@
                     <v-flex xs12>
                       <p>
                         ¿Seguro que desea eliminar
-                        <b>{{ editedItem.ingredient_name }}</b>?
+                        <b>{{ editedItem.asset_name }}</b>?
                       </p>
                     </v-flex>
                   </v-layout>
@@ -207,16 +216,16 @@ export default {
       validForm: false,
       requiredRules: [v => !!v || "Este dato es obligatorio"],
       items: [],
-      ingredients: [],
+      assets: [],
       updatingItem: false,
       deletingItem: false,
       operationMessage: "",
       operationMessageType: "error",
       snackbar: false,
       headers: [
-        { text: "Ingrediente", value: "ingredient_name", align: "left" },
-        { text: "Cantidad", value: "quantity", align: "left" },
-        { text: "Unidad de medida", value: "measure_unit_name", align: "left" },
+        { text: "Recurso", value: "asset_name", align: "left" },
+        { text: "Cantidad", value: "quantity_desc", align: "left" },
+        { text: "Precio de entrada", value: "price_in", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
       measureUnits: []
@@ -251,13 +260,14 @@ export default {
             this.deletingItem = false;
             if (response.code === "success") {
               this.items = response.data[0];
-              this.ingredients = response.data[1];
+              this.assets = response.data[1];
               this.measureUnits = response.data[2];
             }
             break;
           case "listar":
             this.items = response.data[0];
-            this.ingredients = response.data[1];
+            this.assets = response.data[1];
+            console.log(this.assets);
             this.measureUnits = response.data[2];
             break;
           default:
@@ -290,6 +300,8 @@ export default {
     editItem(item) {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
+      console.log(item)
+      console.log(this.assets)
       this.dlgUpdateItem = true;
     },
 
@@ -298,7 +310,8 @@ export default {
         id: -1,
         quantity: null,
         measure_unit_id: null,
-        ingredient_id: null,
+        asset_id: null,
+        price_in: null,
         branch_id: this.$store.getters.getCurrBranch.id
       };
       this.editedItem = Object.assign({}, item);

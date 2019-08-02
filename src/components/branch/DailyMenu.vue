@@ -36,7 +36,7 @@
                 v-on="on"
                 @click="addItem()"
               >
-                <v-icon small>add</v-icon>Adicionar
+                <v-icon small>add</v-icon>Adicionar producto
               </v-btn>
             </template>
             <v-card>
@@ -51,33 +51,33 @@
                         <v-autocomplete
                           outlined
                           :rules="requiredRules"
-                          v-model="editedItem.ingredient_id"
-                          :items="ingredients"
+                          v-model="editedItem.asset_id"
+                          :items="assets"
                           item-text="name"
                           item-value="id"
-                          label="Ingrediente"
+                          label="Producto"
+                          no-data-text="No hay resultados"
                         ></v-autocomplete>
                       </v-flex>
                     </v-layout>
                     <v-layout wrap>
-                      <v-flex xs12 md4>
+                      <v-flex xs12 md6>
                         <v-text-field
                           :rules="requiredRules"
                           outlined
-                          v-model="editedItem.quantity"
-                          label="Cantidad"
+                          v-model="editedItem.price"
+                          label="Precio"
+                          :hint="priceHint"
+                          persistent-hint
                         ></v-text-field>
                       </v-flex>
-                      <v-flex xs12 md8>
-                        <v-select
-                          outlined
+                      <v-flex xs12 md6>
+                        <v-text-field
                           :rules="requiredRules"
-                          v-model="editedItem.measure_unit_id"
-                          :items="measureUnits"
-                          item-value="id"
-                          item-text="name"
-                          label="Unidad de medida"
-                        ></v-select>
+                          outlined
+                          v-model="editedItem.grams"
+                          label="Gramos"
+                        ></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -118,7 +118,7 @@
                     <v-flex xs12>
                       <p>
                         ¿Seguro que desea eliminar
-                        <b>{{ editedItem.ingredient_name }}</b>?
+                        <b>{{ editedItem.asset_name }}</b>?
                       </p>
                     </v-flex>
                   </v-layout>
@@ -207,16 +207,17 @@ export default {
       validForm: false,
       requiredRules: [v => !!v || "Este dato es obligatorio"],
       items: [],
-      ingredients: [],
+      assets: [],
       updatingItem: false,
       deletingItem: false,
       operationMessage: "",
       operationMessageType: "error",
       snackbar: false,
       headers: [
-        { text: "Ingrediente", value: "ingredient_name", align: "left" },
-        { text: "Cantidad", value: "quantity", align: "left" },
-        { text: "Unidad de medida", value: "measure_unit_name", align: "left" },
+        { text: "Activo desde", value: "date", align: "left" },
+        { text: "Producto", value: "asset_name", align: "left" },
+        { text: "Precio", value: "price", align: "left" },
+        { text: "Gramos", value: "grams", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
       measureUnits: []
@@ -225,6 +226,19 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Adicionar" : "Editar";
+    },
+    priceHint() {
+      if (this.editedItem.asset_id) {
+        let priceIn = 0;
+        this.assets.forEach(element => {
+          if (element.id === this.editedItem.asset_id) {
+            priceIn = element.price_in;
+          }
+        });
+        let difference = this.editedItem.price - priceIn
+        return (difference > 0 ? 'Ganacia: ': 'Pérdida: ') + difference;
+      }
+      return 'Seleccione un producto';
     }
   },
   mounted() {
@@ -251,14 +265,12 @@ export default {
             this.deletingItem = false;
             if (response.code === "success") {
               this.items = response.data[0];
-              this.ingredients = response.data[1];
-              this.measureUnits = response.data[2];
+              this.assets = response.data[1];
             }
             break;
           case "listar":
             this.items = response.data[0];
-            this.ingredients = response.data[1];
-            this.measureUnits = response.data[2];
+            this.assets = response.data[1];
             break;
           default:
             this.snackbar = true;
@@ -296,10 +308,9 @@ export default {
     addItem() {
       let item = {
         id: -1,
-        quantity: null,
-        measure_unit_id: null,
-        ingredient_id: null,
-        branch_id: this.$store.getters.getCurrBranch.id
+        asset_id: null,
+        price: null,
+        grams: null
       };
       this.editedItem = Object.assign({}, item);
       this.dlgUpdateItem = true;
@@ -331,7 +342,10 @@ export default {
         this.updatingItem = true;
         var config = {
           method: "post",
-          url: this.editedItem.id === -1 ? "menu-diario/crear" : "menu-diario/editar",
+          url:
+            this.editedItem.id === -1
+              ? "menu-diario/crear"
+              : "menu-diario/editar",
           params: {
             item: this.editedItem,
             branch_id: this.$store.getters.getCurrBranch.id

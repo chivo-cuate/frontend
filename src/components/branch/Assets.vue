@@ -22,7 +22,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text">PRODUCTOS</v-toolbar-title>
+          <v-toolbar-title class="success--text uppercase">{{apiUrl}}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
@@ -54,6 +54,11 @@
                           v-model="editedItem.name"
                           label="Nombre"
                         ></v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout wrap v-if="editedItem.id > 0">
+                      <v-flex xs12>
+                        <v-checkbox v-model="editedItem.status" label="Activo"></v-checkbox>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -134,13 +139,9 @@
           </template>
           <span>Editar</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="apiUrl === 'productos'">
           <template v-slot:activator="{ on }">
-            <v-icon
-              class="mr-2"
-              color="grey"
-              v-on="on"
-            >local_library</v-icon>
+            <v-icon class="mr-2" color="grey" v-on="on">local_library</v-icon>
           </template>
           <span>Ingredientes (preguntar)</span>
         </v-tooltip>
@@ -197,10 +198,12 @@ export default {
       snackbar: false,
       headers: [
         { text: "Nombre", value: "name", align: "left" },
+        { text: "Estado", value: "status_name", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ]
     };
   },
+  props: ["apiUrl"],
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Adicionar" : "Editar";
@@ -208,6 +211,11 @@ export default {
   },
   mounted() {
     this.getDataFromApi();
+  },
+  watch: {
+    $route(to, from) {
+      this.getDataFromApi();
+    }
   },
   methods: {
     handleHttpResponse(event) {
@@ -240,7 +248,8 @@ export default {
             break;
         }
       } else {
-        this.operationMessage = event.data.result.response.response.data.message;
+        this.operationMessage =
+          event.data.result.response.response.data.message;
         this.operationMessageType = "error";
         this.snackbar = true;
         this.dlgUpdateItem = false;
@@ -252,8 +261,9 @@ export default {
 
     getDataFromApi() {
       this.loadingItems = true;
+      this.items = [];
       var config = {
-        url: "productos/listar",
+        url: `${this.apiUrl}/listar`,
         params: {
           branch_id: this.$store.getters.getCurrBranch.id
         }
@@ -288,10 +298,10 @@ export default {
         this.deletingItem = true;
         var config = {
           method: "post",
-          url: "productos/eliminar",
+          url: `${this.apiUrl}/eliminar`,
           params: {
             id: this.editedItem.id,
-            branch_id: this.$store.getters.getCurrBranch.id,
+            branch_id: this.$store.getters.getCurrBranch.id
           }
         };
         this.$refs.axios.submit(config);
@@ -305,11 +315,11 @@ export default {
           method: "post",
           url:
             this.editedItem.id === -1
-              ? "productos/crear"
-              : "productos/editar",
+              ? `${this.apiUrl}/crear`
+              : `${this.apiUrl}/editar`,
           params: {
             item: this.editedItem,
-            branch_id: this.$store.getters.getCurrBranch.id,
+            branch_id: this.$store.getters.getCurrBranch.id
           }
         };
         this.$refs.axios.submit(config);

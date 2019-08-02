@@ -112,7 +112,7 @@
                               :key="`sad-${subModuleIndex}`"
                             >
                               <span v-html="subModule.name" class="success--text"></span>
-                              <v-select
+                              <v-autocomplete
                                 outlined
                                 :items="subModule.perms"
                                 v-model="subModule.active"
@@ -130,7 +130,7 @@
                                     class="grey--text caption"
                                   >({{ subModule.active.length - 1 }} m&aacute;s)</span>
                                 </template>
-                              </v-select>
+                              </v-autocomplete>
                             </v-flex>
                           </v-layout>
                         </v-expansion-panel-content>
