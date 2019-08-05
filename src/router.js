@@ -77,7 +77,7 @@ let routes = [
     }
   },
   {
-    path: '/ordenes',
+    path: '/clientes/ordenes',
     name: 'ordenes',
     meta: {
       requiresAuth: true
@@ -91,7 +91,6 @@ let routes = [
     name: 'sucursal',
     meta: {
       requiresAuth: true,
-      //roles: ['Gerente']
     },
     component: function () {
       return import('@/components/branch/Branch')
@@ -102,7 +101,6 @@ let routes = [
     name: 'sucursales',
     meta: {
       requiresAuth: true,
-      //roles: ['Gerente']
     },
     component: function () {
       return import('@/components/branches/Branches')
@@ -113,7 +111,6 @@ let routes = [
     name: 'security',
     meta: {
       requiresAuth: true,
-      //roles: ['Administrador del Sistema']
     },
     component: function () {
       return import('@/components/security/Security')
@@ -141,20 +138,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     if (store.getters.isGuest) {
       store.commit('setAuthRouteRequested', to.path)
-      next('/')
-    } else if (to.meta.hasOwnProperty('roles')) {
-      let found = false
-      for (let i in to.meta.roles) {
-        if (store.getters.getRoles.includes(to.meta.roles[i])) {
-          found = true
-          break
-        }
-      }
-      if (found) {
-        next()
-      } else {
-        next('/not-allowed')
-      }
+      next('/acceso/iniciar-sesion')
     } else {
       next()
     }

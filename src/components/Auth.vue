@@ -364,7 +364,9 @@ export default {
             this.$store.commit("logout")
           }
       } else {
-        alert(event.data.result.response.message);
+        this.snackbar = true;
+        this.operationMessage = event.data.result.response.message;
+        this.operationMessageType = 'error';
       }
     },
     showCapsLockMsg(e) {

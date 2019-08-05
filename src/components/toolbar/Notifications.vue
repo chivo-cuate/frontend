@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset-y bottom :close-on-content-click="false">
+  <v-menu offset-y bottom :close-on-content-click="false" open-on-hover>
     <template v-slot:activator="{ on }">
       <v-btn color="primary" class="white--text" text v-on="on">
         <v-badge id="badge_notif" ref="badge_notif" v-model="showNotificationsCount" color="red">
@@ -144,7 +144,7 @@ export default {
       axios: null
     };
   },
-  props: ['axiosComp'],
+  props: ["axiosComp"],
   mounted() {
     /*this.toggleGetNotifications(this.$store.getters.isGuest);
     this.$store.watch(
@@ -155,8 +155,8 @@ export default {
     );*/
   },
   methods: {
-    setAxios(axios){
-      this.axios = axios
+    setAxios(axios) {
+      this.axios = axios;
     },
     toggleGetNotifications(isGuest) {
       this.clearNotifications();
@@ -244,7 +244,7 @@ export default {
             if (response.code === "success") {
               this.notifications = response.data.notif.items;
               this.notificationsCount = response.data.notif.count;
-              this.showNotificationsCount = (this.notificationsCount > 0);
+              this.showNotificationsCount = this.notificationsCount > 0;
             } else {
               this.snackbar = true;
             }

@@ -1,22 +1,35 @@
 <template>
   <v-flex xs12>
-    <FreeTables />
-    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)"/>
+    <VProgress v-if="loadingInitialData" message="Cargando" class="text-center" />
+    <v-flex v-else class="animated fadeIn">
+      <Tables :tables="tables" :assets="assets" />
+    </v-flex>
+
+    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
 
 <script>
-import FreeTables from "@/components/orders/FreeTables";
+import Tables from "@/components/orders/Tables";
 
 export default {
   data() {
     return {
-    }
+      loadingInitialData: true,
+      loadingData: false,
+      tables: [],
+      assets: []
+    };
   },
-  components: { FreeTables },
+  components: { Tables },
+  mounted() {
+    this.timer = setInterval(this.getDataFromApi, 5000);
+    this.getDataFromApi();
+  },
   methods: {
     handleHttpResponse(event) {
-      this.loading = false;
+      this.loadingData = false;
+      this.loadingInitialData = false;
 
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
@@ -24,19 +37,11 @@ export default {
         this.operationMessageType = response.code;
 
         switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
-          case "do-some":
-            this.snackbar = true;
-            this.approvingForm = false;
-            this.approveDialog = false;
+          case "listar":
             if (response.code === "success") {
-              this.items[this.formIndex].status = response.data;
-              this.items[this.formIndex].filename = response.filename;
+              this.tables = response.data.tables;
+              this.assets = response.data.assets;
             }
-            break;
-          case "get-ingredients":
-            const { sortBy, descending, page, rowsPerPage } = this.pagination;
-            this.items = response.data;
-            this.totalItems = response.data.length;
             break;
           default:
             this.snackbar = true;
@@ -48,15 +53,18 @@ export default {
         this.snackbar = true;
       }
     },
+
     getDataFromApi() {
-      this.loading = true;
-      var config = {
-        url: "ingredient/get-ingredients",
-        params: {
-          branch_id: this.$store.getters.getCurrBranch.id
-        }
-      };
-      this.$refs.axios.submit(config);
+      if (!this.loadingData) {
+        this.loadingData = true;
+        var config = {
+          url: "ordenes/listar",
+          params: {
+            branch_id: this.$store.getters.getCurrBranch.id
+          }
+        };
+        this.$refs.axios.submit(config);
+      }
     }
   }
 };

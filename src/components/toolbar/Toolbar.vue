@@ -27,41 +27,33 @@
           </template>
 
           <template v-else>
-            <BranchSelector color="success--text" />
-
-            <v-btn v-if="$store.getters.getOrdersPermissions.length > 0" text to="/ordenes">
-              <v-icon class="success--text fa">room_service</v-icon>
-              <span class="success--text">&Oacute;rdenes</span>
-            </v-btn>
-
-            <Management color="success--text" />
-
-            <Notifications />
+            <BranchSelector color="light-green--text" />
+            <Clients color="light-green--text" />
+            <Management color="light-green--text" />
+            <MyAccount color="light-green--text" />
           </template>
         </v-list>
       </v-navigation-drawer>
 
       <v-app-bar class="animated slideInDown" :class="$store.getters.getThemeColor" fixed>
         <v-app-bar-nav-icon
-          style="background-color: green; color: red!important;"
-          class="hidden-md-and-up"
+          class="hidden-md-and-up white--text"
           @click.stop="drawer = !drawer"
         ></v-app-bar-nav-icon>
 
         <v-toolbar-title class="white--text">
           <router-link to="/inicio" tag="span" style="cursor: pointer">
             <img
-              class="hidden-sm-and-down"
               :src="require('../../assets/img/logo_text.png')"
-              alt="El Chivo Cuate"
-            />
-            <img
-              class="hidden-md-and-up"
-              :src="require('../../assets/img/logo_color.png')"
               alt="El Chivo Cuate"
             />
           </router-link>
         </v-toolbar-title>
+
+
+        <v-chip v-if="$store.getters.getCurrBranch" class="ml-3">
+          <span>{{ $store.getters.getCurrBranch.name }}</span>
+        </v-chip>
 
         <v-spacer></v-spacer>
 
@@ -75,33 +67,9 @@
 
           <template v-else>
             <BranchSelector color="white--text" />
-
-            <v-btn v-if="$store.getters.getOrdersPermissions.length > 0" text to="/ordenes">
-              <v-icon class="white--text">room_service</v-icon>
-              <span class="white--text">&Oacute;rdenes</span>
-            </v-btn>
-
+            <Clients color="white--text" />
             <Management color="white--text" />
-
-            <v-menu offset-y transition="fade-transition" bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn color="primary" class="white--text" text v-on="on">
-                  <v-icon class="white--text">account_circle</v-icon>
-                  <span class="white--text">Mi cuenta</span>
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item to="/perfil" class="dropdown-menu-item">
-                  <v-icon>person</v-icon>
-                  <span>Mi perfil</span>
-                </v-list-item>
-
-                <v-list-item v-on:click="logout()" class="dropdown-menu-item">
-                  <v-icon>power_settings_new</v-icon>
-                  <span>Salir</span>
-                </v-list-item>
-              </v-list>
-            </v-menu>
+            <MyAccount color="white--text" />
           </template>
         </v-toolbar-items>
       </v-app-bar>
@@ -116,7 +84,9 @@ import classList from "classlist";
 import { mapGetters } from "vuex";
 import Notifications from "@/components/toolbar/Notifications";
 import BranchSelector from "@/components/toolbar/BranchSelector";
+import Clients from "@/components/toolbar/Clients";
 import Management from "@/components/toolbar/Management";
+import MyAccount from "@/components/toolbar/MyAccount";
 
 export default {
   data() {
@@ -124,15 +94,12 @@ export default {
       drawer: false
     };
   },
-  components: { Notifications, BranchSelector, Management },
+  components: { BranchSelector, Management, Clients, MyAccount },
   mounted() {
     
   },
   methods: {
-    logout() {
-      this.$store.commit("logout");
-      this.$router.push("/acceso/iniciar-sesion");
-    }
+    
   }
 };
 </script>

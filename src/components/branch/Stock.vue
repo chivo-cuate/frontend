@@ -267,7 +267,6 @@ export default {
           case "listar":
             this.items = response.data[0];
             this.assets = response.data[1];
-            console.log(this.assets);
             this.measureUnits = response.data[2];
             break;
           default:
@@ -300,8 +299,6 @@ export default {
     editItem(item) {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      console.log(item)
-      console.log(this.assets)
       this.dlgUpdateItem = true;
     },
 

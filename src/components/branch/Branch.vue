@@ -60,6 +60,19 @@ export default {
   methods: {
     verifyAction(action) {
       this.currAction = action;
+
+      if (action !== 'inicio') {
+        let validRoute = false;
+        this.$store.getters.getBranchPermissions.forEach(element => {
+          let actionAux = element.slug.substring(element.slug.lastIndexOf("/") + 1);
+          if (actionAux === action) {
+            validRoute = true;
+          }
+        });
+        if (!validRoute) {
+          this.$router.push('/not-found');
+        }
+      }
     }
   }
 };

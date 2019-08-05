@@ -4,7 +4,7 @@
     <v-flex class="text-center mt-3">
       <span class="title">Tu solicitud se ha perdido en el espacio.</span><br />
       <router-link to="/">
-        <v-btn color="primary" class="mt-2">
+        <v-btn :class="$store.getters.getThemeColor" class="mt-2 white--text">
           <v-icon small>home</v-icon>Ve al inicio
         </v-btn>
       </router-link>

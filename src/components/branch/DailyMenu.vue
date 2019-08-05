@@ -22,7 +22,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text">MENU DIARIO</v-toolbar-title>
+          <v-toolbar-title class="success--text">{{ menuDate }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
@@ -73,7 +73,6 @@
                       </v-flex>
                       <v-flex xs12 md6>
                         <v-text-field
-                          :rules="requiredRules"
                           outlined
                           v-model="editedItem.grams"
                           label="Gramos"
@@ -214,7 +213,6 @@ export default {
       operationMessageType: "error",
       snackbar: false,
       headers: [
-        { text: "Activo desde", value: "date", align: "left" },
         { text: "Producto", value: "asset_name", align: "left" },
         { text: "Precio", value: "price", align: "left" },
         { text: "Gramos", value: "grams", align: "left" },
@@ -239,6 +237,9 @@ export default {
         return (difference > 0 ? 'Ganacia: ': 'Pérdida: ') + difference;
       }
       return 'Seleccione un producto';
+    },
+    menuDate() {
+      return this.items.length > 0 ? this.items[0].date : 'No hay productos'
     }
   },
   mounted() {

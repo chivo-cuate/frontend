@@ -96,7 +96,7 @@ export default new Vuex.Store({
     getOrdersPermissions: state => {
       let res = [];
       state.payload.permissions.forEach(element => {
-        if (element.name === "Órdenes") {
+        if (element.name === "Clientes") {
           res = element.subModules
         }
       });
