@@ -2,7 +2,7 @@
   <v-flex xs12>
     <VProgress v-if="loadingInitialData" message="Cargando" class="text-center" />
     <v-flex v-else class="animated fadeIn">
-      <Tables :tables="tables" :assets="assets" />
+      <Tables :tables="tables" :assets="assets" v-on:playSound="playNotifSound()" v-on:setResponse="setResponse($event)" />
     </v-flex>
 
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
@@ -18,15 +18,33 @@ export default {
       loadingInitialData: true,
       loadingData: false,
       tables: [],
-      assets: []
+      assets: [],
+      audioPlayer: null
     };
   },
   components: { Tables },
   mounted() {
     this.timer = setInterval(this.getDataFromApi, 5000);
     this.getDataFromApi();
+    this.initAudioPlayer();
   },
   methods: {
+    initAudioPlayer() {
+      if (!this.audioPlayer) {
+        this.audioPlayer = new Audio(this.$store.getters.getBeepFile);
+      }
+    },
+
+    playNotifSound() {
+      this.initAudioPlayer();
+      this.audioPlayer.play();
+    },
+
+    setResponse(response) {
+      this.tables = response.data.tables;
+      this.assets = response.data.assets;
+    },
+
     handleHttpResponse(event) {
       this.loadingData = false;
       this.loadingInitialData = false;
@@ -39,8 +57,7 @@ export default {
         switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
           case "listar":
             if (response.code === "success") {
-              this.tables = response.data.tables;
-              this.assets = response.data.assets;
+              this.setResponse(response);
             }
             break;
           default:

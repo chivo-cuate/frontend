@@ -28,7 +28,7 @@ export default {
   methods: {
     setCurrBranch(branch) {
       this.$store.commit('setCurrBranch', branch)
-      this.$router.push('/sucursal/inicio')
+      this.$router.push('/')
     }
   }
 };
