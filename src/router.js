@@ -27,7 +27,20 @@ let routes = [
   },
   {
     path: '/',
-    name: 'root',
+    name: 'home',
+    meta: {
+      requiresAuth: true
+    },
+    component: function () {
+      return import('@/components/Home')
+    }
+  },
+  {
+    path: '/inicio',
+    name: 'inicio',
+    meta: {
+      requiresAuth: true
+    },
     component: function () {
       return import('@/components/Home')
     }
@@ -40,13 +53,6 @@ let routes = [
     },
     component: function () {
       return import('@/components/Test')
-    }
-  },
-  {
-    path: '/inicio',
-    name: 'inicio',
-    component: function () {
-      return import('@/components/Home')
     }
   },
   {

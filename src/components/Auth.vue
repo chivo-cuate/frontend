@@ -24,10 +24,11 @@
               <v-layout align-center justify-center>
                 <v-flex md8 mt-3>
                   <v-card-text>
-                    <v-form v-model="loginValidationStatus" ref="loginForm">
+                    <v-form @submit.prevent ref="loginForm" v-model="loginValidationStatus">
                       <v-layout row>
                         <v-flex lg12>
                           <v-text-field
+                            autofocus
                             @keyup.enter="login()"
                             v-model="username"
                             ref="txt_username"
@@ -40,6 +41,7 @@
                             hint="Introduzca su nombre de usuario"
                           ></v-text-field>
                           <v-text-field
+                            autocomplete="off"
                             ref="loginPassword"
                             @keyup.enter="login()"
                             @input="showCapsLockMsg($event)"
@@ -89,7 +91,7 @@
               <v-layout justify-center>
                 <v-flex xs10 mt-3>
                   <v-card-text>
-                    <v-form v-model="signupValidationStatus" ref="signupForm">
+                    <v-form @submit.prevent ref="signupForm" v-model="signupValidationStatus">
                       <v-layout row wrap>
                         <v-flex sm12 md11 lg6>
                           <v-text-field
@@ -211,7 +213,7 @@
               <v-layout align-center justify-center row>
                 <v-flex xs8 mt-3>
                   <v-card-text>
-                    <v-form v-model="resetPasswordValidationStatus" ref="resetPasswordForm">
+                    <v-form @submit.prevent ref="resetPasswordForm" v-model="resetPasswordValidationStatus">
                       <v-layout row>
                         <v-flex lg12>
                           <v-text-field
@@ -310,27 +312,27 @@ export default {
       loginValidationStatus: false,
       signupValidationStatus: false,
       resetPasswordValidationStatus: false,
-      nameRules: [v => !!v || "Este dato es obligatorio"],
-      lastNameRules: [v => !!v || "Este dato es obligatorio"],
+      nameRules: [v => !!v || "Dato obligatorio"],
+      lastNameRules: [v => !!v || "Dato obligatorio"],
       passwordRules: [
-        v => !!v || "Este dato es obligatorio"
+        v => !!v || "Dato obligatorio"
         //v => (v && v.length > 5) || "Password requires at least 6 characters"
       ],
       usernameRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v => (v && v.length > 1) || "Debe introducir al menos 2 caracteres"
       ],
       passwordConfirmRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v => v === this.password || "Las contraseñas no coinciden"
       ],
       emailRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "Introduzca una dirección válida"
       ],
-      addressRules: [v => !!v || "Este dato es obligatorio"],
+      addressRules: [v => !!v || "Dato obligatorio"],
       activeTab: null,
       apiUrls: {
         login: 'auth/login',

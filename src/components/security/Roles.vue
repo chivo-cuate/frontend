@@ -26,7 +26,7 @@
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
-          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
+          <v-dialog v-model="dlgUpdateItem" max-width="400px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
                 :disabled="loadingItems || updatingItem"
@@ -45,10 +45,12 @@
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
-                  <v-form ref="form" v-model="validForm">
+                  <v-form @submit.prevent ref="form" v-model="validForm">
                     <v-layout wrap>
                       <v-flex xs12>
                         <v-text-field
+                          autofocus
+                          @keyup.enter="save()"
                           :rules="requiredRules"
                           outlined
                           v-model="editedItem.name"
@@ -142,7 +144,7 @@
               <v-card-actions class="mr-5">
                 <v-spacer></v-spacer>
                 <v-btn
-                  :disabled="deletingItem"
+                  :disabled="updatingItem"
                   :color="$store.getters.getThemeColor"
                   text
                   @click="savePermissions()"
@@ -182,7 +184,7 @@
               <v-card-actions class="mr-5">
                 <v-spacer></v-spacer>
                 <v-btn
-                  :disabled="deletingItem"
+                  :disabled="updatingItem"
                   :color="$store.getters.getThemeColor"
                   text
                   @click="remove()"
@@ -245,21 +247,6 @@
       </v-flex>
     </div>-->
 
-    <v-snackbar
-      :timeout="5000"
-      :bottom="true"
-      :right="true"
-      :absolute="true"
-      v-model="snackbar"
-      :color="operationMessageType"
-    >
-      <v-icon small class="white--text">info</v-icon>
-      {{ operationMessage }}
-      <v-btn text @click="snackbar = false">
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-snackbar>
-
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
@@ -278,14 +265,10 @@ export default {
       editedItem: {},
       managers: [],
       validForm: false,
-      requiredRules: [v => !!v || "Este dato es obligatorio"],
+      requiredRules: [v => !!v || "Dato obligatorio"],
       items: [],
       editedPermissions: [],
       updatingItem: false,
-      deletingItem: false,
-      operationMessage: "",
-      operationMessageType: "error",
-      snackbar: false,
       headers: [
         { text: "Nombre", value: "name", align: "left" },
         { text: "Descripción", value: "description", align: "left" },
@@ -306,25 +289,21 @@ export default {
       this.loadingItems = false;
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
 
         switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
           case "editar-permisos":
-            this.snackbar = true;
             this.dlgPermissions = false;
             this.updatingItem = false;
             if (response.code === "success") {
               this.items = response.data;
             }
             break;
-          case "eliminar":
+          case "crear":
           case "editar":
-            this.snackbar = true;
+          case "eliminar":
             this.dlgUpdateItem = false;
             this.dlgDeleteItem = false;
             this.updatingItem = false;
-            this.deletingItem = false;
             if (response.code === "success") {
               this.items = response.data;
             }
@@ -333,13 +312,8 @@ export default {
             this.items = response.data;
             break;
           default:
-            this.snackbar = true;
             break;
         }
-      } else {
-        this.operationMessage = "Your request could not be executed.";
-        this.operationMessageType = "error";
-        this.snackbar = true;
       }
     },
 
@@ -366,6 +340,7 @@ export default {
         manager_id: null,
         manager_name: null
       };
+      this.editedIndex = -1;
       this.editedItem = Object.assign({}, item);
       this.dlgUpdateItem = true;
     },
@@ -384,14 +359,15 @@ export default {
     },
 
     remove() {
-      if (!this.deletingItem) {
-        this.deletingItem = true;
+      if (!this.updatingItem) {
+        this.updatingItem = true;
         var config = {
           method: "post",
           url: "roles/eliminar",
           params: {
             id: this.editedItem.id
-          }
+          },
+          snackbar: true,
         };
         this.$refs.axios.submit(config);
       }
@@ -405,7 +381,8 @@ export default {
           url: this.editedItem.id === -1 ? "roles/crear" : "roles/editar",
           params: {
             item: this.editedItem
-          }
+          },
+          snackbar: true,
         };
         this.$refs.axios.submit(config);
       }
@@ -430,7 +407,8 @@ export default {
           params: {
             id: this.editedItem.id,
             items: activePerms
-          }
+          },
+          snackbar: true,
         };
         this.$refs.axios.submit(config);
       }

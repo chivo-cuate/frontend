@@ -26,7 +26,7 @@
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
 
-          <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
+          <v-dialog v-model="dlgUpdateItem" max-width="550px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
                 :disabled="loadingItems || updatingItem"
@@ -45,7 +45,7 @@
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
-                  <v-form ref="form" v-model="validForm">
+                  <v-form @submit.prevent ref="form" v-model="validForm">
                     <v-layout wrap>
                       <v-flex xs12 sm8>
                         <v-autocomplete
@@ -63,8 +63,8 @@
                         <v-text-field
                           :rules="requiredRules"
                           outlined
-                          v-model="editedItem.price_in"
-                          label="Precio ent"
+                          v-model="editedItem.quantity"
+                          label="Cantidad"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -84,8 +84,8 @@
                         <v-text-field
                           :rules="requiredRules"
                           outlined
-                          v-model="editedItem.quantity"
-                          label="Cantidad"
+                          v-model="editedItem.price_in"
+                          label="Precio unitario"
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -183,21 +183,6 @@
       <template v-slot:no-data>No se han encontrado elementos.</template>
     </v-data-table>
 
-    <v-snackbar
-      :timeout="5000"
-      :bottom="true"
-      :right="true"
-      :absolute="true"
-      v-model="snackbar"
-      :color="operationMessageType"
-    >
-      <v-icon small class="white--text">info</v-icon>
-      {{ operationMessage }}
-      <v-btn text @click="snackbar = false">
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-snackbar>
-
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
@@ -214,18 +199,16 @@ export default {
       editedIndex: -1,
       editedItem: {},
       validForm: false,
-      requiredRules: [v => !!v || "Este dato es obligatorio"],
+      requiredRules: [v => !!v || "Dato obligatorio"],
       items: [],
       assets: [],
       updatingItem: false,
       deletingItem: false,
-      operationMessage: "",
-      operationMessageType: "error",
-      snackbar: false,
       headers: [
         { text: "Recurso", value: "asset_name", align: "left" },
         { text: "Cantidad", value: "quantity_desc", align: "left" },
-        { text: "Precio de entrada", value: "price_in", align: "left" },
+        { text: "Precio ent", value: "price_in", align: "left" },
+        { text: "Tipo", value: "type_name", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
       measureUnits: []
@@ -246,43 +229,37 @@ export default {
 
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
 
         switch (action) {
           case "crear":
           case "editar":
           case "eliminar":
-            this.snackbar = true;
             this.dlgUpdateItem = false;
             this.dlgDeleteItem = false;
             this.updatingItem = false;
             this.deletingItem = false;
             if (response.code === "success") {
-              this.items = response.data[0];
-              this.assets = response.data[1];
-              this.measureUnits = response.data[2];
+              this.setScopeObjects(response);
             }
             break;
           case "listar":
-            this.items = response.data[0];
-            this.assets = response.data[1];
-            this.measureUnits = response.data[2];
+            this.setScopeObjects(response);
             break;
           default:
-            this.snackbar = true;
             break;
         }
       } else {
-        this.operationMessage =
-          event.data.result.response.response.data.message;
-        this.operationMessageType = "error";
-        this.snackbar = true;
         this.dlgUpdateItem = false;
         this.dlgDeleteItem = false;
         this.updatingItem = false;
         this.deletingItem = false;
       }
+    },
+
+    setScopeObjects(response) {
+      this.items = response.data[0];
+      this.assets = response.data[1];
+      this.measureUnits = response.data[2];
     },
 
     getDataFromApi() {
@@ -330,7 +307,8 @@ export default {
           params: {
             id: this.editedItem.id,
             branch_id: this.$store.getters.getCurrBranch.id
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -345,7 +323,8 @@ export default {
           params: {
             item: this.editedItem,
             branch_id: this.$store.getters.getCurrBranch.id
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }

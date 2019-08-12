@@ -45,10 +45,12 @@
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
-                  <v-form ref="form" v-model="validForm">
+                  <v-form @submit.prevent ref="form" v-model="validForm">
                     <v-layout wrap>
                       <v-flex xs12 sm6>
                         <v-text-field
+                          :autofocus="true"
+                          @keyup.enter="save()"
                           :rules="requiredRules"
                           outlined
                           v-model="editedItem.name"
@@ -58,7 +60,7 @@
                       <v-flex xs12 sm6>
                         <v-text-field
                           type="number"
-                          :rules="requiredRules"
+                          :rules="numberRules"
                           outlined
                           v-model="editedItem.tables"
                           label="Mesas"
@@ -111,20 +113,19 @@
             </v-card>
           </v-dialog>
 
-          <v-dialog v-model="dlgDeleteItem" max-width="300px" persistent>
+          <v-dialog v-model="dlgDeleteItem" max-width="500px" persistent>
             <v-card>
               <v-card-title>
                 <span class="headline">Eliminar elemento</span>
               </v-card-title>
-              <v-card-text>
-                <v-container grid-list-md>
-                  <v-layout wrap>
-                    <v-flex xs12>
-                      <p>¿Seguro que desea eliminar el elemento {{ editedItem.name }}?</p>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12>
+                    <v-card-text class="error uppercase white--text">Advertencia</v-card-text>
+                    <v-card-text class="error--text">Se dispone a eliminar una sucursal completa.<br/>De continuar, perder&aacute; todos los registros de las operaciones realizadas en <v-chip small>{{ editedItem.name }}</v-chip>.</v-card-text>
+                  </v-flex>
+                </v-layout>
+              </v-container>
               <v-card-actions class="mr-5">
                 <v-spacer></v-spacer>
                 <v-btn
@@ -181,21 +182,6 @@
       </v-flex>
     </div>-->
 
-    <v-snackbar
-      :timeout="5000"
-      :bottom="true"
-      :right="true"
-      :absolute="true"
-      v-model="snackbar"
-      :color="operationMessageType"
-    >
-      <v-icon small class="white--text">info</v-icon>
-      {{ operationMessage }}
-      <v-btn text @click="snackbar = false">
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-snackbar>
-
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
@@ -213,13 +199,14 @@ export default {
       editedItem: {},
       managers: [],
       validForm: false,
-      requiredRules: [v => !!v || "Este dato es obligatorio"],
+      requiredRules: [v => !!v || "Dato obligatorio"],
+      numberRules: [
+        v => !!v || "Dato obligatorio",
+        v => v > 0 || "Dato incorrecto"
+      ],
       items: [],
       updatingItem: false,
       deletingItem: false,
-      operationMessage: "",
-      operationMessageType: "error",
-      snackbar: false,
       headers: [
         { text: "Nombre", value: "name", align: "left" },
         { text: "Mesas", value: "tables", align: "left" },
@@ -243,14 +230,11 @@ export default {
 
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
 
         switch (action) {
           case "crear":
           case "editar":
           case "eliminar":
-            this.snackbar = true;
             this.dlgUpdateItem = false;
             this.dlgDeleteItem = false;
             this.updatingItem = false;
@@ -265,12 +249,9 @@ export default {
             this.managers = response.data.managers;
             break;
           default:
-            this.snackbar = true;
             break;
         }
       } else {
-        this.operationMessage = event.data.result.response.response.data.message;
-        this.operationMessageType = "error";
         this.snackbar = true;
         this.dlgUpdateItem = false;
         this.dlgDeleteItem = false;
@@ -320,7 +301,8 @@ export default {
           url: "sucursales/eliminar",
           params: {
             id: this.editedItem.id
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -337,7 +319,8 @@ export default {
               : "sucursales/editar",
           params: {
             item: this.editedItem
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }

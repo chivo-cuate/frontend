@@ -4,8 +4,8 @@
     :bottom="true"
     :right="true"
     v-model="snackbar"
-    absolute
     :color="operationMessageType"
+    style="bottom: 70px"
   >
     <v-icon small class="white--text fa">info</v-icon>
     {{ operationMessage }}

@@ -45,7 +45,7 @@
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
-                  <v-form ref="form" v-model="validForm">
+                  <v-form @submit.prevent ref="form" v-model="validForm">
                     <v-layout wrap>
                       <v-flex xs12>
                         <v-autocomplete
@@ -57,7 +57,16 @@
                           item-value="id"
                           label="Producto"
                           no-data-text="No hay resultados"
-                        ></v-autocomplete>
+                        >
+                          <template v-slot:item="data">
+                            <v-list-item-content>
+                              <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                              <v-list-item-subtitle
+                                v-html="`Precio de entrada (u): $${data.item.price_in}`"
+                              ></v-list-item-subtitle>
+                            </v-list-item-content>
+                          </template>
+                        </v-autocomplete>
                       </v-flex>
                     </v-layout>
                     <v-layout wrap>
@@ -72,11 +81,7 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 md6>
-                        <v-text-field
-                          outlined
-                          v-model="editedItem.grams"
-                          label="Gramos"
-                        ></v-text-field>
+                        <v-text-field outlined v-model="editedItem.grams" label="Gramos"></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -173,20 +178,44 @@
       <template v-slot:no-data>No se han encontrado elementos.</template>
     </v-data-table>
 
-    <v-snackbar
-      :timeout="5000"
-      :bottom="true"
-      :right="true"
-      :absolute="true"
-      v-model="snackbar"
-      :color="operationMessageType"
-    >
-      <v-icon small class="white--text">info</v-icon>
-      {{ operationMessage }}
-      <v-btn text @click="snackbar = false">
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-snackbar>
+    <v-card v-if="canEnableCooks" class="mt-3">
+      <v-container>
+        <v-layout wrap>
+          <v-flex xs12 lg6 offset-lg2>
+            <v-autocomplete
+              chips
+              outlined
+              multiple
+              :rules="requiredRules"
+              v-model="menuCooks"
+              :items="allCooks"
+              item-text="full_name"
+              item-value="id"
+              label="Elaboradores para este menú"
+              no-data-text="No hay resultados"
+            ></v-autocomplete>
+          </v-flex>
+          <v-flex xs12 lg4>
+            <v-btn
+              @click="saveActiveCooks()"
+              :disabled="menuCooks.length < 1 || updatingItem"
+              x-large
+              :class="`${$store.getters.getThemeColor} white--text`"
+            >
+              <v-icon v-if="!updatingItem" small>check</v-icon>
+              <v-progress-circular
+                v-else
+                :size="15"
+                :width="1"
+                indeterminate
+                :color="$store.getters.getThemeColor"
+                class="v-icon"
+              ></v-progress-circular>Actualizar
+            </v-btn>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-card>
 
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
@@ -204,88 +233,79 @@ export default {
       editedIndex: -1,
       editedItem: {},
       validForm: false,
-      requiredRules: [v => !!v || "Este dato es obligatorio"],
+      requiredRules: [v => !!v || "Dato obligatorio"],
       items: [],
       assets: [],
       updatingItem: false,
       deletingItem: false,
-      operationMessage: "",
-      operationMessageType: "error",
-      snackbar: false,
       headers: [
         { text: "Producto", value: "asset_name", align: "left" },
         { text: "Precio", value: "price", align: "left" },
         { text: "Gramos", value: "grams", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
-      measureUnits: []
+      measureUnits: [],
+      menuCooks: [],
+      allCooks: [],
+      canEnableCooks: false
     };
   },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "Adicionar" : "Editar";
     },
-    priceHint() {
+    priceIn() {
       if (this.editedItem.asset_id) {
-        let priceIn = 0;
+        let priceIn = null;
         this.assets.forEach(element => {
           if (element.id === this.editedItem.asset_id) {
             priceIn = element.price_in;
           }
         });
-        let difference = this.editedItem.price - priceIn
-        return (difference > 0 ? 'Ganacia: ': 'Pérdida: ') + difference;
+        return priceIn;
       }
-      return 'Seleccione un producto';
+    },
+    priceHint() {
+      if (this.priceIn) {
+        let difference = this.editedItem.price - this.priceIn;
+        return (difference > 0 ? "Ganacia: " : "Pérdida: ") + difference;
+      }
+      return "Seleccione un producto";
     },
     menuDate() {
-      return this.items.length > 0 ? this.items[0].date : 'No hay productos'
+      return this.items.length > 0 ? this.items[0].date : "No hay productos";
     }
   },
   mounted() {
+    this.$store.getters.getBranchPermissions.forEach(element => {
+      if (element.name === "Menú diario") {
+        element.perms.forEach(perm => {
+          if (perm.text === "Habilitar elaboradores") {
+            this.canEnableCooks = true;
+          }
+        });
+      }
+    });
     this.getDataFromApi();
   },
   methods: {
     handleHttpResponse(event) {
+      //let action = event.url.substring(event.url.lastIndexOf("/") + 1);
       this.loadingItems = false;
-      let action = event.url.substring(event.url.lastIndexOf("/") + 1);
+      this.dlgUpdateItem = false;
+      this.dlgDeleteItem = false;
+      this.updatingItem = false;
+      this.deletingItem = false;
+      this.setScopeObjects(event);
+    },
 
+    setScopeObjects(event) {
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
-
-        switch (action) {
-          case "crear":
-          case "editar":
-          case "eliminar":
-            this.snackbar = true;
-            this.dlgUpdateItem = false;
-            this.dlgDeleteItem = false;
-            this.updatingItem = false;
-            this.deletingItem = false;
-            if (response.code === "success") {
-              this.items = response.data[0];
-              this.assets = response.data[1];
-            }
-            break;
-          case "listar":
-            this.items = response.data[0];
-            this.assets = response.data[1];
-            break;
-          default:
-            this.snackbar = true;
-            break;
-        }
-      } else {
-        this.operationMessage =
-          event.data.result.response.response.data.message;
-        this.operationMessageType = "error";
-        this.snackbar = true;
-        this.dlgUpdateItem = false;
-        this.dlgDeleteItem = false;
-        this.updatingItem = false;
-        this.deletingItem = false;
+        this.items = response.data[0];
+        this.assets = response.data[1];
+        this.menuCooks = response.data[2];
+        this.allCooks = response.data[3];
       }
     },
 
@@ -332,7 +352,8 @@ export default {
           params: {
             id: this.editedItem.id,
             branch_id: this.$store.getters.getCurrBranch.id
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -349,8 +370,26 @@ export default {
               : "menu-diario/editar",
           params: {
             item: this.editedItem,
+            cooks: this.menuCooks,
             branch_id: this.$store.getters.getCurrBranch.id
-          }
+          },
+          snackbar: true
+        };
+        this.$refs.axios.submit(config);
+      }
+    },
+
+    saveActiveCooks() {
+      if (!this.updatingItem) {
+        this.updatingItem = true;
+        var config = {
+          method: "post",
+          url: "menu-diario/habilitar-elaboradores",
+          params: {
+            cooks: this.menuCooks,
+            branch_id: this.$store.getters.getCurrBranch.id
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-flex xs12 sm4>
+      <v-flex xs12 md4>
         <v-card>
           <v-list dense>
             <v-list-item
@@ -20,8 +20,8 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 sm8 text-center>
-        <v-flex sm11 offset-sm1>
+      <v-flex xs12 md8 text-center>
+        <v-flex md11 offset-md1>
           <v-card class="elevation-0">
             <p class="text-center uppercase white--text" :class="$store.getters.getThemeColor">{{ $route.params.action }}</p>
             <Index v-if="currAction === 'inicio'" />

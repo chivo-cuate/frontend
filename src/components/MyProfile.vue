@@ -1,15 +1,17 @@
 <template>
   <v-flex>
-    <VProgress v-if="loadingInitialElements" message="Cargando" class="text-center"/>
+    <VProgress v-if="loadingInitialElements" message="Cargando" class="text-center" />
 
     <v-layout row wrap v-else>
       <v-flex xs12 class="animated fadeIn">
         <v-card>
           <v-container pa-10>
-            <v-form v-model="profileValidationStatus" ref="form">
+            <v-form @submit.prevent ref="form" v-model="profileValidationStatus">
               <v-layout row wrap>
                 <v-flex sm5 md5>
                   <v-text-field
+                    :autofocus="true"
+                    @keyup.enter="save()"
                     v-model="userData.first_name"
                     name="name"
                     label="Nombres"
@@ -44,44 +46,32 @@
 
               <v-layout row wrap mt-5>
                 <v-flex xs12 mt-2>
-                  <v-tooltip bottom :color="validationColor">
+                  <v-tooltip right :color="validationColor">
                     <template v-slot:activator="{ on }">
-                    <v-btn
-                      :disabled="loading"
-                      @click="updateProfile()"
-                      class="white--text"
-                      :class="{ red: !profileValidationStatus, indigo: profileValidationStatus }"
-                      v-on="on"
-                    >
-                      <v-progress-circular
-                        v-if="loading"
-                        :width="2"
-                        size="18"
-                        indeterminate
-                        class="gray--text fa"
-                      ></v-progress-circular>
-                      <v-icon
-                        v-else-if="!loading && profileValidationStatus"
-                        small
-                        
-                      >check</v-icon>
-                      <v-icon
-                        v-else-if="!loading && !profileValidationStatus"
-                        small
-                        
-                      >error_outline</v-icon>Actualizar perfil
-                    </v-btn>
+                      <v-btn
+                        :disabled="loading"
+                        @click="updateProfile()"
+                        class="white--text"
+                        :color="profileValidationStatus ? $store.getters.getThemeColor : 'error'"
+                        v-on="on"
+                      >
+                        <v-progress-circular
+                          v-if="loading"
+                          :width="2"
+                          size="18"
+                          indeterminate
+                          class="gray--text fa"
+                        ></v-progress-circular>
+                        <v-icon v-else-if="!loading && profileValidationStatus" small>check</v-icon>
+                        <v-icon v-else-if="!loading && !profileValidationStatus" small>error_outline</v-icon>Actualizar perfil
+                      </v-btn>
                     </template>
                     <span>{{validationMessage}}</span>
                   </v-tooltip>
                 </v-flex>
 
                 <v-flex xs12 mt-2>
-                  <v-btn
-                    v-on:click="dlgChangePassword = true"
-                    class="white--text"
-                    color="warning"
-                  >
+                  <v-btn v-on:click="dlgChangePassword = true" class="white--text" color="warning">
                     <v-icon size="22">lock</v-icon>&nbsp;Cambiar contrase&ntilde;a
                   </v-btn>
                 </v-flex>
@@ -91,9 +81,10 @@
                 <v-card>
                   <v-card-title class="headline grey lighten-2">Cambiar contrase&ntilde;a</v-card-title>
                   <v-container pt-5 pr-10 pb-5 pl-10>
-                    <v-form v-model="passwordValidationStatus" ref="passwordForm">
+                    <v-form @submit.prevent ref="passwordForm" v-model="passwordValidationStatus">
                       <v-layout row wrap>
                         <v-text-field
+                          autofocus
                           v-model="userData.current_password"
                           prepend-icon="lock"
                           label="Actual"
@@ -110,6 +101,7 @@
                           hint="Al menos 6 caracteres"
                         ></v-text-field>
                         <v-text-field
+                          @keyup.enter="changePassword()"
                           v-model="userData.password_confirm"
                           prepend-icon="lock"
                           label="Confirmar"
@@ -124,7 +116,8 @@
                           :disabled="loading"
                           v-on:click="changePassword()"
                           class="white--text"
-                          color="info"
+                          :color="$store.getters.getThemeColor"
+                          text
                         >
                           <v-progress-circular
                             v-if="loading"
@@ -133,15 +126,14 @@
                             indeterminate
                             class="gray--text fa"
                           ></v-progress-circular>
-                          <v-icon v-else size="22" >done</v-icon>Aceptar
+                          <v-icon v-else size="22">done</v-icon>Aceptar
                         </v-btn>
                         <v-btn
                           v-on:click="closePasswordDlg()"
                           class="white--text ml-1"
                           color="error"
-                        >
-                          <v-icon  size="22">cancel</v-icon>Cancelar
-                        </v-btn>
+                          text
+                        >Cancelar</v-btn>
                       </v-layout>
                     </v-form>
                   </v-container>
@@ -168,21 +160,8 @@
       </v-flex>
     </v-layout>
 
-    <v-snackbar
-      :timeout="5000"
-      :bottom="true"
-      :right="true"
-      v-model="snackbar"
-      :color="operationMessageType"
-    >
-      <v-icon small class="white--text fa">info</v-icon>
-      {{ operationMessage }}
-      <v-btn text @click.native="snackbar = false">
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-snackbar>
+    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
 
-    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)"/>
   </v-flex>
 </template>
 
@@ -195,28 +174,25 @@ export default {
       uploadDialog: false,
       uploadingImage: false,
       loadingInitialElements: true,
-      snackbar: false,
-      nameRules: [v => !!v || "Este dato es obligatorio"],
-      lastNameRules: [v => !!v || "Este dato es obligatorio"],
-      dsaLetterRules: [v => !!v || "Este dato es obligatorio"],
+      nameRules: [v => !!v || "Dato obligatorio"],
+      lastNameRules: [v => !!v || "Dato obligatorio"],
+      dsaLetterRules: [v => !!v || "Dato obligatorio"],
       passwordRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v => (v && v.length > 5) || "Al menos 6 caracteres"
       ],
       passwordConfirmRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v => v === this.userData.password || "Los valores no coinciden"
       ],
       emailRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "El formato no es correcto"
       ],
-      postcodeRules: [v => !!v || "Este dato es obligatorio"],
-      addressRules: [v => !!v || "Este dato es obligatorio"],
-      operationMessage: "Introduzca sus credenciales",
-      operationMessageType: "warning",
+      postcodeRules: [v => !!v || "Dato obligatorio"],
+      addressRules: [v => !!v || "Dato obligatorio"],
       uploadDlg: false,
       profileValidationStatus: false,
       passwordValidationStatus: false,
@@ -231,7 +207,7 @@ export default {
         : "Verifique sus datos";
     },
     validationColor: function() {
-      return this.profileValidationStatus ? "indigo" : "red";
+      return this.profileValidationStatus ? "grey" : "red";
     }
   },
   mounted() {
@@ -243,6 +219,7 @@ export default {
         this.loading = true;
         let config = {
           method: "form",
+          snackbar: true,
           url: "auth/update-profile",
           params: new FormData(),
           headers: {
@@ -303,35 +280,21 @@ export default {
 
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
 
         switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
-          case "upload-signature":
-            this.snackbar = true;
-            this.uploadingImage = false;
-            break;
           case "get-profile":
             if (response.code === "success") {
               this.userData = response.data;
-            } else {
-              this.snackbar = true;
             }
             break;
           case "change-password":
-            this.snackbar = true;
             if (response.code === "success") {
               this.dlgChangePassword = false;
             }
             break;
           default:
-            this.snackbar = true;
             break;
         }
-      } else {
-        this.operationMessage = "La solicitud no pudo ser procesada.";
-        this.operationMessageType = "error";
-        this.snackbar = true;
       }
     }
   }

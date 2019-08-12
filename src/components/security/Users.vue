@@ -45,10 +45,12 @@
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
-                  <v-form ref="form" v-model="validForm">
+                  <v-form @submit.prevent ref="form" v-model="validForm">
                     <v-layout wrap>
                       <v-flex xs12 sm4>
                         <v-text-field
+                          :autofocus="true"
+                          @keyup.enter="save()"
                           :rules="requiredRules"
                           outlined
                           v-model="editedItem.first_name"
@@ -146,7 +148,10 @@
                             <v-chip v-if="index === 0">
                               <span>{{ item.name }}</span>
                             </v-chip>
-                            <span v-if="index === 1" class="grey--text caption">({{ editedRoles.length - 1 }} m&aacute;s)</span>
+                            <span
+                              v-if="index === 1"
+                              class="grey--text caption"
+                            >({{ editedRoles.length - 1 }} m&aacute;s)</span>
                           </template>
                         </v-autocomplete>
                       </v-flex>
@@ -165,7 +170,10 @@
                             <v-chip v-if="index === 0">
                               <span>{{ item.name }}</span>
                             </v-chip>
-                            <span v-if="index === 1" class="grey--text caption">({{ editedBranches.length - 1 }} m&aacute;s)</span>
+                            <span
+                              v-if="index === 1"
+                              class="grey--text caption"
+                            >({{ editedBranches.length - 1 }} m&aacute;s)</span>
                           </template>
                         </v-autocomplete>
                       </v-flex>
@@ -216,7 +224,7 @@
               <v-card-actions class="mr-5">
                 <v-spacer></v-spacer>
                 <v-btn
-                  :disabled="deletingItem"
+                  :disabled="updatingItem"
                   :color="$store.getters.getThemeColor"
                   text
                   @click="remove()"
@@ -273,21 +281,6 @@
       </v-flex>
     </div>-->
 
-    <v-snackbar
-      :timeout="5000"
-      :bottom="true"
-      :right="true"
-      :absolute="true"
-      v-model="snackbar"
-      :color="operationMessageType"
-    >
-      <v-icon small class="white--text">info</v-icon>
-      {{ operationMessage }}
-      <v-btn text @click="snackbar = false">
-        <v-icon small>close</v-icon>
-      </v-btn>
-    </v-snackbar>
-
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
@@ -307,23 +300,18 @@ export default {
       roles: [],
       branches: [],
       validForm: false,
-      requiredRules: [v => !!v || "Este dato es obligatorio"],
+      requiredRules: [v => !!v || "Dato obligatorio"],
       items: [],
       editedRoles: [],
       updatingItem: false,
-      deletingItem: false,
-      operationMessage: "",
-      operationMessageType: "error",
-      snackbar: false,
       headers: [
-        { text: "Nombre", value: "first_name", align: "left" },
-        { text: "Apellidos", value: "last_name", align: "left" },
+        { text: "Nombre completo", value: "full_name", align: "left" },
         { text: "Nombre de usuario", value: "username", align: "left" },
         { text: "Email", value: "email", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
       emailRules: [
-        v => !!v || "Este dato es obligatorio",
+        v => !!v || "Dato obligatorio",
         v =>
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "Formato incorrecto"
@@ -351,47 +339,32 @@ export default {
       let action = event.url.substring(event.url.lastIndexOf("/") + 1);
       if (event.data.result.code === 200) {
         var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
 
         switch (action) {
           case "crear":
           case "editar":
-            this.snackbar = true;
+          case "eliminar":
             this.dlgUpdateItem = false;
+            this.dlgDeleteItem = false;
             this.updatingItem = false;
             if (response.code === "success") {
-              this.items = response.data[0];
-              this.roles = response.data[1];
-              this.branches = response.data[2];
-            }
-            break;
-          case "eliminar":
-            this.snackbar = true;
-            this.dlgDeleteItem = false;
-            this.deletingItem = false;
-            if (response.code === "success") {
-              this.items = response.data[0];
-              this.roles = response.data[1];
-              this.branches = response.data[2];
+              this.setScopeObjects(response);
             }
             break;
           case "listar":
-            this.items = response.data[0];
-            this.roles = response.data[1];
-            this.branches = response.data[2];
+            this.loadingItems = false;
+            this.setScopeObjects(response);
             break;
           default:
-            this.snackbar = true;
             break;
         }
-      } else {
-        this.operationMessage = "Your request could not be executed.";
-        this.operationMessageType = "error";
-        this.snackbar = true;
-        this.updatingItem = false;
-        this.deletingItem = false;
       }
+    },
+
+    setScopeObjects(response) {
+      this.items = response.data[0];
+      this.roles = response.data[1];
+      this.branches = response.data[2];
     },
 
     getDataFromApi() {
@@ -436,7 +409,8 @@ export default {
           url: "usuarios/eliminar",
           params: {
             id: this.editedItem.id
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -452,7 +426,8 @@ export default {
             item: this.editedItem,
             roles: this.editedRoles,
             branches: this.editedBranches
-          }
+          },
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
