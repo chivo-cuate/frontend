@@ -198,7 +198,7 @@
           <v-flex xs12 lg4>
             <v-btn
               @click="saveActiveCooks()"
-              :disabled="menuCooks.length < 1 || updatingItem"
+              :disabled="updatingItem"
               x-large
               :class="`${$store.getters.getThemeColor} white--text`"
             >

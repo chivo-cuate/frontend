@@ -1,31 +1,121 @@
 <template>
   <v-flex xs12>
     <VProgress v-if="loadingInitialData" message="Cargando" class="text-center" />
-    <v-flex v-else class="animated fadeIn">
-      <Tables :tables="tables" :assets="assets" v-on:playSound="playNotifSound()" v-on:setResponse="setResponse($event)" />
-    </v-flex>
-
+    <template v-else>
+      <template v-if="!this.$store.getters.getCurrBranch">
+        <v-container>
+          <v-layout wrap>
+            <v-flex xs12>
+              <v-alert class="warning">Debe seleccionar una sucursal para poder usar esta p&aacute;gina</v-alert>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </template>
+      <template v-else>
+        <v-container v-if="!cooksEnabled">
+          <v-flex>
+            <v-alert
+              dense
+              tile
+              prominent
+              dismissible
+              dark
+              color="warning"
+              border="left"
+              icon="warning"
+              class="animated flash"
+            >No existen elaboradores habilitados para el men&uacute; de hoy. Solo podr&aacute;n ser procesadas las &oacute;rdenes que no involucren alimentos elaborados.</v-alert>
+          </v-flex>
+        </v-container>
+        <v-flex class="animated fadeIn" :style="cooksEnabled ? '' : 'margin-top: -30px;'">
+          <Tables
+            v-if="permissions.canList"
+            ref="tablesComp"
+            :tables="tables"
+            :assets="assets"
+            :perms="permissions"
+            v-on:playSound="playNotifSound()"
+            v-on:setResponse="setResponse($event)"
+          />
+          <template v-if="permissions.canViewPending">
+            <PendingOrders :orders="pendingOrders" />
+            <Cooks :cooks="cooks" @setResponse="setResponse($event)" />
+          </template>
+        </v-flex>
+      </template>
+    </template>
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
 
 <script>
 import Tables from "@/components/orders/Tables";
+import PendingOrders from "@/components/orders/PendingOrders";
+import Cooks from "@/components/orders/Cooks";
 
 export default {
   data() {
     return {
       loadingInitialData: true,
       loadingData: false,
+      cooksEnabled: true,
       tables: [],
       assets: [],
-      audioPlayer: null
+      pendingOrders: [],
+      cooks: [],
+      audioPlayer: null,
+      timer: null,
+      permissions: {
+        canList: false,
+        canCreate: false,
+        canEdit: false,
+        canDelete: false,
+        canViewPending: false,
+        canCook: false,
+        canCheckout: false
+      }
     };
   },
-  components: { Tables },
+  components: { Tables, PendingOrders, Cooks },
+  created() {
+    this.$store.getters.getOrdersPermissions.forEach(permissions => {
+      permissions.perms.forEach(perm => {
+        switch (perm.route) {
+          case "/ordenes/ordenes/listar":
+            this.permissions.canList = true;
+            break;
+          case "/ordenes/ordenes/crear":
+            this.permissions.canCreate = true;
+            break;
+          case "/ordenes/ordenes/editar":
+            this.permissions.canEdit = true;
+            break;
+          case "/ordenes/ordenes/eliminar":
+            this.permissions.canDelete = true;
+            break;
+          case "/ordenes/ordenes/elaborar":
+            this.permissions.canCook = true;
+            break;
+          case "/ordenes/ordenes/ver-pendientes":
+            this.permissions.canViewPending = true;
+            break;
+          case "/ordenes/ordenes/cerrar":
+            this.permissions.canCheckout = true;
+            break;
+          default:
+            break;
+        }
+      });
+    });
+    if (!(this.permissions.canList || this.permissions.canViewPending)) {
+      this.$router.push("/403");
+    }
+  },
   mounted() {
-    this.timer = setInterval(this.getDataFromApi, 5000);
-    this.getDataFromApi();
+    if (this.permissions.canList || this.permissions.canViewPending) {
+      this.timer = setInterval(this.getDataFromApi, 5000);
+      this.getDataFromApi();
+    }
     this.initAudioPlayer();
   },
   methods: {
@@ -43,6 +133,9 @@ export default {
     setResponse(response) {
       this.tables = response.data.tables;
       this.assets = response.data.assets;
+      this.pendingOrders = response.data.orders;
+      this.cooks = response.data.cooks;
+      this.cooksEnabled = response.data.cooks_enabled;
     },
 
     handleHttpResponse(event) {
@@ -58,16 +151,19 @@ export default {
           case "listar":
             if (response.code === "success") {
               this.setResponse(response);
+              if (this.$refs.tablesComp) {
+                this.$refs.tablesComp.updateCurrTableAndOrders(response);
+              }
+            }
+            break;
+          case "ver-pendientes":
+            if (response.code === "success") {
+              this.setResponse(response);
             }
             break;
           default:
-            this.snackbar = true;
             break;
         }
-      } else {
-        this.operationMessage = "Your request could not be executed.";
-        this.operationMessageType = "error";
-        this.snackbar = true;
       }
     },
 
@@ -75,12 +171,16 @@ export default {
       if (!this.loadingData) {
         this.loadingData = true;
         var config = {
-          url: "ordenes/listar",
+          url: this.permissions.canList
+            ? "ordenes/listar"
+            : "ordenes/ver-pendientes",
           params: {
             branch_id: this.$store.getters.getCurrBranch.id
           }
         };
-        this.$refs.axios.submit(config);
+        if (this.$refs.axios) {
+          this.$refs.axios.submit(config);
+        }
       }
     }
   }

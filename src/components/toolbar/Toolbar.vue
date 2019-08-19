@@ -5,7 +5,7 @@
         <v-list dense nav class="py-0">
           <v-list-item two-line>
             <v-list-item-avatar>
-              <img :src="require('../../assets/img/logo_color.png')" alt="El Chivo Cuate" />
+              <img :src="require('@/assets/img/logo_color.png')" alt="El Chivo Cuate" />
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>Taquer&iacute;a</v-list-item-title>
@@ -36,23 +36,26 @@
       </v-navigation-drawer>
 
       <v-app-bar class="animated slideInDown" :class="$store.getters.getThemeColor" fixed>
-        <v-app-bar-nav-icon
-          class="hidden-md-and-up white--text"
-          @click.stop="drawer = !drawer"
-        ></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon class="hidden-md-and-up white--text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
         <v-toolbar-title class="white--text">
           <router-link to="/inicio" tag="span" style="cursor: pointer">
-            <img
-              :src="require('../../assets/img/logo_text.png')"
-              alt="El Chivo Cuate"
-            />
+            <img :src="require('@/assets/img/logo_text.png')" alt="El Chivo Cuate" />
           </router-link>
         </v-toolbar-title>
 
-
-        <v-chip v-if="$store.getters.getCurrBranch" class="ml-3">
-          <span>{{ $store.getters.getCurrBranch.name }}</span>
+        <v-chip
+          v-if="!$store.getters.isGuest && $store.getters.getCurrBranch"
+          pill
+          class="ml-3 mt-1"
+          dark
+          text-color="white"
+          small
+        >
+          <v-avatar left :color="$store.getters.getThemeColor">
+            <v-icon>domain</v-icon>
+          </v-avatar>
+          {{ $store.getters.getCurrBranch.name }}
         </v-chip>
 
         <v-spacer></v-spacer>
@@ -95,12 +98,8 @@ export default {
     };
   },
   components: { BranchSelector, Management, Clients, MyAccount },
-  mounted() {
-    
-  },
-  methods: {
-    
-  }
+  mounted() {},
+  methods: {}
 };
 </script>
 

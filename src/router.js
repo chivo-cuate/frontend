@@ -6,8 +6,8 @@ Vue.use(Router)
 
 let routes = [
   {
-    path: '*',
-    name: 'not-found',
+    path: '/404',
+    name: '404',
     meta: {
       requiresAuth: false
     },
@@ -16,13 +16,13 @@ let routes = [
     }
   },
   {
-    path: '/404',
-    name: '404',
+    path: '/403',
+    name: '403',
     meta: {
       requiresAuth: false
     },
     component: function () {
-      return import('@/components/NotFound')
+      return import('@/components/NotAllowed')
     }
   },
   {
@@ -131,7 +131,17 @@ let routes = [
     component: function () {
       return import('@/components/ActivateAccount')
     }
-  }
+  },
+  {
+    path: '*',
+    name: 'not-found',
+    meta: {
+      requiresAuth: false
+    },
+    component: function () {
+      return import('@/components/NotFound')
+    }
+  },
 ]
 
 let router = new Router({

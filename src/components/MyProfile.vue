@@ -3,48 +3,81 @@
     <VProgress v-if="loadingInitialElements" message="Cargando" class="text-center" />
 
     <v-layout row wrap v-else>
-      <v-flex xs12 class="animated fadeIn">
+      <v-flex xs10 offset-xs1 class="animated fadeIn">
         <v-card>
           <v-container pa-10>
             <v-form @submit.prevent ref="form" v-model="profileValidationStatus">
-              <v-layout row wrap>
-                <v-flex sm5 md5>
+              <v-layout wrap>
+                <v-flex xs12 sm6>
                   <v-text-field
+                    outlined
                     :autofocus="true"
                     @keyup.enter="save()"
                     v-model="userData.first_name"
-                    name="name"
                     label="Nombres"
-                    type="text"
                     :rules="nameRules"
-                  ></v-text-field>
-                  <v-text-field
-                    v-model="userData.last_name"
-                    name="last_name"
-                    label="Apellidos"
-                    type="text"
-                    :rules="lastNameRules"
                   ></v-text-field>
                 </v-flex>
-                <v-flex offset-sm2 sm5>
+                <v-flex xs12 sm6>
                   <v-text-field
-                    v-model="userData.email"
-                    name="email"
-                    label="Correo electrónico"
-                    type="email"
-                    :rules="emailRules"
-                  ></v-text-field>
-                  <v-text-field
-                    v-model="userData.username"
-                    name="address"
-                    label="Nombre de usuario"
-                    type="text"
-                    :rules="nameRules"
+                    outlined
+                    v-model="userData.last_name"
+                    label="Apellidos"
+                    :rules="lastNameRules"
                   ></v-text-field>
                 </v-flex>
               </v-layout>
 
-              <v-layout row wrap mt-5>
+              <v-layout wrap>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    outlined
+                    v-model="userData.username"
+                    label="Nombre de usuario"
+                    :rules="nameRules"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    outlined
+                    v-model="userData.email"
+                    label="Correo electrónico"
+                    type="email"
+                    :rules="emailRules"
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+
+              <v-layout wrap>
+                <v-flex xs12 sm6>
+                  <v-text-field outlined v-model="userData.ine" label="INE" :rules="nameRules"></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-text-field outlined v-model="userData.phone_number" label="Teléfono"></v-text-field>
+                </v-flex>
+              </v-layout>
+
+              <v-layout wrap>
+                <v-flex xs12 sm6>
+                  <v-text-field
+                    outlined
+                    v-model="userData.address"
+                    label="Dirección"
+                    :rules="nameRules"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6>
+                  <v-select
+                    :items="[{value:'F', text: 'Femenino'}, {value:'M', text: 'Masculino'}]"
+                    outlined
+                    v-model="userData.sex"
+                    label="Sexo"
+                    :rules="nameRules"
+                  ></v-select>
+                </v-flex>
+              </v-layout>
+
+              <v-layout row wrap mt-3>
                 <v-flex xs12 mt-2>
                   <v-tooltip right :color="validationColor">
                     <template v-slot:activator="{ on }">
@@ -161,7 +194,6 @@
     </v-layout>
 
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
-
   </v-flex>
 </template>
 
@@ -179,7 +211,7 @@ export default {
       dsaLetterRules: [v => !!v || "Dato obligatorio"],
       passwordRules: [
         v => !!v || "Dato obligatorio",
-        v => (v && v.length > 5) || "Al menos 6 caracteres"
+        v => (v && v.length > 0) || "Al menos 6 caracteres"
       ],
       passwordConfirmRules: [
         v => !!v || "Dato obligatorio",
@@ -226,19 +258,21 @@ export default {
             "Content-Type": "multipart/form-data"
           }
         };
-        config.params.append("user_data", JSON.stringify(this.userData));
-        if (this.userData.dsa_letter) {
+        config.params.append("item", JSON.stringify(this.userData));
+        /*if (this.userData.dsa_letter) {
           config.params.append("dsa_letter", this.userData.dsa_letter);
-        }
+        }*/
         this.$refs.axios.submit(config);
       }
     },
+
     changePassword() {
       if (this.$refs.passwordForm.validate()) {
         this.loading = true;
         var config = {
           url: "auth/change-password",
           method: "post",
+          snackbar: true,
           params: {
             current_password: this.userData.current_password,
             password: this.userData.password,
@@ -248,12 +282,14 @@ export default {
         this.$refs.axios.submit(config);
       }
     },
+
     closePasswordDlg() {
       this.userData.current_password = null;
       this.userData.password = null;
       this.userData.password_confirm = null;
       this.dlgChangePassword = false;
     },
+
     getProfileInfo() {
       this.loadingInitialElements = true;
       let config = {
@@ -262,6 +298,7 @@ export default {
       };
       this.$refs.axios.submit(config);
     },
+
     setDSALetter(event) {
       this.userData.dsa_letter = event;
       if (event) {
@@ -271,9 +308,11 @@ export default {
         this.userData.dsa_letter_name = null;
       }
     },
+    
     showUpload() {
       this.uploadDialog = true;
     },
+
     handleHttpResponse(event) {
       this.loading = false;
       this.loadingInitialElements = false;
