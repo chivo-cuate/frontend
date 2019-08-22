@@ -4,8 +4,7 @@
       <v-flex md5>
         <v-toolbar tabs :color="$store.getters.getThemeColor">
           <v-toolbar-title class="white--text">
-            <v-icon class="white--text">lock</v-icon>
-            Introduzca sus datos
+            <v-icon class="white--text">lock</v-icon>Introduzca sus datos
           </v-toolbar-title>
         </v-toolbar>
         <v-card>
@@ -90,7 +89,11 @@
               <v-layout align-center justify-center row>
                 <v-flex xs8 mt-3>
                   <v-card-text>
-                    <v-form @submit.prevent ref="resetPasswordForm" v-model="resetPasswordValidationStatus">
+                    <v-form
+                      @submit.prevent
+                      ref="resetPasswordForm"
+                      v-model="resetPasswordValidationStatus"
+                    >
                       <v-layout row>
                         <v-flex lg12>
                           <v-text-field
@@ -111,7 +114,7 @@
                     <v-spacer></v-spacer>
                     <v-tooltip left color="grey">
                       <template v-slot:activator="{ on }">
-                          <v-btn
+                        <v-btn
                           :disabled="loading"
                           @click="requestPasswordReset()"
                           class="white--text mr-3"
@@ -143,13 +146,12 @@
       </v-flex>
     </v-layout>
 
-    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)"/>
-    
+    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
 
 <script>
-import { setTimeout } from 'timers';
+import { setTimeout } from "timers";
 
 export default {
   data() {
@@ -165,9 +167,7 @@ export default {
       resetPasswordValidationStatus: false,
       nameRules: [v => !!v || "Dato obligatorio"],
       lastNameRules: [v => !!v || "Dato obligatorio"],
-      passwordRules: [
-        v => !!v || "Dato obligatorio",
-      ],
+      passwordRules: [v => !!v || "Dato obligatorio"],
       usernameRules: [
         v => !!v || "Dato obligatorio",
         v => (v && v.length > 1) || "Debe introducir al menos 2 caracteres"
@@ -180,10 +180,10 @@ export default {
       ],
       activeTab: null,
       apiUrls: {
-        login: 'auth/login',
-        resetPassword: 'acceso/restablecer-contrasena'
-      },
-    }
+        login: "auth/login",
+        resetPassword: "acceso/restablecer-contrasena"
+      }
+    };
   },
   mounted() {
     this.activeTab = `tab-${this.$route.params.action}`;
@@ -193,21 +193,27 @@ export default {
   },
   methods: {
     redirect(action) {
-      this.$router.push(`/acceso/${action}`)
+      this.$router.push(`/acceso/${action}`);
     },
 
     handleHttpResponse(event) {
       this.loading = false;
       if (event.data.result.code !== 500) {
-        var response = event.data.result.response
+        var response = event.data.result.response;
         if (response.code === "success") {
-            this.$store.commit("updatePayload", response.data)
-            var redirect = this.$store.getters.getAuthRouteRequested
-            this.$store.commit('setAuthRouteRequested', null)
-            this.$router.push(redirect ? redirect : "/inicio")
-          } else {
-            this.$store.commit("logout")
-          }
+          this.$store.commit("updatePayload", response.data);
+          var redirect = this.$store.getters.getAuthRouteRequested;
+          this.$store.commit("setAuthRouteRequested", null);
+          this.$router.push(
+            redirect
+              ? redirect
+              : response.data.redirect
+              ? response.data.redirect
+              : "/inicio"
+          );
+        } else {
+          this.$store.commit("logout");
+        }
       }
     },
 
@@ -220,7 +226,7 @@ export default {
           snackbar: true,
           params: {
             username: this.username,
-            password: this.password,
+            password: this.password
           }
         };
         this.$refs.axios.submit(config);
@@ -246,8 +252,7 @@ export default {
         };
         this.$refs.axios.submit(config);
       }
-    },
-    
+    }
   },
   computed: {
     loginValidationMessage: function() {

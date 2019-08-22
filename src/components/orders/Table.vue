@@ -1,5 +1,5 @@
 <template>
-  <v-menu dark offset-y transition="fade-transition" bottom open-on-hover>
+  <v-menu close-on-click dark offset-y transition="fade-transition" bottom open-on-hover>
     <template v-slot:activator="{ on }">
       <v-flex class="text-center align-center">
         <v-btn text disabled>

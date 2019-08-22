@@ -21,14 +21,28 @@
         :drwOrders="drwOrders"
         :editedTable="editedTable"
         :perms="perms"
-        @close="drwOrders = false"
+        @close="closeDrwOrders()"
         @showYesNoDialog="showYesNoDialog($event)"
       />
 
-      <SimpleTableDlg @close="dlgViewMenu = false" :visible="dlgViewMenu" :width="700" :title="'Menu para hoy'" :headers="dailyMenuHeaders" :items="compDailyMenu" />
+      <SimpleTableDlg
+        @close="dlgViewMenu = false"
+        :visible="dlgViewMenu"
+        :width="700"
+        :title="'Menú'"
+        :headers="dailyMenuHeaders"
+        :items="compDailyMenu"
+      />
 
-      <SimpleTableDlg @close="dlgViewOrder = false" :visible="dlgViewOrder" :width="500" :title="'Productos'" :headers="viewOrderHeaders" :items="compEditedAssetsInfo" />
-      
+      <SimpleTableDlg
+        @close="dlgViewOrder = false"
+        :visible="dlgViewOrder"
+        :width="500"
+        :title="'Productos'"
+        :headers="viewOrderHeaders"
+        :items="compEditedAssetsInfo"
+      />
+
       <v-dialog v-model="dlgEditOrder" width="500" persistent>
         <v-card>
           <v-card-title
@@ -143,14 +157,40 @@
         </v-card>
       </v-dialog>
 
-      <YesNoDlg @yes="checkout()" @no="dlgCheckout = false" :visible="dlgCheckout" :width="500" :title="'Cerrar orden'" :question="`Se dispone a cerrar la cuenta # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number} con un monto de:`" :chip="compOrderPrice" :processing="handlingOrder" />
+      <YesNoDlg
+        @yes="checkout()"
+        @no="dlgCheckout = false"
+        :visible="dlgCheckout"
+        :width="500"
+        :title="'Cerrar orden'"
+        :question="`Se dispone a cerrar la cuenta # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number} con un monto de:`"
+        :chip="compOrderPrice"
+        :processing="handlingOrder"
+      />
 
-      <YesNoDlg @yes="cancelOrder()" @no="dlgCancelOrder = false" :visible="dlgCancelOrder" :width="350" :title="'Cancelar orden'" :question="`Se dispone a cancelar la orden # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number} con un monto de:`" :chip="compOrderPrice" :processing="handlingOrder" />
+      <YesNoDlg
+        @yes="cancelOrder()"
+        @no="dlgCancelOrder = false"
+        :visible="dlgCancelOrder"
+        :width="350"
+        :title="'Cancelar orden'"
+        :question="`Se dispone a cancelar la orden # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number} con un monto de:`"
+        :chip="compOrderPrice"
+        :processing="handlingOrder"
+      />
 
-      <YesNoDlg @yes="serveProducts()" @no="dlgServeProducts = false" :visible="dlgServeProducts" :width="350" :title="'Servir productos'" :question="`Se dispone a servir los productos de la orden # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number}.`" :chip="null" :processing="handlingOrder" />
-      
+      <YesNoDlg
+        @yes="serveProducts()"
+        @no="dlgServeProducts = false"
+        :visible="dlgServeProducts"
+        :width="350"
+        :title="'Servir productos'"
+        :question="`Se dispone a servir los productos de la orden # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number}.`"
+        :chip="null"
+        :processing="handlingOrder"
+      />
+
       <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
-
     </v-card>
   </v-container>
 </template>
@@ -197,12 +237,22 @@ export default {
         { text: "Producto", value: "name" },
         { text: "Precio", value: "price" },
         { text: "Cantidad", value: "quantity" },
-        { text: "Estado", value: "status" },
+        { text: "Estado", value: "status" }
       ]
     };
   },
   components: { Table, TableOrders, SimpleTableDlg, YesNoDlg },
   props: ["tables", "assets", "perms"],
+  mounted() {
+    
+  },
+  watch: {
+    editedOrders: function(newValue, oldValue) {
+      if (!newValue) {
+        this.drwOrders = false;
+      }
+    }
+  },
   computed: {
     compEditedAssetsInfo() {
       let res = [];
@@ -211,13 +261,13 @@ export default {
           name: this.getAssetById(element.asset_id).name,
           quantity: element.quantity,
           price: this.getAssetPriceById(element.asset_id, element.quantity),
-          status: element.finished === '1' ? 'Servido' : 'Pendiente'
+          status: element.finished === "1" ? "Servido" : "Pendiente"
         });
       });
       res.push({
-        name: 'TOTAL',
+        name: "TOTAL",
         price: this.compOrderPrice
-      })
+      });
       return res;
     },
     compDailyMenu() {
@@ -244,6 +294,11 @@ export default {
     }
   },
   methods: {
+    closeDrwOrders() {
+      this.drwOrders = false;
+      this.editedOrders = [];
+    },
+
     setEditedAssets() {
       this.editedAssets = [];
       this.editedOrder.assets.forEach(element => {
@@ -262,19 +317,19 @@ export default {
       this.setEditedOrder(event.orderIndex);
       this.setEditedAssets();
       switch (event.action) {
-        case 'dlgEditOrder':
+        case "dlgEditOrder":
           this.dlgEditOrder = true;
           break;
-        case 'dlgServeProducts':
+        case "dlgServeProducts":
           this.dlgServeProducts = true;
           break;
-        case 'dlgCheckout':
+        case "dlgCheckout":
           this.dlgCheckout = true;
           break;
-        case 'dlgViewOrder':
+        case "dlgViewOrder":
           this.dlgViewOrder = true;
           break;
-        case 'dlgCancelOrder':
+        case "dlgCancelOrder":
           this.dlgCancelOrder = true;
           break;
         default:
@@ -439,10 +494,9 @@ export default {
         this.dlgCheckout = false;
         this.dlgCancelOrder = false;
         this.dlgServeProducts = false;
-        
+
         if (response.code === "success") {
           this.$emit("setResponse", response);
-          this.$emit("playSound");
         }
         this.updateCurrTableAndOrders(response);
       }

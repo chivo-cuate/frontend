@@ -6,7 +6,9 @@
         <v-container>
           <v-layout wrap>
             <v-flex xs12>
-              <v-alert class="warning">Debe seleccionar una sucursal para poder usar esta p&aacute;gina</v-alert>
+              <v-alert
+                class="warning"
+              >Debe seleccionar una sucursal para poder usar esta p&aacute;gina</v-alert>
             </v-flex>
           </v-layout>
         </v-container>
@@ -34,8 +36,7 @@
             :tables="tables"
             :assets="assets"
             :perms="permissions"
-            v-on:playSound="playNotifSound()"
-            v-on:setResponse="setResponse($event)"
+            @setResponse="setResponse($event)"
           />
           <template v-if="permissions.canViewPending">
             <PendingOrders :orders="pendingOrders" />
@@ -63,7 +64,6 @@ export default {
       assets: [],
       pendingOrders: [],
       cooks: [],
-      audioPlayer: null,
       timer: null,
       permissions: {
         canList: false,
@@ -116,26 +116,16 @@ export default {
       this.timer = setInterval(this.getDataFromApi, 5000);
       this.getDataFromApi();
     }
-    this.initAudioPlayer();
+    this.$root.$emit("resetNotifications");
   },
   methods: {
-    initAudioPlayer() {
-      if (!this.audioPlayer) {
-        this.audioPlayer = new Audio(this.$store.getters.getBeepFile);
-      }
-    },
-
-    playNotifSound() {
-      this.initAudioPlayer();
-      this.audioPlayer.play();
-    },
-
     setResponse(response) {
       this.tables = response.data.tables;
       this.assets = response.data.assets;
       this.pendingOrders = response.data.orders;
       this.cooks = response.data.cooks;
       this.cooksEnabled = response.data.cooks_enabled;
+      this.$root.$emit("setNotifications", response.data.notifications);
     },
 
     handleHttpResponse(event) {

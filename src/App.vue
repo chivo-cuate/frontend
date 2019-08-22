@@ -2,7 +2,7 @@
   <v-app>
     <Toolbar />
     <v-container fill-height mt-12 pt-12>
-      <v-layout row wrap class="animated fadeIn">
+      <v-layout wrap class="animated fadeIn">
         <v-flex xs12>
           <router-view />
         </v-flex>
