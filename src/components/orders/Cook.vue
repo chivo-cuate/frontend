@@ -7,17 +7,17 @@
             :src="require(cook.sex === 'F' ? `@/assets/img/cheff_f.png` : `@/assets/img/cheff_m.png`)"
             width="70px"
           ></v-img>
-          <v-chip label dark class="mt-1 uppercase">{{`${cook.first_name} ${cook.last_name}`}}</v-chip>
+          <v-chip label dark class="mt-1 cyan darken-3">{{`${cook.first_name} ${cook.last_name}`}}</v-chip>
         </div>
         <v-divider></v-divider>
         <template v-if="cook.current_order">
           <p>
-            <v-chip label>
+            <v-chip label class="mt-1">
               <v-icon>mdi-tag</v-icon>
-              Mesa {{cook.current_order.table_number}}
+              <span v-html="`Mesa ${cook.current_order.table_number} - orden ${cook.current_order.order_number}`"></span>
             </v-chip>
             <br />
-            <v-chip label class="warning darken-1">
+            <v-chip label class="warning darken-1 mt-1">
               <v-icon class="white--text">mdi-timelapse</v-icon>
               {{cook.current_order.elapsed_time}}
             </v-chip>

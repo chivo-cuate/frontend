@@ -243,9 +243,7 @@ export default {
   },
   components: { Table, TableOrders, SimpleTableDlg, YesNoDlg },
   props: ["tables", "assets", "perms"],
-  mounted() {
-    
-  },
+  mounted() {},
   watch: {
     editedOrders: function(newValue, oldValue) {
       if (!newValue) {
@@ -368,6 +366,9 @@ export default {
     },
 
     getAssetPriceById(id, quantity) {
+      if (!id) {
+        return 0;
+      }
       let asset = this.getAssetById(id);
       return asset
         ? parseInt(asset.price) * (quantity ? parseInt(quantity) : 1)

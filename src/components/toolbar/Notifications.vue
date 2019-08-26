@@ -3,7 +3,7 @@
     <template v-slot:activator="{ on }">
       <v-btn color="primary" class="white--text" text v-on="on">
         <v-badge overlap color="red" :class="compNotifAnimation">
-          <template v-slot:badge>{{ compNotificationsCount }}</template>
+          <template v-if="compShowNotifBadge" v-slot:badge>{{ compNotificationsCount }}</template>
           <v-icon v-if="compShowNotifBadge" medium color="white">notifications_active</v-icon>
           <v-icon v-else medium color="white">notifications_none</v-icon>
         </v-badge>
@@ -12,60 +12,75 @@
 
     <v-card class="general-notif-container pa-0">
       <v-list>
-        <v-list-item v-for="(item, index) in notifications" :key="`notif-${index}`">
-          <v-container>
-            <v-layout row wrap>
-              <v-flex>
-                <span class="success--text body-2" v-html="item.title"></span>
-              </v-flex>
-            </v-layout>
-            <v-layout row wrap class="caption grey--text">
-              <v-flex xs6>
-                <span>
-                  <v-icon small>today</v-icon>
-                  <span v-html="item.created_at"></span>
-                </span>
-              </v-flex>
-              <v-flex xs6 class="text-right">
-                <span>
-                  <i v-html="'Hace '"></i>
-                  <i v-html="item.headline"></i>
-                </span>
-              </v-flex>
-            </v-layout>
-            <v-layout row wrap class="caption">
-              <v-flex xs12>
-                <span v-html="item.subtitle"></span>
-              </v-flex>
-              <div class="divider"></div>
-            </v-layout>
-          </v-container>
-        </v-list-item>
+        <template v-if="compNotificationsCount > 0">
+          <v-list-item v-for="(item, index) in notifications" :key="`notif-${index}`">
+            <v-container>
+              <v-layout row wrap>
+                <v-flex>
+                  <span class="success--text body-2" v-html="item.title"></span>
+                </v-flex>
+              </v-layout>
+              <v-layout row wrap class="caption grey--text">
+                <v-flex xs6>
+                  <span>
+                    <v-icon small>today</v-icon>
+                    <span v-html="item.created_at"></span>
+                  </span>
+                </v-flex>
+                <v-flex xs6 class="text-right">
+                  <span>
+                    <i v-html="'Hace '"></i>
+                    <i v-html="item.headline"></i>
+                  </span>
+                </v-flex>
+              </v-layout>
+              <v-layout row wrap class="caption">
+                <v-flex xs12>
+                  <span v-html="item.subtitle"></span>
+                </v-flex>
+                <div class="divider"></div>
+              </v-layout>
+            </v-container>
+          </v-list-item>
 
-        <v-list-item>
-          <v-container>
-            <v-layout row wrap>
-              <v-flex class="text-right">
-                <v-btn
-                  @click="deleteNotifications()"
-                  small
-                  :disabled="deletingNotifications"
-                  color="error"
-                >
-                  <v-progress-circular
-                    size="15"
-                    :width="2"
-                    v-if="deletingNotifications"
-                    indeterminate
-                    color="gray"
-                    class="white--text"
-                  ></v-progress-circular>
-                  <v-icon size="large" v-else>notifications_off</v-icon>
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-list-item>
+          <v-list-item>
+            <v-container>
+              <v-layout row wrap>
+                <v-flex class="text-right">
+                  <v-btn
+                    @click="clearNotifications()"
+                    text
+                    small
+                    :disabled="deletingNotifications"
+                    color="error"
+                  >
+                    <v-progress-circular
+                      size="15"
+                      :width="2"
+                      v-if="deletingNotifications"
+                      indeterminate
+                      color="gray"
+                      class="white--text"
+                    ></v-progress-circular>
+                    <v-icon medium v-else>notifications_off</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-list-item>
+        </template>
+
+        <template v-else>
+          <v-list-item>
+            <v-container>
+              <v-layout row wrap>
+                <v-flex class="text-center success--text">
+                  <v-icon class="success--text" small>warning</v-icon>No hay elementos.
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-list-item>
+        </template>
       </v-list>
     </v-card>
   </v-menu>
@@ -74,7 +89,6 @@
 <script>
 import classList from "classlist";
 import Speech from "speak-tts";
-import { setTimeout } from "timers";
 
 export default {
   data() {
@@ -93,7 +107,7 @@ export default {
       this.setNewNotifications(event);
     });
     this.$root.$on("resetNotifications", event => {
-      this.notifications = [];
+      this.clearNotifications();
     });
   },
   /*watch: {
@@ -137,7 +151,7 @@ export default {
               : available_voices[0];
             that.speech.setLanguage(this.bestVoice.lang);
             that.speech.setVoice(this.bestVoice.name);
-            that.speech.setRate(0.7);
+            that.speech.setRate(0.6);
             that.speech.setVolume(1);
           })
           .catch(e => {
@@ -161,7 +175,9 @@ export default {
       this.speech.speak({ text: text });
     },
 
-    clearNotifications() {}
+    clearNotifications() {
+      this.notifications = [];
+    }
   },
   computed: {
     compNotificationsCount() {
@@ -169,7 +185,7 @@ export default {
     },
 
     compShowNotifBadge() {
-      return this.notificationsCount > 0;
+      return this.notifications.length > 0;
     },
 
     compNotifAnimation() {
@@ -187,7 +203,7 @@ export default {
 .general-notif-container {
   min-width: 300px;
   max-width: 300px;
-  max-height: 400px;
+  max-height: 300px;
   overflow-y: scroll;
   background-color: #fff;
   border: 4px solid #ddd;

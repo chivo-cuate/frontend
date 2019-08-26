@@ -23,7 +23,7 @@
                     outlined
                     v-model="userData.last_name"
                     label="Apellidos"
-                    :rules="lastNameRules"
+                    :rules="nameRules"
                   ></v-text-field>
                 </v-flex>
               </v-layout>
@@ -77,7 +77,9 @@
                 </v-flex>
               </v-layout>
 
-              <v-layout row wrap mt-3>
+              <v-divider></v-divider>
+
+              <v-layout row wrap mt-3 ml-1>
                 <v-flex xs12 mt-2>
                   <v-tooltip right :color="validationColor">
                     <template v-slot:activator="{ on }">
@@ -202,16 +204,12 @@ export default {
   data() {
     return {
       dlgChangePassword: false,
-      dlgCancelReg: false,
       uploadDialog: false,
-      uploadingImage: false,
       loadingInitialElements: true,
       nameRules: [v => !!v || "Dato obligatorio"],
-      lastNameRules: [v => !!v || "Dato obligatorio"],
-      dsaLetterRules: [v => !!v || "Dato obligatorio"],
       passwordRules: [
         v => !!v || "Dato obligatorio",
-        v => (v && v.length > 0) || "Al menos 6 caracteres"
+        v => (v && v.length > 5) || "Al menos 6 caracteres"
       ],
       passwordConfirmRules: [
         v => !!v || "Dato obligatorio",
@@ -223,8 +221,6 @@ export default {
           /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
           "El formato no es correcto"
       ],
-      postcodeRules: [v => !!v || "Dato obligatorio"],
-      addressRules: [v => !!v || "Dato obligatorio"],
       uploadDlg: false,
       profileValidationStatus: false,
       passwordValidationStatus: false,

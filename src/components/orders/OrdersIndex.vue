@@ -7,8 +7,16 @@
           <v-layout wrap>
             <v-flex xs12>
               <v-alert
-                class="warning"
-              >Debe seleccionar una sucursal para poder usar esta p&aacute;gina</v-alert>
+                dense
+                tile
+                prominent
+                dismissible
+                dark
+                color="warning"
+                border="left"
+                icon="warning"
+                class="animated flash">
+                Debe seleccionar una sucursal para poder usar esta p&aacute;gina</v-alert>
             </v-flex>
           </v-layout>
         </v-container>
@@ -112,9 +120,11 @@ export default {
     }
   },
   mounted() {
-    if (this.permissions.canList || this.permissions.canViewPending) {
+    if ((this.permissions.canList || this.permissions.canViewPending) && this.$store.getters.getCurrBranch) {
       this.timer = setInterval(this.getDataFromApi, 5000);
       this.getDataFromApi();
+    } else {
+      this.loadingInitialData = false;
     }
     this.$root.$emit("resetNotifications");
   },

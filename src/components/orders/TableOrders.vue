@@ -20,7 +20,7 @@
                 <v-avatar left :class="order.gui_attribs.icon_color">
                   <v-icon size="20" class="white--text">{{ order.gui_attribs.icon }}</v-icon>
                 </v-avatar>
-                <span>Orden #{{ orderIndex + 1 }}</span>
+                <span>Orden #{{ order.order_number }}</span>
               </v-chip>
             </v-flex>
 

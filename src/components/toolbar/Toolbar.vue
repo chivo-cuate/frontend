@@ -41,11 +41,6 @@
 
         <CurrBranchChip />
 
-        <!--<v-btn
-          text
-          @click="$refs.notifComp.notifyUser('test')"
-        >TTS</v-btn>-->
-
         <v-spacer></v-spacer>
 
         <v-toolbar-items class="hidden-sm-and-down">
@@ -63,14 +58,10 @@
         </v-toolbar-items>
       </v-app-bar>
     </v-flex>
-
-    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-layout>
 </template>
 
 <script>
-import classList from "classlist";
-import { mapGetters } from "vuex";
 import Login from "@/components/toolbar/Login";
 import CurrBranchChip from "@/components/toolbar/CurrBranchChip";
 import BranchSelector from "@/components/toolbar/BranchSelector";
@@ -83,7 +74,6 @@ export default {
   data() {
     return {
       drawer: false,
-      audioPlayer: null,
     };
   },
   components: {

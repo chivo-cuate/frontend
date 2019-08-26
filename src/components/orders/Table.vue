@@ -10,7 +10,7 @@
               :color="orderStatus.icon_color"
               overlap
               class="animated slideInDown"
-              :style="`bottom: 32px; left: ${59 - (20 * orderStatusIndex)}px;`"
+              :style="`bottom: 32px; left: ${19 + (20 * orderStatusIndex)}px;`"
             >
               <template v-slot:badge>
                 <!--<v-icon x-small>{{ orderStatus.icon }}</v-icon>-->

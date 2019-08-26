@@ -5,7 +5,11 @@
         <v-img :src="require(`@/assets/img/table${order.status_id}.png`)" width="70px"></v-img>
       </v-btn>
       <br />
-      <v-chip class="table-number-menu no-radius">Mesa {{order.table_number}}</v-chip>
+      <v-chip label class="mt-1">
+              <v-icon small>mdi-tag</v-icon>
+              <span v-html="`Mesa ${order.table_number} - orden ${order.order_number}`"></span>
+            </v-chip>
+            
       <br />
       <div
         v-for="(orderAsset, orderAssetIndex) in order.assets"
