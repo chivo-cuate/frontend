@@ -21,7 +21,7 @@
           <v-img :src="require(`@/assets/img/table${table.status_id}.png`)" width="70px"></v-img>
         </v-btn>
       </v-flex>
-      <v-flex mb-3>
+      <v-flex mt-6>
         <v-chip v-on="on" class="table-number-menu">Mesa {{table.table_number}}</v-chip>
       </v-flex>
     </template>
