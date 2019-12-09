@@ -1,10 +1,15 @@
 <template>
   <v-container>
     <v-card tile>
-      <v-card-title :class="`title ${$store.getters.getThemeColor} white--text`" primary-title>
+      <v-card-title
+        :class="`title ${$store.getters.getThemeColor} white--text`"
+        primary-title
+      >
         <v-icon class="white--text">local_dining</v-icon>Mesas disponibles
         <v-spacer></v-spacer>
-        <v-btn text class="white--text" @click="dlgViewMenu = true">Ver men&uacute;</v-btn>
+        <v-btn text class="white--text" @click="dlgViewMenu = true"
+          >Ver men&uacute;</v-btn
+        >
       </v-card-title>
 
       <v-layout wrap text-center mt-8 pb-2>
@@ -13,7 +18,11 @@
           :key="`table-${tableIndex}`"
           class="animated fadeIn mr-5 ml-5 text-center"
         >
-          <Table :table="table" :perms="perms" @setEditedTable="setEditedTable($event)" />
+          <Table
+            :table="table"
+            :perms="perms"
+            @setEditedTable="setEditedTable($event)"
+          />
         </v-flex>
       </v-layout>
 
@@ -48,11 +57,17 @@
           <v-card-title
             :class="`headline ${$store.getters.getThemeColor} white--text`"
             primary-title
-          >Mesa {{editedTable.table_number}}</v-card-title>
+            >Mesa {{ editedTable.table_number }}</v-card-title
+          >
           <v-card-text>
             <v-container grid-list-md>
               <v-layout wrap mb-3>
-                <v-flex xs12>
+                <v-flex xs12 v-if="$store.getters.canSetOrderType">
+                  <v-radio-group v-model="editedOrder.order_type_id">
+                    <v-radio value="1">Para consumir</v-radio>
+                    <v-radio value="2">Para llevar</v-radio>
+                  </v-radio-group>
+                </v-flex><v-flex xs12>
                   <v-btn
                     @click="addAsset()"
                     :disabled="editedAssetsLength > 0 && !validAssetForm"
@@ -85,9 +100,16 @@
                     >
                       <template v-slot:item="data">
                         <v-list-item-content>
-                          <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                          <v-list-item-title
+                            v-html="data.item.name"
+                          ></v-list-item-title>
                           <v-list-item-subtitle
-                            v-html="`Precio: $${data.item.price}` + (data.item.grams ? ` (${data.item.grams} gramos)` : '')"
+                            v-html="
+                              `Precio: $${data.item.price}` +
+                                (data.item.grams
+                                  ? ` (${data.item.grams} gramos)`
+                                  : '')
+                            "
                           ></v-list-item-subtitle>
                         </v-list-item-content>
                       </template>
@@ -108,13 +130,22 @@
                     <v-text-field
                       readonly
                       :disabled="editedAssetAux.finished === '1'"
-                      :value="getAssetPriceById(editedAssetAux.asset_id, editedAssetAux.quantity)"
+                      :value="
+                        getAssetPriceById(
+                          editedAssetAux.asset_id,
+                          editedAssetAux.quantity
+                        )
+                      "
                       label="Precio"
                     ></v-text-field>
                   </v-flex>
 
                   <v-flex xs12 sm2>
-                    <v-btn width="100%" class="error" @click="removeAsset(assetIndex)">
+                    <v-btn
+                      width="100%"
+                      class="error"
+                      @click="removeAsset(assetIndex)"
+                    >
                       <v-icon>delete</v-icon>
                     </v-btn>
                   </v-flex>
@@ -125,7 +156,7 @@
                     <span>Total:</span>
                     <v-chip>
                       <v-icon left>attach_money</v-icon>
-                      {{compOrderPrice}}
+                      {{ compOrderPrice }}
                     </v-chip>
                   </v-flex>
                 </v-layout>
@@ -138,7 +169,9 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
-              :disabled="editedAssetsLength < 1 || !validAssetForm || handlingOrder"
+              :disabled="
+                editedAssetsLength < 1 || !validAssetForm || handlingOrder
+              "
               :color="$store.getters.getThemeColor"
               text
               @click="sendOrder()"
@@ -152,7 +185,9 @@
               ></v-progress-circular>
               <span v-html="`${editedOrder.id ? 'Editar' : 'Agregar'}`"></span>
             </v-btn>
-            <v-btn color="error" text @click="dlgEditOrder = false">Cancelar</v-btn>
+            <v-btn color="error" text @click="dlgEditOrder = false"
+              >Cancelar</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -163,7 +198,10 @@
         :visible="dlgCheckout"
         :width="500"
         :title="'Cerrar orden'"
-        :question="`Se dispone a cerrar la cuenta # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number} con un monto de:`"
+        :question="
+          `Se dispone a cerrar la cuenta # ${this.editedOrderIndex +
+            1} de la mesa ${editedTable.table_number} con un monto de:`
+        "
         :chip="compOrderPrice"
         :processing="handlingOrder"
       />
@@ -174,7 +212,10 @@
         :visible="dlgCancelOrder"
         :width="350"
         :title="'Cancelar orden'"
-        :question="`Se dispone a cancelar la orden # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number} con un monto de:`"
+        :question="
+          `Se dispone a cancelar la orden # ${this.editedOrderIndex +
+            1} de la mesa ${editedTable.table_number} con un monto de:`
+        "
         :chip="compOrderPrice"
         :processing="handlingOrder"
       />
@@ -185,7 +226,10 @@
         :visible="dlgServeProducts"
         :width="350"
         :title="'Servir productos'"
-        :question="`Se dispone a servir los productos de la orden # ${this.editedOrderIndex + 1} de la mesa ${editedTable.table_number}.`"
+        :question="
+          `Se dispone a servir los productos de la orden # ${this
+            .editedOrderIndex + 1} de la mesa ${editedTable.table_number}.`
+        "
         :chip="null"
         :processing="handlingOrder"
       />
@@ -238,12 +282,13 @@ export default {
         { text: "Precio", value: "price" },
         { text: "Cantidad", value: "quantity" },
         { text: "Estado", value: "status" }
-      ]
+      ],
     };
   },
   components: { Table, TableOrders, SimpleTableDlg, YesNoDlg },
   props: ["tables", "assets", "perms"],
-  mounted() {},
+  mounted() {
+  },
   watch: {
     editedOrders: function(newValue, oldValue) {
       if (!newValue) {
@@ -419,7 +464,8 @@ export default {
           params: {
             item: {
               table_number: this.editedTable.table_number,
-              id: this.editedOrder.id
+              id: this.editedOrder.id,
+              order_type_id: this.editedOrder.order_type_id
             },
             assets: this.editedAssets,
             branch_id: this.$store.getters.getCurrBranch.id
