@@ -32,6 +32,9 @@
             </v-btn>
           </template>
           <v-list>
+            <v-list-item v-if="order.gui_attribs.edit" class="dropdown-menu-item" @click="showYesNoDialog('dlgViewOrder')">
+              <v-icon>pageview</v-icon><span>Detalles</span>
+            </v-list-item>
             <v-list-item v-if="order.gui_attribs.edit" class="dropdown-menu-item" @click="showYesNoDialog('dlgEditOrder')">
               <v-icon>edit</v-icon><span>Editar</span>
             </v-list-item>

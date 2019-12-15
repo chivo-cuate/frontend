@@ -40,8 +40,18 @@
         @close="closeDrwOrders()"
         @showYesNoDialog="showYesNoDialog($event)"
       />
+    </v-card>
 
-      <SimpleTableDlg
+    <SimpleTableDlg
+      @close="dlgViewMenu = false"
+      :visible="dlgViewMenu"
+      :width="700"
+      :title="'Menú'"
+      :headers="dailyMenuHeaders"
+      :items="compDailyMenu"
+    />
+
+    <SimpleTableDlg
         @close="dlgViewOrder = false"
         :visible="dlgViewOrder"
         :width="500"
@@ -89,16 +99,6 @@
         :chip="null"
         :processing="handlingOrder"
       />
-    </v-card>
-
-    <SimpleTableDlg
-      @close="dlgViewMenu = false"
-      :visible="dlgViewMenu"
-      :width="700"
-      :title="'Menú'"
-      :headers="dailyMenuHeaders"
-      :items="compDailyMenu"
-    />
 
     <v-dialog v-model="dlgEditOrder" width="500" persistent>
       <v-card>
@@ -290,7 +290,6 @@ export default {
   props: ["tables", "takeAwayOrders", "assets", "perms"],
   mounted() {
     this.$root.$on("showYesNoDialog", event => {
-      console.log(event.order);
       this.editedOrder = Object.assign({}, event.order);
       this.setEditedAssets();
       this.activateDlgFlag(event.action);

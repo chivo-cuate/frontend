@@ -1,7 +1,10 @@
 <template>
   <v-container>
     <v-card tile>
-      <v-card-title :class="`title ${$store.getters.getThemeColor} white--text`" primary-title>
+      <v-card-title
+        :class="`title ${$store.getters.getThemeColor} white--text`"
+        primary-title
+      >
         <v-icon class="white--text">mdi-account</v-icon>Elaboradores habilitados
       </v-card-title>
 
@@ -15,10 +18,20 @@
         </v-flex>
       </v-layout>
 
-      <YesNoDlg @yes="finishOrder()" @no="dlgFinish = false" :visible="dlgFinish" :width="350" :title="'Terminar orden'" :question="`Se dispone a dar por terminada la orden actual de ${editedCook.first_name} ${editedCook.last_name}, asociada a la mesa ${editedCook.current_order.table_number}.`" :chip="null" :processing="handlingOrder" />
+      <YesNoDlg
+        @yes="finishOrder()"
+        @no="dlgFinish = false"
+        :visible="dlgFinish"
+        :width="350"
+        :title="'Terminar orden'"
+        :question="
+          `Se dispone a dar por terminada la orden actual de ${editedCook.first_name} ${editedCook.last_name}.`
+        "
+        :chip="null"
+        :processing="handlingOrder"
+      />
 
       <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
-
     </v-card>
   </v-container>
 </template>
@@ -30,15 +43,14 @@ import YesNoDlg from "@/components/_dialogs/YesNoDlg";
 export default {
   data() {
     return {
-      editedCook: {current_order: {}},
+      editedCook: { current_order: {} },
       handlingOrder: false,
-      dlgFinish: false,
+      dlgFinish: false
     };
   },
   components: { Cook, YesNoDlg },
   props: ["cooks"],
   methods: {
-    
     setEditedCook(event) {
       this.editedCook = event;
       this.dlgFinish = true;
@@ -69,10 +81,9 @@ export default {
       this.operationMessageType = response.code;
       this.dlgFinish = false;
       if (response.code === "success") {
-        this.$emit('setResponse', response);
+        this.$emit("setResponse", response);
       }
-    },
-
+    }
   }
 };
 </script>
