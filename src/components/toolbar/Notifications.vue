@@ -141,7 +141,10 @@ export default {
           .then(data => {
             let available_voices = window.speechSynthesis.getVoices();
             for (var i = 0; i < available_voices.length; i++) {
-              if (available_voices[i].lang === "es-MX") {
+              if (available_voices[i].lang === "es-ES" && !that.bestVoice) {
+                that.bestVoice = available_voices[i];
+              }
+              else if (available_voices[i].lang === "es-MX") {
                 that.bestVoice = available_voices[i];
                 break;
               }
