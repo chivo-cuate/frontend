@@ -26,7 +26,7 @@
       </v-flex>
     </template>
     <v-list>
-      <v-list-item v-if="perms.canCreate" class="dropdown-menu-item" @click="setEditedTable('add')">
+      <v-list-item v-if="perms.canCreateOPC" class="dropdown-menu-item" @click="setEditedTable('add')">
         <v-icon>local_dining</v-icon>
         <span>Agregar orden</span>
       </v-list-item>
@@ -71,7 +71,7 @@ export default {
   props: ["table", "perms"],
   methods: {
     setEditedTable(action) {
-      this.$emit("setEditedTable", { table: this.table, action: action });
+      this.$emit("setEditedTable", { table: this.table, action: action, order_type: 1 });
     }
   }
 };

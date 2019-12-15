@@ -5,7 +5,7 @@
         <v-icon class="white--text">mdi-account</v-icon>Elaboradores habilitados
       </v-card-title>
 
-      <v-layout wrap text-center mt-8 pb-2>
+      <v-layout wrap text-center mt-8>
         <v-flex
           v-for="(cook, cookIndex) in cooks"
           :key="`table-${cookIndex}`"

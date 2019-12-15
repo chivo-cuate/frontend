@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card tile>
+    <v-card tile class="pb-4">
       <v-card-title
         :class="`title ${$store.getters.getThemeColor} white--text`"
         primary-title
@@ -17,7 +17,7 @@
       </v-layout>
       <v-layout v-else wrap>
         <v-flex>
-          <p class="title text-center mt-5">No hay &oacute;rdenes sin asignar.</p>
+          <p class="title text-center mt-8">No se han encontrado &oacute;rdenes en cola.</p>
         </v-flex>
       </v-layout>
     </v-card>

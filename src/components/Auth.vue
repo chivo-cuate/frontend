@@ -1,7 +1,7 @@
 <template>
   <v-flex xs12>
     <v-layout justify-center class="animated fadeIn">
-      <v-flex md5>
+      <v-flex xs10 sm8 md6 lg5>
         <v-toolbar tabs :color="$store.getters.getThemeColor">
           <v-toolbar-title class="white--text">
             <v-icon class="white--text">lock</v-icon>Introduzca sus datos
@@ -21,7 +21,7 @@
 
             <v-tab-item value="tab-iniciar-sesion">
               <v-layout align-center justify-center>
-                <v-flex md8 mt-3>
+                <v-flex xs11 sm10 md9 mt-3>
                   <v-card-text>
                     <v-form @submit.prevent ref="loginForm" v-model="loginValidationStatus">
                       <v-layout row>

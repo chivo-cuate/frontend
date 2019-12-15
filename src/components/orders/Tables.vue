@@ -1,13 +1,20 @@
 <template>
   <v-container>
-    <v-card tile>
+    <TakeAwayOrders
+      v-if="perms.canCreateOPL"
+      :takeAwayOrders="takeAwayOrders"
+      @showDlgMenu="showDlgMenu()"
+      @setEditedTable="setEditedTable($event)"
+    />
+
+    <v-card tile v-if="perms.canCreateOPC">
       <v-card-title
         :class="`title ${$store.getters.getThemeColor} white--text`"
         primary-title
       >
         <v-icon class="white--text">local_dining</v-icon>Mesas disponibles
         <v-spacer></v-spacer>
-        <v-btn text class="white--text" @click="dlgViewMenu = true"
+        <v-btn text class="white--text" @click="showDlgMenu()"
           >Ver men&uacute;</v-btn
         >
       </v-card-title>
@@ -35,15 +42,6 @@
       />
 
       <SimpleTableDlg
-        @close="dlgViewMenu = false"
-        :visible="dlgViewMenu"
-        :width="700"
-        :title="'Menú'"
-        :headers="dailyMenuHeaders"
-        :items="compDailyMenu"
-      />
-
-      <SimpleTableDlg
         @close="dlgViewOrder = false"
         :visible="dlgViewOrder"
         :width="500"
@@ -52,146 +50,6 @@
         :items="compEditedAssetsInfo"
       />
 
-      <v-dialog v-model="dlgEditOrder" width="500" persistent>
-        <v-card>
-          <v-card-title
-            :class="`headline ${$store.getters.getThemeColor} white--text`"
-            primary-title
-            >Mesa {{ editedTable.table_number }}</v-card-title
-          >
-          <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap mb-3>
-                <v-flex xs12 v-if="$store.getters.canSetOrderType">
-                  <v-radio-group v-model="editedOrder.order_type_id">
-                    <v-radio value="1">Para consumir</v-radio>
-                    <v-radio value="2">Para llevar</v-radio>
-                  </v-radio-group>
-                </v-flex><v-flex xs12>
-                  <v-btn
-                    @click="addAsset()"
-                    :disabled="editedAssetsLength > 0 && !validAssetForm"
-                    :class="`${$store.getters.getThemeColor} white--text`"
-                  >
-                    <v-icon>mdi-food</v-icon>Agregar
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-              <v-form @submit.prevent ref="form" v-model="validAssetForm">
-                <v-layout
-                  wrap
-                  v-for="(editedAssetAux, assetIndex) in editedAssets"
-                  :key="`prod-${assetIndex}`"
-                >
-                  <v-flex xs8 sm6>
-                    <v-autocomplete
-                      small-chips
-                      style="max-height: 20px!important;"
-                      :rules="requiredRules"
-                      v-model="editedAssetAux.asset_id"
-                      :readonly="editedAssetAux.finished === '1'"
-                      :items="assets"
-                      :item-color="$store.getters.getThemeColor"
-                      item-text="name"
-                      item-value="id"
-                      label="Producto"
-                      no-data-text="No hay resultados"
-                      @change="removeDuplicateAssets()"
-                    >
-                      <template v-slot:item="data">
-                        <v-list-item-content>
-                          <v-list-item-title
-                            v-html="data.item.name"
-                          ></v-list-item-title>
-                          <v-list-item-subtitle
-                            v-html="
-                              `Precio: $${data.item.price}` +
-                                (data.item.grams
-                                  ? ` (${data.item.grams} gramos)`
-                                  : '')
-                            "
-                          ></v-list-item-subtitle>
-                        </v-list-item-content>
-                      </template>
-                    </v-autocomplete>
-                  </v-flex>
-
-                  <v-flex xs4 sm2>
-                    <v-text-field
-                      :rules="numberRules"
-                      :disabled="editedAssetAux.finished === '1'"
-                      v-model="editedAssetAux.quantity"
-                      label="Unidades"
-                      type="number"
-                    ></v-text-field>
-                  </v-flex>
-
-                  <v-flex xs4 sm2>
-                    <v-text-field
-                      readonly
-                      :disabled="editedAssetAux.finished === '1'"
-                      :value="
-                        getAssetPriceById(
-                          editedAssetAux.asset_id,
-                          editedAssetAux.quantity
-                        )
-                      "
-                      label="Precio"
-                    ></v-text-field>
-                  </v-flex>
-
-                  <v-flex xs12 sm2>
-                    <v-btn
-                      width="100%"
-                      class="error"
-                      @click="removeAsset(assetIndex)"
-                    >
-                      <v-icon>delete</v-icon>
-                    </v-btn>
-                  </v-flex>
-                </v-layout>
-
-                <v-layout wrap>
-                  <v-flex xs12>
-                    <span>Total:</span>
-                    <v-chip>
-                      <v-icon left>attach_money</v-icon>
-                      {{ compOrderPrice }}
-                    </v-chip>
-                  </v-flex>
-                </v-layout>
-              </v-form>
-            </v-container>
-          </v-card-text>
-
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              :disabled="
-                editedAssetsLength < 1 || !validAssetForm || handlingOrder
-              "
-              :color="$store.getters.getThemeColor"
-              text
-              @click="sendOrder()"
-            >
-              <v-progress-circular
-                v-if="handlingOrder"
-                :size="15"
-                :width="1"
-                indeterminate
-                class="v-icon"
-              ></v-progress-circular>
-              <span v-html="`${editedOrder.id ? 'Editar' : 'Agregar'}`"></span>
-            </v-btn>
-            <v-btn color="error" text @click="dlgEditOrder = false"
-              >Cancelar</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
       <YesNoDlg
         @yes="checkout()"
         @no="dlgCheckout = false"
@@ -199,8 +57,7 @@
         :width="500"
         :title="'Cerrar orden'"
         :question="
-          `Se dispone a cerrar la cuenta # ${this.editedOrderIndex +
-            1} de la mesa ${editedTable.table_number} con un monto de:`
+          `Se dispone a cerrar la cuenta # ${editedOrder.order_number} ${editedOrder.order_type_id === 1 ? `de la mesa ${editedOrder.table_number}` : `para llevar`} con un monto de:`
         "
         :chip="compOrderPrice"
         :processing="handlingOrder"
@@ -213,8 +70,7 @@
         :width="350"
         :title="'Cancelar orden'"
         :question="
-          `Se dispone a cancelar la orden # ${this.editedOrderIndex +
-            1} de la mesa ${editedTable.table_number} con un monto de:`
+          `Se dispone a cancelar la orden # ${editedOrder.order_number} ${editedOrder.order_type_id === 1 ? `de la mesa ${editedOrder.table_number}` : `para llevar`} con un monto de:`
         "
         :chip="compOrderPrice"
         :processing="handlingOrder"
@@ -233,9 +89,153 @@
         :chip="null"
         :processing="handlingOrder"
       />
-
-      <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
     </v-card>
+
+    <SimpleTableDlg
+      @close="dlgViewMenu = false"
+      :visible="dlgViewMenu"
+      :width="700"
+      :title="'Menú'"
+      :headers="dailyMenuHeaders"
+      :items="compDailyMenu"
+    />
+
+    <v-dialog v-model="dlgEditOrder" width="500" persistent>
+      <v-card>
+        <v-card-title
+          :class="`headline ${$store.getters.getThemeColor} white--text`"
+          primary-title
+          >Mesa {{ editedTable.table_number }}</v-card-title
+        >
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap mb-3>
+              <v-flex xs12>
+                <v-btn
+                  @click="addAsset()"
+                  :disabled="editedAssetsLength > 0 && !validAssetForm"
+                  :class="`${$store.getters.getThemeColor} white--text`"
+                >
+                  <v-icon>mdi-food</v-icon>Agregar
+                </v-btn>
+              </v-flex>
+            </v-layout>
+            <v-form @submit.prevent ref="form" v-model="validAssetForm">
+              <v-layout
+                wrap
+                v-for="(editedAssetAux, assetIndex) in editedAssets"
+                :key="`prod-${assetIndex}`"
+              >
+                <v-flex xs8 sm6>
+                  <v-autocomplete
+                    small-chips
+                    style="max-height: 20px!important;"
+                    :rules="requiredRules"
+                    v-model="editedAssetAux.asset_id"
+                    :readonly="editedAssetAux.finished === '1'"
+                    :items="assets"
+                    :item-color="$store.getters.getThemeColor"
+                    item-text="name"
+                    item-value="id"
+                    label="Producto"
+                    no-data-text="No hay resultados"
+                    @change="removeDuplicateAssets()"
+                  >
+                    <template v-slot:item="data">
+                      <v-list-item-content>
+                        <v-list-item-title
+                          v-html="data.item.name"
+                        ></v-list-item-title>
+                        <v-list-item-subtitle
+                          v-html="
+                            `Precio: $${data.item.price}` +
+                              (data.item.grams
+                                ? ` (${data.item.grams} gramos)`
+                                : '')
+                          "
+                        ></v-list-item-subtitle>
+                      </v-list-item-content>
+                    </template>
+                  </v-autocomplete>
+                </v-flex>
+
+                <v-flex xs4 sm2>
+                  <v-text-field
+                    :rules="numberRules"
+                    :disabled="editedAssetAux.finished === '1'"
+                    v-model="editedAssetAux.quantity"
+                    label="Unidades"
+                    type="number"
+                  ></v-text-field>
+                </v-flex>
+
+                <v-flex xs4 sm2>
+                  <v-text-field
+                    readonly
+                    :disabled="editedAssetAux.finished === '1'"
+                    :value="
+                      getAssetPriceById(
+                        editedAssetAux.asset_id,
+                        editedAssetAux.quantity
+                      )
+                    "
+                    label="Precio"
+                  ></v-text-field>
+                </v-flex>
+
+                <v-flex xs12 sm2>
+                  <v-btn
+                    width="100%"
+                    class="error"
+                    @click="removeAsset(assetIndex)"
+                  >
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+
+              <v-layout wrap>
+                <v-flex xs12>
+                  <span>Total:</span>
+                  <v-chip>
+                    <v-icon left>attach_money</v-icon>
+                    {{ compOrderPrice }}
+                  </v-chip>
+                </v-flex>
+              </v-layout>
+            </v-form>
+          </v-container>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            :disabled="
+              editedAssetsLength < 1 || !validAssetForm || handlingOrder
+            "
+            :color="$store.getters.getThemeColor"
+            text
+            @click="sendOrder()"
+          >
+            <v-progress-circular
+              v-if="handlingOrder"
+              :size="15"
+              :width="1"
+              indeterminate
+              class="v-icon"
+            ></v-progress-circular>
+            <span v-html="`${editedOrder.id ? 'Editar' : 'Agregar'}`"></span>
+          </v-btn>
+          <v-btn color="error" text @click="dlgEditOrder = false"
+            >Cancelar</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-container>
 </template>
 
@@ -244,6 +244,7 @@ import Table from "@/components/orders/Table";
 import TableOrders from "@/components/orders/TableOrders";
 import SimpleTableDlg from "@/components/_dialogs/SimpleTableDlg";
 import YesNoDlg from "@/components/_dialogs/YesNoDlg";
+import TakeAwayOrders from "@/components/orders/TakeAwayOrders";
 
 export default {
   data() {
@@ -282,12 +283,18 @@ export default {
         { text: "Precio", value: "price" },
         { text: "Cantidad", value: "quantity" },
         { text: "Estado", value: "status" }
-      ],
+      ]
     };
   },
-  components: { Table, TableOrders, SimpleTableDlg, YesNoDlg },
-  props: ["tables", "assets", "perms"],
+  components: { Table, TableOrders, SimpleTableDlg, YesNoDlg, TakeAwayOrders },
+  props: ["tables", "takeAwayOrders", "assets", "perms"],
   mounted() {
+    this.$root.$on("showYesNoDialog", event => {
+      console.log(event.order);
+      this.editedOrder = Object.assign({}, event.order);
+      this.setEditedAssets();
+      this.activateDlgFlag(event.action);
+    });
   },
   watch: {
     editedOrders: function(newValue, oldValue) {
@@ -313,6 +320,7 @@ export default {
       });
       return res;
     },
+
     compDailyMenu() {
       let res = [];
       this.assets.forEach(element => {
@@ -322,6 +330,7 @@ export default {
       });
       return res;
     },
+
     compOrderPrice() {
       let res = 0;
       this.editedAssets.forEach(element => {
@@ -332,6 +341,7 @@ export default {
       });
       return res;
     },
+
     editedAssetsLength() {
       return this.editedAssets.length;
     }
@@ -354,12 +364,20 @@ export default {
       this.editedOrderIndex = orderIndex;
       let order = this.editedOrders[orderIndex];
       this.editedOrder = Object.assign({}, order);
+      this.setEditedAssets();
+    },
+
+    showDlgMenu() {
+      this.dlgViewMenu = true;
     },
 
     showYesNoDialog(event) {
       this.setEditedOrder(event.orderIndex);
-      this.setEditedAssets();
-      switch (event.action) {
+      this.activateDlgFlag(event.action);
+    },
+
+    activateDlgFlag(action) {
+      switch (action) {
         case "dlgEditOrder":
           this.dlgEditOrder = true;
           break;
@@ -386,7 +404,9 @@ export default {
 
       switch (data.action) {
         case "add":
-          this.editedOrder = {};
+          this.editedOrder = {
+            order_type_id: data.order_type
+          };
           this.editedAssets = [];
           this.dlgEditOrder = true;
           break;

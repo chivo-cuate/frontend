@@ -42,6 +42,7 @@
             v-if="permissions.canList"
             ref="tablesComp"
             :tables="tables"
+            :takeAwayOrders="takeAwayOrders"
             :assets="assets"
             :perms="permissions"
             @setResponse="setResponse($event)"
@@ -53,7 +54,9 @@
         </v-flex>
       </template>
     </template>
+
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
+    
   </v-flex>
 </template>
 
@@ -70,12 +73,14 @@ export default {
       cooksEnabled: true,
       tables: [],
       assets: [],
+      takeAwayOrders: [],
       pendingOrders: [],
       cooks: [],
       timer: null,
       permissions: {
         canList: false,
-        canCreate: false,
+        canCreateOPC: false,
+        canCreateOPL: false,
         canEdit: false,
         canDelete: false,
         canViewPending: false,
@@ -88,26 +93,30 @@ export default {
   created() {
     this.$store.getters.getOrdersPermissions.forEach(permissions => {
       permissions.perms.forEach(perm => {
-        switch (perm.route) {
-          case "/ordenes/ordenes/listar":
+        switch (perm.text) {
+          case "Listar":
             this.permissions.canList = true;
             break;
-          case "/ordenes/ordenes/crear":
-            this.permissions.canCreate = true;
+          case "Crear OPC":
+            this.permissions.canCreateOPC = true;
             break;
-          case "/ordenes/ordenes/editar":
+          case "Crear OPL":
+            this.permissions.canCreateOPL = true;
+            break;
+          case "Editar":
             this.permissions.canEdit = true;
             break;
-          case "/ordenes/ordenes/eliminar":
+          case "Cancelar":
             this.permissions.canDelete = true;
             break;
-          case "/ordenes/ordenes/elaborar":
+          case "Elaborar OPC":
+          case "Elaborar OPL":
             this.permissions.canCook = true;
             break;
-          case "/ordenes/ordenes/ver-pendientes":
+          case "Ver pendientes":
             this.permissions.canViewPending = true;
             break;
-          case "/ordenes/ordenes/cerrar":
+          case "Cerrar cuenta":
             this.permissions.canCheckout = true;
             break;
           default:
@@ -131,6 +140,7 @@ export default {
   methods: {
     setResponse(response) {
       this.tables = response.data.tables;
+      this.takeAwayOrders = response.data.takeaway_orders;
       this.assets = response.data.assets;
       this.pendingOrders = response.data.orders;
       this.cooks = response.data.cooks;

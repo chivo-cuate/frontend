@@ -101,19 +101,6 @@ export default new Vuex.Store({
       });
       return res;
     },
-    canSetOrderType: (state) => {
-      let res = false;
-      state.payload.permissions.forEach(mod => {
-        mod.subModules.forEach(subModule => {
-          subModule.perms.forEach(perm => {
-            if (perm.text === "Crear OPL") {
-              res = true;
-            }
-          });
-        });
-      });
-      return res;
-    },
     getCurrBranch: state => {
       return state.payload.curr_branch;
     },
