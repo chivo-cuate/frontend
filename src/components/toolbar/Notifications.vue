@@ -158,7 +158,7 @@ export default {
         let that = this;
         let audioPlayer = new Audio("assets/snd/notif.mp3");
         audioPlayer.onended = function() {
-          if (that.speech.hasBrowserSupport() && that.playNotifications) {
+          if (that.speech.hasBrowserSupport()/* && that.playNotifications*/) {
             that.textToSpeech(text);
           }
         };
