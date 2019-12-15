@@ -1,6 +1,10 @@
 <template>
   <v-flex xs12>
-    <VProgress v-if="loadingInitialData" message="Cargando" class="text-center" />
+    <VProgress
+      v-if="loadingInitialData"
+      message="Cargando"
+      class="text-center"
+    />
     <template v-else>
       <template v-if="!this.$store.getters.getCurrBranch">
         <v-container>
@@ -15,8 +19,11 @@
                 color="warning"
                 border="left"
                 icon="warning"
-                class="animated flash">
-                Debe seleccionar una sucursal para poder usar esta p&aacute;gina</v-alert>
+                class="animated flash"
+              >
+                Debe seleccionar una sucursal para poder usar esta
+                p&aacute;gina</v-alert
+              >
             </v-flex>
           </v-layout>
         </v-container>
@@ -34,10 +41,16 @@
               border="left"
               icon="warning"
               class="animated flash"
-            >No existen elaboradores habilitados para el men&uacute; de hoy. Solo podr&aacute;n ser procesadas las &oacute;rdenes que no involucren alimentos elaborados.</v-alert>
+              >No existen elaboradores habilitados para el men&uacute; de hoy.
+              Solo podr&aacute;n ser procesadas las &oacute;rdenes que no
+              involucren alimentos elaborados.</v-alert
+            >
           </v-flex>
         </v-container>
-        <v-flex class="animated fadeIn" :style="cooksEnabled ? '' : 'margin-top: -30px;'">
+        <v-flex
+          class="animated fadeIn"
+          :style="cooksEnabled ? '' : 'margin-top: -30px;'"
+        >
           <Tables
             v-if="permissions.canList"
             ref="tablesComp"
@@ -56,7 +69,6 @@
     </template>
 
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
-    
   </v-flex>
 </template>
 
@@ -129,7 +141,10 @@ export default {
     }
   },
   mounted() {
-    if ((this.permissions.canList || this.permissions.canViewPending) && this.$store.getters.getCurrBranch) {
+    if (
+      (this.permissions.canList || this.permissions.canViewPending) &&
+      this.$store.getters.getCurrBranch
+    ) {
       this.timer = setInterval(this.getDataFromApi, 5000);
       this.getDataFromApi();
     } else {
@@ -137,6 +152,10 @@ export default {
     }
     this.$root.$emit("resetNotifications");
   },
+  // beforeRouteLeave(to, from, next) {
+  //   this.$root.$emit("stopAudioPlayer");
+  //   next();
+  // },
   methods: {
     setResponse(response) {
       this.tables = response.data.tables;

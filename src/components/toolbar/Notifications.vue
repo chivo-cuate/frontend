@@ -3,8 +3,12 @@
     <template v-slot:activator="{ on }">
       <v-btn color="primary" class="white--text" text v-on="on">
         <v-badge overlap color="red" :class="compNotifAnimation">
-          <template v-if="compShowNotifBadge" v-slot:badge>{{ compNotificationsCount }}</template>
-          <v-icon v-if="compShowNotifBadge" medium color="white">notifications_active</v-icon>
+          <template v-if="compShowNotifBadge" v-slot:badge>{{
+            compNotificationsCount
+          }}</template>
+          <v-icon v-if="compShowNotifBadge" medium color="white"
+            >notifications_active</v-icon
+          >
           <v-icon v-else medium color="white">notifications_none</v-icon>
         </v-badge>
       </v-btn>
@@ -13,7 +17,10 @@
     <v-card class="general-notif-container pa-0">
       <v-list>
         <template v-if="compNotificationsCount > 0">
-          <v-list-item v-for="(item, index) in notifications" :key="`notif-${index}`">
+          <v-list-item
+            v-for="(item, index) in notifications"
+            :key="`notif-${index}`"
+          >
             <v-container>
               <v-layout row wrap>
                 <v-flex>
@@ -42,32 +49,6 @@
               </v-layout>
             </v-container>
           </v-list-item>
-
-          <v-list-item>
-            <v-container>
-              <v-layout row wrap>
-                <v-flex class="text-right">
-                  <v-btn
-                    @click="clearNotifications()"
-                    text
-                    small
-                    :disabled="deletingNotifications"
-                    color="error"
-                  >
-                    <v-progress-circular
-                      size="15"
-                      :width="2"
-                      v-if="deletingNotifications"
-                      indeterminate
-                      color="gray"
-                      class="white--text"
-                    ></v-progress-circular>
-                    <v-icon medium v-else>notifications_off</v-icon>
-                  </v-btn>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-list-item>
         </template>
 
         <template v-else>
@@ -75,12 +56,41 @@
             <v-container>
               <v-layout row wrap>
                 <v-flex class="text-center success--text">
-                  <v-icon class="success--text" small>warning</v-icon>No hay elementos.
+                  <v-icon class="success--text" small>warning</v-icon>No hay
+                  elementos.
                 </v-flex>
               </v-layout>
             </v-container>
           </v-list-item>
         </template>
+
+        <v-list-item>
+          <v-container>
+            <v-layout row wrap>
+              <v-flex class="text-right">
+                <v-btn
+                  @click="clearNotifications()"
+                  text
+                  small
+                  :disabled="deletingNotifications"
+                  color="error"
+                >
+                  <v-progress-circular
+                    size="15"
+                    :width="2"
+                    v-if="deletingNotifications"
+                    indeterminate
+                    color="gray"
+                    class="white--text"
+                  ></v-progress-circular>
+                  <v-icon v-else medium>{{
+                    playNotifications ? `notifications` : `notifications_off`
+                  }}</v-icon>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-list-item>
       </v-list>
     </v-card>
   </v-menu>
@@ -98,16 +108,22 @@ export default {
       newNotifications: [],
       notifications: [],
       speech: null,
-      voice: null
+      voice: null,
+      playNotifications: true,
+      audioPlayer: null
     };
   },
   mounted() {
+    this.audioPlayer = new Audio("assets/snd/notif.mp3");
     this.initSpeech();
     this.$root.$on("setNotifications", event => {
       this.setNewNotifications(event);
     });
     this.$root.$on("resetNotifications", event => {
       this.clearNotifications();
+    });
+    this.$root.$on("stopAudioPlayer", event => {
+      this.stopAudioPlayer();
     });
   },
   /*watch: {
@@ -116,16 +132,53 @@ export default {
   methods: {
     setNewNotifications(receivedNotifications) {
       this.newNotifications = [];
+      let allNewNotifications = "";
       receivedNotifications.forEach(notification => {
         let notificationIndex = this.getNotificationIndex(notification);
         if (notificationIndex === -1) {
-          this.newNotifications.push(notification);
+          allNewNotifications += ` ${notification.subtitle}`;
         }
       });
       this.notifications = receivedNotifications;
-      this.newNotifications.forEach(newNotification => {
-        this.notifyUser(newNotification.subtitle);
-      });
+      this.notifyUser(allNewNotifications);
+      // this.newNotifications.forEach(newNotification => {
+      //   this.notifyUser(newNotification.subtitle);
+      // });
+      // receivedNotifications.forEach(notification => {
+      //   let notificationIndex = this.getNotificationIndex(notification);
+      //   if (notificationIndex === -1) {
+      //     this.notifications.push(notification);
+      //     this.notifyUser(notification.subtitle);
+      //   }
+      // });
+    },
+
+    notifyUser(text) {
+      if (text !== "") {
+        let that = this;
+        let audioPlayer = new Audio("assets/snd/notif.mp3");
+        audioPlayer.onended = function() {
+          if (that.speech.hasBrowserSupport() && that.playNotifications) {
+            that.textToSpeech(text);
+          }
+        };
+        audioPlayer.play();
+      }
+    },
+
+    textToSpeech(text) {
+      this.speech.speak({ text: text });
+    },
+
+    clearNotifications() {
+      this.notifications = [];
+      this.playNotifications = !this.playNotifications;
+      this.stopAudioPlayer();
+    },
+
+    stopAudioPlayer() {
+      this.audioPlayer.pause();
+      this.audioPlayer.currentTime = 0;
     },
 
     getNotificationIndex(notification) {
@@ -143,8 +196,7 @@ export default {
             for (var i = 0; i < available_voices.length; i++) {
               if (available_voices[i].lang === "es-ES" && !that.bestVoice) {
                 that.bestVoice = available_voices[i];
-              }
-              else if (available_voices[i].lang === "es-MX") {
+              } else if (available_voices[i].lang === "es-MX") {
                 that.bestVoice = available_voices[i];
                 break;
               }
@@ -154,32 +206,13 @@ export default {
               : available_voices[0];
             that.speech.setLanguage(this.bestVoice.lang);
             that.speech.setVoice(this.bestVoice.name);
-            that.speech.setRate(0.6);
+            that.speech.setRate(0.7);
             that.speech.setVolume(1);
           })
           .catch(e => {
             console.error("An error occured while initializing speech: ", e);
           });
       }
-    },
-
-    notifyUser(text) {
-      let audioPlayer = new Audio("assets/snd/notif.mp3");
-      let that = this;
-      audioPlayer.onended = function() {
-        if (that.speech.hasBrowserSupport()) {
-          that.textToSpeech(text);
-        }
-      };
-      audioPlayer.play();
-    },
-
-    textToSpeech(text) {
-      this.speech.speak({ text: text });
-    },
-
-    clearNotifications() {
-      this.notifications = [];
     }
   },
   computed: {
