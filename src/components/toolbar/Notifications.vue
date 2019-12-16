@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset-y bottom :close-on-content-click="false" open-on-hover>
+  <v-menu offset-y bottom :close-on-content-click="false" :close-on-="false" open-on-hover>
     <template v-slot:activator="{ on }">
       <v-btn color="primary" class="white--text" text v-on="on">
         <v-badge overlap color="red" :class="compNotifAnimation">
@@ -69,7 +69,7 @@
             <v-layout row wrap>
               <v-flex class="text-right">
                 <v-btn
-                  @click="clearNotifications()"
+                  @click="resetNotifications()"
                   text
                   small
                   :disabled="deletingNotifications"
@@ -104,8 +104,7 @@ export default {
   data() {
     return {
       deletingNotifications: false,
-      selectedNotifications: [],
-      newNotifications: [],
+      spokenNotifications: [],
       notifications: [],
       speech: null,
       voice: null,
@@ -114,16 +113,14 @@ export default {
     };
   },
   mounted() {
+    this.spokenNotifications = [];
     this.audioPlayer = new Audio("assets/snd/notif.mp3");
     this.initSpeech();
     this.$root.$on("setNotifications", event => {
       this.setNewNotifications(event);
     });
     this.$root.$on("resetNotifications", event => {
-      this.clearNotifications();
-    });
-    this.$root.$on("stopAudioPlayer", event => {
-      this.stopAudioPlayer();
+      this.resetNotifications();
     });
   },
   /*watch: {
@@ -131,16 +128,16 @@ export default {
   },*/
   methods: {
     setNewNotifications(receivedNotifications) {
-      this.newNotifications = [];
-      let allNewNotifications = "";
+      let strNewNotifications = "";
       receivedNotifications.forEach(notification => {
         let notificationIndex = this.getNotificationIndex(notification);
         if (notificationIndex === -1) {
-          allNewNotifications += ` ${notification.subtitle}`;
+          strNewNotifications += ` ${notification.subtitle}`;
+          this.spokenNotifications.push(notification);
         }
       });
       this.notifications = receivedNotifications;
-      this.notifyUser(allNewNotifications);
+      this.notifyUser(strNewNotifications);
       // this.newNotifications.forEach(newNotification => {
       //   this.notifyUser(newNotification.subtitle);
       // });
@@ -156,13 +153,12 @@ export default {
     notifyUser(text) {
       if (text !== "") {
         let that = this;
-        let audioPlayer = new Audio("assets/snd/notif.mp3");
-        audioPlayer.onended = function() {
+        this.audioPlayer.onended = function() {
           if (that.speech.hasBrowserSupport()/* && that.playNotifications*/) {
             that.textToSpeech(text);
           }
         };
-        audioPlayer.play();
+        this.audioPlayer.play();
       }
     },
 
@@ -170,19 +166,18 @@ export default {
       this.speech.speak({ text: text });
     },
 
-    clearNotifications() {
+    resetNotifications() {
       this.notifications = [];
-      this.playNotifications = !this.playNotifications;
+      this.spokenNotifications = [];
       this.stopAudioPlayer();
     },
 
     stopAudioPlayer() {
-      this.audioPlayer.pause();
-      this.audioPlayer.currentTime = 0;
+      this.speech.cancel();
     },
 
     getNotificationIndex(notification) {
-      return this.notifications.findIndex(obj => obj.id === notification.id);
+      return this.spokenNotifications.findIndex(obj => obj.id === notification.id);
     },
 
     initSpeech() {
@@ -206,7 +201,7 @@ export default {
               : available_voices[0];
             that.speech.setLanguage(this.bestVoice.lang);
             that.speech.setVoice(this.bestVoice.name);
-            that.speech.setRate(0.7);
+            that.speech.setRate(0.9);
             that.speech.setVolume(1);
           })
           .catch(e => {

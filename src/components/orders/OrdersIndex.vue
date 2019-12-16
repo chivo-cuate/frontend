@@ -152,10 +152,10 @@ export default {
     }
     this.$root.$emit("resetNotifications");
   },
-  // beforeRouteLeave(to, from, next) {
-  //   this.$root.$emit("stopAudioPlayer");
-  //   next();
-  // },
+  beforeRouteLeave(to, from, next) {
+    this.$root.$emit("resetNotifications");
+    next();
+  },
   methods: {
     setResponse(response) {
       this.tables = response.data.tables;
