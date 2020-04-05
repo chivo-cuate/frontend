@@ -151,14 +151,11 @@
 </template>
 
 <script>
-import { setTimeout } from "timers";
-
 export default {
   data() {
     return {
       e1: true,
       e2: true,
-      capsLockAlert: false,
       loading: false,
       email: "",
       password: "",

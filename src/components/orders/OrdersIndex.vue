@@ -61,8 +61,13 @@
             @setResponse="setResponse($event)"
           />
           <template v-if="permissions.canViewPending">
-            <PendingOrders :orders="pendingOrders" />
-            <Cooks :cooks="cooks" @setResponse="setResponse($event)" />
+            <template v-if="$store.getters.getChosenCooks.length === 0">
+              <CookingPartners />
+            </template>
+            <template v-else>
+              <PendingOrders :orders="pendingOrders" />
+              <Cooks @setResponse="setResponse($event)" />
+            </template>
           </template>
         </v-flex>
       </template>
@@ -76,6 +81,7 @@
 import Tables from "@/components/orders/Tables";
 import PendingOrders from "@/components/orders/PendingOrders";
 import Cooks from "@/components/orders/Cooks";
+import CookingPartners from "@/components/orders/CookingPartners";
 
 export default {
   data() {
@@ -101,7 +107,7 @@ export default {
       }
     };
   },
-  components: { Tables, PendingOrders, Cooks },
+  components: { Tables, PendingOrders, Cooks, CookingPartners },
   created() {
     this.$store.getters.getOrdersPermissions.forEach(permissions => {
       permissions.perms.forEach(perm => {
@@ -151,6 +157,7 @@ export default {
       this.loadingInitialData = false;
     }
     this.$root.$emit("resetNotifications");
+    this.$store.commit("setChosenCooks", []);
   },
   beforeRouteLeave(to, from, next) {
     this.$root.$emit("resetNotifications");

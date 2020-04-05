@@ -5,7 +5,7 @@
         :class="`title ${$store.getters.getThemeColor} white--text`"
         primary-title
       >
-        <v-icon class="white--text">mdi-account</v-icon>Elaboradores habilitados
+        <v-icon class="white--text">mdi-account</v-icon>Elaboradores seleccionados
       </v-card-title>
 
       <v-layout wrap text-center mt-8>
@@ -45,11 +45,14 @@ export default {
     return {
       editedCook: { current_order: {} },
       handlingOrder: false,
-      dlgFinish: false
+      dlgFinish: false,
+      cooks: []
     };
   },
   components: { Cook, YesNoDlg },
-  props: ["cooks"],
+  mounted() {
+    this.cooks = this.$store.getters.getChosenCooks
+  },
   methods: {
     setEditedCook(event) {
       this.editedCook = event;

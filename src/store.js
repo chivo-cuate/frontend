@@ -15,12 +15,15 @@ export default new Vuex.Store({
     authRouteRequested: null,
     debug: true,
     payload: {
+      is_guest: true,
       name: null,
       curr_branch: {},
       branches: [],
       jwt: null,
       permissions: [],
       roles: [],
+      cooks: [],
+      chosen_cooks: [],
     }
   },
   mutations: {
@@ -33,6 +36,9 @@ export default new Vuex.Store({
     setAuthRouteRequested(state, authRouteRequested) {
       state.authRouteRequested = authRouteRequested
     },
+    setChosenCooks(state, cooks) {
+      state.payload.chosen_cooks = cooks
+    },
     logout(state) {
       state.authRouteRequested = null
       state.payload = {
@@ -42,6 +48,8 @@ export default new Vuex.Store({
         jwt: null,
         permissions: [],
         roles: [],
+        cooks: [],
+        chosen_cooks: [],
       }
     }
   },
@@ -109,6 +117,15 @@ export default new Vuex.Store({
     },
     getRoles: state => {
       return state.payload.roles
+    },
+    getCooks: state => {
+      return state.payload.cooks
+    },
+    getChosenCooks: state => {
+      return state.payload.chosen_cooks
+    },
+    getCurrentBranchCooks: state => {
+      return state.payload.cooks[state.payload.curr_branch.id].users
     },
     getPayload: state => {
       return state.payload
