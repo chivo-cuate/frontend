@@ -12,6 +12,7 @@
     "classlist": "^2.0.0",
     "file-saver": "^2.0.2",
     "ion-sound": "^3.0.7",
+    "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "speak-tts": "^2.0.8",
     "v-tooltip": "^2.0.2",
@@ -29,7 +30,7 @@
     "@vue/cli-service": "^3.9.3",
     "sass": "^1.17.4",
     "sass-loader": "^7.1.0",
-    "vue-cli-plugin-vuetify": "^0.6.1",
+    "vue-cli-plugin-vuetify": "~0.6.3",
     "vue-template-compiler": "^2.5.21",
     "vuetify-loader": "^1.2.2"
   }

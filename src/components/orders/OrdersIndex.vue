@@ -206,12 +206,14 @@ export default {
     getDataFromApi() {
       if (!this.loadingData) {
         this.loadingData = true;
-        var config = {
+        let pp = this.$store.getters.getChosenCooksIDs
+        let config = {
           url: this.permissions.canList
             ? "ordenes/listar"
             : "ordenes/ver-pendientes",
           params: {
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranch.id,
+            cooks: this.$store.getters.getChosenCooksIDs.join()
           }
         };
         if (this.$refs.axios) {

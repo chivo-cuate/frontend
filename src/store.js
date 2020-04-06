@@ -16,6 +16,7 @@ export default new Vuex.Store({
     debug: true,
     payload: {
       is_guest: true,
+      user_id: null,
       name: null,
       curr_branch: {},
       branches: [],
@@ -42,6 +43,8 @@ export default new Vuex.Store({
     logout(state) {
       state.authRouteRequested = null
       state.payload = {
+        is_guest: true,
+        user_id: null,
         name: null,
         curr_branch: {},
         branches: [],
@@ -124,6 +127,9 @@ export default new Vuex.Store({
     getChosenCooks: state => {
       return state.payload.chosen_cooks
     },
+    getChosenCooksIDs: state => {
+      return state.payload.chosen_cooks.map(obj => obj.id)
+    },
     getCurrentBranchCooks: state => {
       return state.payload.cooks[state.payload.curr_branch.id].users
     },
@@ -144,6 +150,9 @@ export default new Vuex.Store({
     },
     getUserToken: state => {
       return state.payload.token
+    },
+    getUserID: state => {
+      return state.payload.user_id
     }
   },
   plugins: [vuexLocal.plugin]
