@@ -61,7 +61,7 @@
             @setResponse="setResponse($event)"
           />
           <template v-if="permissions.canViewPending">
-            <template v-if="$store.getters.getChosenCooks.length === 0">
+            <template v-if="cooksNotChosenYet">
               <CookingPartners />
             </template>
             <template v-else>
@@ -108,6 +108,11 @@ export default {
     };
   },
   components: { Tables, PendingOrders, Cooks, CookingPartners },
+  computed: {
+    cooksNotChosenYet() {
+      return (!this.$store.getters.getChosenCooks || this.$store.getters.getChosenCooks.length === 0)
+    }
+  },
   created() {
     this.$store.getters.getOrdersPermissions.forEach(permissions => {
       permissions.perms.forEach(perm => {
@@ -206,7 +211,6 @@ export default {
     getDataFromApi() {
       if (!this.loadingData) {
         this.loadingData = true;
-        let pp = this.$store.getters.getChosenCooksIDs
         let config = {
           url: this.permissions.canList
             ? "ordenes/listar"

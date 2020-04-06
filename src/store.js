@@ -128,7 +128,7 @@ export default new Vuex.Store({
       return state.payload.chosen_cooks
     },
     getChosenCooksIDs: state => {
-      return state.payload.chosen_cooks.map(obj => obj.id)
+      return state.payload.chosen_cooks ? state.payload.chosen_cooks.map(obj => obj.id) : []
     },
     getCurrentBranchCooks: state => {
       return state.payload.cooks[state.payload.curr_branch.id].users
