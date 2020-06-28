@@ -53,7 +53,6 @@
 </template>
 
 <script>
-import _ from "lodash";
 
 export default {
   data() {
@@ -86,15 +85,16 @@ export default {
       return this.chosenCooks.findIndex((obj) => obj.id === cookId);
     },
     toggleActiveCook(index) {
-      let cookIndex = this.getSelectedCooksIndex(index);
+      let cookIndex = this.getSelectedCooksIndex(index)
       if (cookIndex === -1) {
-        this.chosenCooks.push(this.cooks[index]);
+        this.chosenCooks.push(this.cooks[index])
       } else {
-        this.chosenCooks.splice(cookIndex, 1);
+        this.chosenCooks.splice(cookIndex, 1)
       }
     },
     setChosenCooks() {
-      this.$store.commit("setChosenCooks", this.chosenCooks);
+      this.$store.commit("setChosenCooks", this.chosenCooks)
+      console.log(this.$store.getters.getChosenCooks)
     },
   },
 };

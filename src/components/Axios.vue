@@ -1,11 +1,10 @@
 <template>
   <v-snackbar
     :timeout="5000"
-    :bottom="true"
     :right="true"
+    :bottom="true"
     v-model="snackbar"
     :color="operationMessageType"
-    style="bottom: 70px"
   >
     <v-icon small class="white--text fa">info</v-icon>
     {{ operationMessage }}

@@ -2,8 +2,8 @@
   <v-menu offset-y bottom :close-on-content-click="false" :close-on-="false" open-on-hover>
     <template v-slot:activator="{ on }">
       <v-btn color="primary" class="white--text" text v-on="on">
-        <v-badge overlap color="red" :class="compNotifAnimation">
-          <template v-if="compShowNotifBadge" v-slot:badge>{{
+        <v-badge overlap :color="compShowNotifBadge ? 'red' : 'green'" :class="compNotifAnimation">
+          <template v-slot:badge>{{
             compNotificationsCount
           }}</template>
           <v-icon v-if="compShowNotifBadge" medium color="white"

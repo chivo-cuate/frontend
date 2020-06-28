@@ -81,7 +81,7 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 md6>
-                        <v-text-field outlined v-model="editedItem.grams" label="Gramos"></v-text-field>
+                        <v-text-field outlined v-model="editedItem.grams" label="Gramos/Ml"></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-form>

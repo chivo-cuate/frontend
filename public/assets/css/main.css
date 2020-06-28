@@ -176,3 +176,7 @@
 .no-radius {
   border-radius: 0!important;
 }
+
+.v-snack__wrapper {
+  bottom: 45px!important;
+}

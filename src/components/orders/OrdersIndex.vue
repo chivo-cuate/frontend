@@ -61,7 +61,7 @@
             @setResponse="setResponse($event)"
           />
           <template v-if="permissions.canViewPending">
-            <template v-if="cooksNotChosenYet">
+            <template v-if="compCooksNotChosen">
               <CookingPartners />
             </template>
             <template v-else>
@@ -109,8 +109,8 @@ export default {
   },
   components: { Tables, PendingOrders, Cooks, CookingPartners },
   computed: {
-    cooksNotChosenYet() {
-      return (!this.$store.getters.getChosenCooks || this.$store.getters.getChosenCooks.length === 0)
+    compCooksNotChosen() {
+      return (this.$store.getters.getChosenCooks.length === 0)
     }
   },
   created() {
