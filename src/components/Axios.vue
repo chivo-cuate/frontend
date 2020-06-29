@@ -60,13 +60,19 @@ export default {
         case "form":
         case "post":
           this.post().then(result => {
-            this.showSnackbar(this.requestInfo.snackbar, result.result.response);
+            this.showSnackbar(
+              this.requestInfo.snackbar,
+              result.result.response
+            );
             this.$emit("finish", { data: result, url: this.requestInfo.url });
           });
           break;
         default:
           this.get().then(result => {
-            this.showSnackbar(this.requestInfo.snackbar, result.result.response);
+            this.showSnackbar(
+              this.requestInfo.snackbar,
+              result.result.response
+            );
             this.$emit("finish", { data: result, url: this.requestInfo.url });
           });
           break;

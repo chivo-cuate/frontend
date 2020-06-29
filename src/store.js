@@ -14,6 +14,7 @@ export default new Vuex.Store({
     themeColor: 'light-green',
     authRouteRequested: null,
     debug: true,
+    chosen_cooks: [],
     payload: {
       is_guest: true,
       user_id: null,
@@ -24,7 +25,6 @@ export default new Vuex.Store({
       permissions: [],
       roles: [],
       cooks: [],
-      chosen_cooks: [],
     }
   },
   mutations: {
@@ -38,11 +38,11 @@ export default new Vuex.Store({
       state.authRouteRequested = authRouteRequested
     },
     setChosenCooks(state, chosen_cooks) {
-      state.payload.chosen_cooks = chosen_cooks
-      console.log(state.payload.chosen_cooks)
+      state.chosen_cooks = chosen_cooks
     },
     logout(state) {
       state.authRouteRequested = null
+      state.chosen_cooks = []
       state.payload = {
         is_guest: true,
         user_id: null,
@@ -53,11 +53,9 @@ export default new Vuex.Store({
         permissions: [],
         roles: [],
         cooks: [],
-        chosen_cooks: [],
       }
     }
   },
-  actions: {},
   getters: {
     isGuest: state => {
       return state.payload.roles.length === 0
@@ -126,12 +124,10 @@ export default new Vuex.Store({
       return state.payload.cooks
     },
     getChosenCooks: state => {
-      console.log(state.payload.chosen_cooks)
-      alert("Q pinga es")
-      return state.payload.chosen_cooks
+      return state.chosen_cooks
     },
     getChosenCooksIDs: state => {
-      return state.payload.chosen_cooks ? state.payload.chosen_cooks.map(obj => obj.id) : []
+      return state.chosen_cooks.map(obj => obj.id)
     },
     getCurrentBranchCooks: state => {
       return state.payload.is_guest ? [] : state.payload.cooks[state.payload.curr_branch.id].users

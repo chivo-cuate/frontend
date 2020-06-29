@@ -17,16 +17,34 @@
         <span>Salir</span>
       </v-list-item>
     </v-list>
+
+    <AxiosComponent ref="axios" @finish="handleHttpResponse($event)"/>
+
   </v-menu>
 </template>
 
 <script>
+
 export default {
   data() {
     return {};
   },
   methods: {
     logout() {
+      let chosenCooks = this.$store.getters.getChosenCooks;
+      let cookIds = chosenCooks.map(cook => {
+        return cook.id;
+      });
+      let config = {
+        url: "auth/logout",
+        snackbar: false,
+        method: "post",
+        params: {
+          cook_ids: cookIds,
+          branch_id: this.$store.getters.getCurrBranch.id
+        }
+      };
+      this.$refs.axios.submit(config);
       this.$store.commit("logout");
       this.$router.push("/acceso/iniciar-sesion");
     }

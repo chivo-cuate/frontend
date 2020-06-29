@@ -62,7 +62,7 @@
           />
           <template v-if="permissions.canViewPending">
             <template v-if="compCooksNotChosen">
-              <CookingPartners />
+              <CookingPartners @setChosenCooks="setChosenCooks($event)" />
             </template>
             <template v-else>
               <PendingOrders :orders="pendingOrders" />
@@ -162,7 +162,6 @@ export default {
       this.loadingInitialData = false;
     }
     this.$root.$emit("resetNotifications");
-    this.$store.commit("setChosenCooks", []);
   },
   beforeRouteLeave(to, from, next) {
     this.$root.$emit("resetNotifications");
@@ -224,6 +223,21 @@ export default {
           this.$refs.axios.submit(config);
         }
       }
+    },
+
+    setChosenCooks(chosenCooks) {
+      this.$store.commit("setChosenCooks", chosenCooks);
+      let cookIds = this.$store.getters.getChosenCooksIDs
+      let config = {
+        url: "auth/marcar-elaboradores-autenticados",
+        snackbar: false,
+        method: "post",
+        params: {
+          cook_ids: cookIds,
+          branch_id: this.$store.getters.getCurrBranch.id
+        }
+      };
+      this.$refs.axios.submit(config);
     }
   }
 };
