@@ -436,7 +436,7 @@ export default {
       var config = {
         url: `${this.apiUrl}/listar`,
         params: {
-          branch_id: this.$store.getters.getCurrBranch.id
+          branch_id: this.$store.getters.getCurrBranchID
         }
       };
       this.$refs.axios.submit(config);
@@ -460,7 +460,7 @@ export default {
           {
             id: -1,
             name: null,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           }
         );
       }
@@ -481,7 +481,7 @@ export default {
           url: `${this.apiUrl}/eliminar`,
           params: {
             id: this.editedItem.id,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true,
         };
@@ -500,7 +500,7 @@ export default {
               : `${this.apiUrl}/editar`,
           params: {
             item: this.editedItem,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true,
         };
@@ -517,7 +517,7 @@ export default {
           params: {
             id: this.editedItem.id,
             ingredients: this.editedIngredients,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true,
         };

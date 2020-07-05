@@ -31,17 +31,14 @@ export default {
   },
   methods: {
     logout() {
-      let chosenCooks = this.$store.getters.getChosenCooks;
-      let cookIds = chosenCooks.map(cook => {
-        return cook.id;
-      });
+      let cookIds = this.$store.getters.getChosenCooksIDs
       let config = {
         url: "auth/logout",
         snackbar: false,
         method: "post",
         params: {
           cook_ids: cookIds,
-          branch_id: this.$store.getters.getCurrBranch.id
+          branch_id: this.$store.getters.getCurrBranchID
         }
       };
       this.$refs.axios.submit(config);

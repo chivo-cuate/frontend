@@ -81,7 +81,7 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 md6>
-                        <v-text-field outlined v-model="editedItem.grams" label="Gramos/Ml"></v-text-field>
+                        <v-text-field outlined v-model="editedItem.grams" label="Cantidad"></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -241,7 +241,7 @@ export default {
       headers: [
         { text: "Producto", value: "asset_name", align: "left" },
         { text: "Precio", value: "price", align: "left" },
-        { text: "Gramos", value: "grams", align: "left" },
+        { text: "Cantidad", value: "grams", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
       measureUnits: [],
@@ -290,7 +290,6 @@ export default {
   },
   methods: {
     handleHttpResponse(event) {
-      //let action = event.url.substring(event.url.lastIndexOf("/") + 1);
       this.loadingItems = false;
       this.dlgUpdateItem = false;
       this.dlgDeleteItem = false;
@@ -306,6 +305,7 @@ export default {
         this.assets = response.data[1];
         this.menuCooks = response.data[2];
         this.allCooks = response.data[3];
+        console.log(this.assets)
       }
     },
 
@@ -314,7 +314,7 @@ export default {
       var config = {
         url: "menu-diario/listar",
         params: {
-          branch_id: this.$store.getters.getCurrBranch.id
+          branch_id: this.$store.getters.getCurrBranchID
         }
       };
       this.$refs.axios.submit(config);
@@ -351,7 +351,7 @@ export default {
           url: "menu-diario/eliminar",
           params: {
             id: this.editedItem.id,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true
         };
@@ -371,7 +371,7 @@ export default {
           params: {
             item: this.editedItem,
             cooks: this.menuCooks,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true
         };
@@ -387,7 +387,7 @@ export default {
           url: "menu-diario/habilitar-elaboradores",
           params: {
             cooks: this.menuCooks,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true
         };

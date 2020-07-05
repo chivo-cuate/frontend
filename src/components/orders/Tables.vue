@@ -276,7 +276,7 @@ export default {
         { text: "Categoría", value: "group" },
         { text: "Producto", value: "name" },
         { text: "Precio", value: "price" },
-        { text: "Gramos", value: "grams" }
+        { text: "Cantidad", value: "grams" }
       ],
       viewOrderHeaders: [
         { text: "Producto", value: "name" },
@@ -487,7 +487,7 @@ export default {
               order_type_id: this.editedOrder.order_type_id
             },
             assets: this.editedAssets,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           }
         };
         this.$refs.axios.submit(config);
@@ -504,7 +504,7 @@ export default {
           params: {
             id: this.editedOrder.id,
             table_number: this.editedTable.table_number,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           }
         };
         this.$refs.axios.submit(config);
@@ -521,7 +521,7 @@ export default {
           params: {
             id: this.editedOrder.id,
             table_number: this.editedTable.table_number,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           }
         };
         this.$refs.axios.submit(config);
@@ -538,7 +538,7 @@ export default {
           params: {
             id: this.editedOrder.id,
             table_number: this.editedTable.table_number,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           }
         };
         this.$refs.axios.submit(config);

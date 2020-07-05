@@ -175,6 +175,7 @@ export default {
       this.pendingOrders = response.data.orders;
       this.cooks = response.data.cooks;
       this.cooksEnabled = response.data.cooks_enabled;
+      this.$store.commit("setChosenCooks", this.cooks);
       this.$root.$emit("setNotifications", response.data.notifications);
     },
 
@@ -215,7 +216,7 @@ export default {
             ? "ordenes/listar"
             : "ordenes/ver-pendientes",
           params: {
-            branch_id: this.$store.getters.getCurrBranch.id,
+            branch_id: this.$store.getters.getCurrBranchID,
             cooks: this.$store.getters.getChosenCooksIDs.join()
           }
         };
@@ -234,7 +235,7 @@ export default {
         method: "post",
         params: {
           cook_ids: cookIds,
-          branch_id: this.$store.getters.getCurrBranch.id
+          branch_id: this.$store.getters.getCurrBranchID
         }
       };
       this.$refs.axios.submit(config);

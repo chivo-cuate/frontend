@@ -267,7 +267,7 @@ export default {
       var config = {
         url: "almacen/listar",
         params: {
-          branch_id: this.$store.getters.getCurrBranch.id
+          branch_id: this.$store.getters.getCurrBranchID
         }
       };
       this.$refs.axios.submit(config);
@@ -286,7 +286,7 @@ export default {
         measure_unit_id: null,
         asset_id: null,
         price_in: null,
-        branch_id: this.$store.getters.getCurrBranch.id
+        branch_id: this.$store.getters.getCurrBranchID
       };
       this.editedItem = Object.assign({}, item);
       this.dlgUpdateItem = true;
@@ -306,7 +306,7 @@ export default {
           url: "almacen/eliminar",
           params: {
             id: this.editedItem.id,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true
         };
@@ -322,7 +322,7 @@ export default {
           url: this.editedItem.id === -1 ? "almacen/crear" : "almacen/editar",
           params: {
             item: this.editedItem,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true
         };

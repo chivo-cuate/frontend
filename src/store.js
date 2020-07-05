@@ -114,6 +114,9 @@ export default new Vuex.Store({
     getCurrBranch: state => {
       return state.payload.curr_branch;
     },
+    getCurrBranchID: state => {
+      return state.payload.curr_branch ? state.payload.curr_branch.id : -1;
+    },
     getBranches: state => {
       return state.payload.branches
     },

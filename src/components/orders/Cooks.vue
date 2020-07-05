@@ -70,7 +70,7 @@ export default {
             id: this.editedCook.current_order.id,
             cook_id: this.editedCook.id,
             table_number: this.editedCook.current_order.table_number,
-            branch_id: this.$store.getters.getCurrBranch.id
+            branch_id: this.$store.getters.getCurrBranchID
           }
         };
         this.$refs.axios.submit(config);

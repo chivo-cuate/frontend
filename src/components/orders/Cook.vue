@@ -52,6 +52,9 @@
 
 <script>
 export default {
-  props: ["cook"]
+  props: ["cook"],
+  mounted() {
+    console.log(this.cook)
+  }
 };
 </script>
