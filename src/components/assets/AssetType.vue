@@ -55,6 +55,19 @@
                           label="Nombre"
                         ></v-text-field>
                       </v-flex>
+                      <v-flex xs12>
+                        <v-autocomplete
+                          outlined
+                          :rules="requiredRules"
+                          v-model="editedItem.measure_unit_id"
+                          :items="measureUnits"
+                          item-text="name"
+                          item-value="id"
+                          label="Unidad de medida"
+                          no-data-text="No hay resultados"
+                        >
+                        </v-autocomplete>
+                      </v-flex>
                       <v-flex xs12 v-if="apiUrl === 'productos'">
                         <v-autocomplete
                           outlined
@@ -299,7 +312,7 @@
           <span>Editar</span>
         </v-tooltip>
 
-        <v-tooltip bottom v-if="apiUrl === 'productos'">
+        <v-tooltip bottom v-if="apiUrl === 'productos' && item.category_needs_cooking">
           <template v-slot:activator="{ on }">
             <v-icon color="info" @click="showDlgIngredients(item)" v-on="on">local_library</v-icon>
           </template>
@@ -363,7 +376,7 @@ export default {
       ingredientsHeaders: [
         { text: "Ingrediente", value: "name", align: "left" },
         { text: "Cantidad", value: "quantity", align: "left" },
-        { text: "Medida", value: "measure_unit_name", align: "left" },
+        { text: "U/M", value: "measure_unit_name", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ]
     };
@@ -436,7 +449,6 @@ export default {
       var config = {
         url: `${this.apiUrl}/listar`,
         params: {
-          branch_id: this.$store.getters.getCurrBranchID
         }
       };
       this.$refs.axios.submit(config);
@@ -460,7 +472,6 @@ export default {
           {
             id: -1,
             name: null,
-            branch_id: this.$store.getters.getCurrBranchID
           }
         );
       }
@@ -480,8 +491,7 @@ export default {
           method: "post",
           url: `${this.apiUrl}/eliminar`,
           params: {
-            id: this.editedItem.id,
-            branch_id: this.$store.getters.getCurrBranchID
+            id: this.editedItem.id
           },
           snackbar: true,
         };
@@ -499,8 +509,7 @@ export default {
               ? `${this.apiUrl}/crear`
               : `${this.apiUrl}/editar`,
           params: {
-            item: this.editedItem,
-            branch_id: this.$store.getters.getCurrBranchID
+            item: this.editedItem
           },
           snackbar: true,
         };
@@ -517,7 +526,6 @@ export default {
           params: {
             id: this.editedItem.id,
             ingredients: this.editedIngredients,
-            branch_id: this.$store.getters.getCurrBranchID
           },
           snackbar: true,
         };

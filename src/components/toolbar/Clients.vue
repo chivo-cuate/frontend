@@ -24,7 +24,7 @@ export default {
     };
   },
   mounted() {
-    this.ordersPerms = this.$store.getters.getOrdersPermissions.length;
+    this.ordersPerms = this.$store.getters.getPermissions("Clientes").length;
   },
   props: ["color"]
 };

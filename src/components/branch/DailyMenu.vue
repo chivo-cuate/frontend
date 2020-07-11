@@ -277,7 +277,7 @@ export default {
     }
   },
   mounted() {
-    this.$store.getters.getBranchPermissions.forEach(element => {
+    this.$store.getters.getPermissions("Sucursales").forEach(element => {
       if (element.name === "Menú diario") {
         element.perms.forEach(perm => {
           if (perm.text === "Habilitar elaboradores") {
@@ -305,7 +305,6 @@ export default {
         this.assets = response.data[1];
         this.menuCooks = response.data[2];
         this.allCooks = response.data[3];
-        console.log(this.assets)
       }
     },
 

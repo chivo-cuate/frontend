@@ -77,7 +77,7 @@
                           :items="measureUnits"
                           item-value="id"
                           item-text="name"
-                          label="Unidad de medida"
+                          label="U/M"
                         ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 sm4>

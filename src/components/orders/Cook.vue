@@ -14,7 +14,9 @@
           <p>
             <v-chip label class="mt-1">
               <v-icon>mdi-tag</v-icon>
-              <span v-html="`${cook.current_order.order_type_id === 1 ? `Mesa ${cook.current_order.table_number}`  : 'Para llevar'} - orden ${cook.current_order.order_number}`"></span>
+              <span
+                v-html="`${cook.current_order.order_type_id === 1 ? `Mesa ${cook.current_order.table_number}`  : 'Para llevar'} - orden ${cook.current_order.order_number}`"
+              ></span>
             </v-chip>
             <br />
             <v-chip label class="warning darken-1 mt-1">
@@ -53,8 +55,6 @@
 <script>
 export default {
   props: ["cook"],
-  mounted() {
-    console.log(this.cook)
-  }
+  mounted() {}
 };
 </script>

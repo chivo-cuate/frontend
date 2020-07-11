@@ -5,7 +5,7 @@
         <v-card>
           <v-list dense>
             <v-list-item
-              v-for="(item, index) in $store.getters.getBranchesPermissions"
+              v-for="(item, index) in $store.getters.getPermissions('Sucursales')"
               :to="item.slug"
               :key="`action-${index}`"
             >

@@ -114,7 +114,7 @@ export default {
     }
   },
   created() {
-    this.$store.getters.getOrdersPermissions.forEach(permissions => {
+    this.$store.getters.getPermissions("Clientes").forEach(permissions => {
       permissions.perms.forEach(perm => {
         switch (perm.text) {
           case "Listar":

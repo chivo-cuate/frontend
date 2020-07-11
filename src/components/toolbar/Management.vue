@@ -22,6 +22,10 @@
         <v-icon>domain</v-icon>
         <span>Sucursales</span>
       </v-list-item>
+      <v-list-item v-if="assetsPerms > 0" to="/productos/inicio" class="dropdown-menu-item">
+        <v-icon>mdi-food</v-icon>
+        <span>Productos</span>
+      </v-list-item>
       <v-list-item
         v-if="branchPerms > 0 && $store.getters.getCurrBranch"
         to="/sucursal/inicio"
@@ -44,9 +48,10 @@ export default {
     };
   },
   mounted() {
-    this.securityPerms = this.$store.getters.getSecurityPermissions.length;
-    this.branchPerms = this.$store.getters.getBranchPermissions.length;
-    this.branchesPerms = this.$store.getters.getBranchesPermissions.length;
+    this.securityPerms = this.$store.getters.getPermissions("Seguridad").length
+    this.branchPerms = this.$store.getters.getPermissions("Mi Sucursal").length
+    this.branchesPerms = this.$store.getters.getPermissions("Sucursales").length
+    this.assetsPerms = this.$store.getters.getPermissions("Productos").length
   },
   props: ["color"]
 };

@@ -133,6 +133,16 @@ let routes = [
     }
   },
   {
+    path: '/productos/:action',
+    name: 'productos',
+    meta: {
+      requiresAuth: true
+    },
+    component: function () {
+      return import('@/components/assets/Assets')
+    }
+  },
+  {
     path: '*',
     name: 'not-found',
     meta: {

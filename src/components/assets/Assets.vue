@@ -5,7 +5,7 @@
         <v-card>
           <v-list dense>
             <v-list-item
-              v-for="(item, index) in $store.getters.getPermissions('Sucursales')"
+              v-for='(item, index) in $store.getters.getPermissions("Productos")'
               :to="item.slug"
               :key="`action-${index}`"
             >
@@ -25,7 +25,9 @@
           <v-card class="elevation-0">
             <p class="text-center uppercase white--text" :class="$store.getters.getThemeColor">{{ $route.params.action }}</p>
             <Index v-if="currAction === 'inicio'" />
+            <AssetType :apiUrl="currAction" v-if="currAction === 'ingredientes'" class="animated fadeIn" />
             <Stock v-if="currAction === 'almacen'" class="animated fadeIn" />
+            <AssetType :apiUrl="currAction" v-if="currAction === 'productos'" class="animated fadeIn" />
             <DailyMenu v-if="currAction === 'menu-diario'" class="animated fadeIn" />
           </v-card>
         </v-flex>
@@ -35,23 +37,24 @@
 </template>
 
 <script>
-import Index from "@/components/branch/Index";
-import Stock from "@/components/branch/Stock";
-import DailyMenu from "@/components/branch/DailyMenu";
+import Index from "@/components/assets/Index";
+import AssetType from "@/components/assets/AssetType";
 
 export default {
   data: () => ({
     drawer: null,
-    currAction: null
+    currAction: null,
+    permissions: []
   }),
   
-  components: { Index, Stock, DailyMenu, Assets },
+  components: { Index, AssetType },
 
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
     next();
   },
   mounted() {
+    this.permissions = this.$store.getters.getPermissions("Productos")
     this.verifyAction(this.$route.params.action);
   },
   methods: {
@@ -60,7 +63,7 @@ export default {
 
       if (action !== 'inicio') {
         let validRoute = false;
-        this.$store.getters.getPermissions("Sucursales").forEach(element => {
+        this.$store.getters.getPermissions("Productos").forEach(element => {
           let actionAux = element.slug.substring(element.slug.lastIndexOf("/") + 1);
           if (actionAux === action) {
             validRoute = true;

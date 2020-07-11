@@ -5,7 +5,7 @@
         <v-card>
           <v-list dense>
             <v-list-item
-              v-for="(item, index) in $store.getters.getSecurityPermissions"
+              v-for="(item, index) in permissions"
               :to="item.slug"
               :key="`action-${index}`"
             >
@@ -41,8 +41,8 @@ import Usuarios from "@/components/security/Users";
 
 export default {
   data: () => ({
-    drawer: null,
-    currAction: null
+    currAction: null,
+    permissions: []
   }),
   components: { Index, Roles, Usuarios },
   beforeRouteUpdate(to, from, next) {
@@ -50,19 +50,12 @@ export default {
     next();
   },
   mounted() {
-    this.verifyAction(this.$route.params.action);
+    this.verifyAction(this.$route.params.action)
+    this.permissions = this.$store.getters.getPermissions("Seguridad")
   },
   methods: {
     verifyAction(action) {
       this.currAction = action;
-      /*let validAction = this.actions.find(obj => {
-        return obj.action === action;
-      });
-      if (validAction) {
-        this.currAction = validAction.action;
-      } else {
-        this.$router.push("/404");
-      }*/
     }
   }
 };

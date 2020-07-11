@@ -38,11 +38,11 @@ export default {
       }
       if (process.env.NODE_ENV === "development") {
         if (this.requestInfo.method !== "form") {
-          this.requestInfo.params.XDEBUG_SESSION_START = "netbeans-xdebug";
+          this.requestInfo.params.XDEBUG_SESSION_START = "phpstorm-xdebug";
         } else {
           this.requestInfo.params.append(
             "XDEBUG_SESSION_START",
-            "netbeans-xdebug"
+            "phpstorm-xdebug"
           );
         }
       }
@@ -98,7 +98,7 @@ export default {
       return new Promise((resolve, reject) => {
         var fullUrl = `${this.requestInfo.url}${
           this.requestInfo.params.XDEBUG_SESSION_START
-            ? "&XDEBUG_SESSION_START=netbeans-xdebug"
+            ? "&XDEBUG_SESSION_START=phpstorm-xdebug"
             : ""
         }`;
 

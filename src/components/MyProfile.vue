@@ -133,7 +133,6 @@
                           label="Nueva"
                           :rules="passwordRules"
                           type="password"
-                          hint="Al menos 6 caracteres"
                         ></v-text-field>
                         <v-text-field
                           @keyup.enter="changePassword()"
@@ -209,7 +208,7 @@ export default {
       nameRules: [v => !!v || "Dato obligatorio"],
       passwordRules: [
         v => !!v || "Dato obligatorio",
-        v => (v && v.length > 5) || "Al menos 6 caracteres"
+        v => (v && v.length > 2) || "Al menos 3 caracteres"
       ],
       passwordConfirmRules: [
         v => !!v || "Dato obligatorio",

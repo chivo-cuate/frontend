@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
+import _ from 'lodash'
 
 Vue.use(Vuex)
 
@@ -75,41 +76,11 @@ export default new Vuex.Store({
     getUserPermissions: state => {
       return state.payload.permissions
     },
-    getSecurityPermissions: state => {
-      let res = [];
-      state.payload.permissions.forEach(element => {
-        if (element.name === "Seguridad") {
-          res = element.subModules
-        }
-      });
-      return res;
-    },
-    getBranchPermissions: state => {
-      let res = [];
-      state.payload.permissions.forEach(element => {
-        if (element.name === "Mi Sucursal") {
-          res = element.subModules
-        }
-      });
-      return res;
-    },
-    getBranchesPermissions: state => {
-      let res = [];
-      state.payload.permissions.forEach(element => {
-        if (element.name === "Sucursales") {
-          res = element.subModules
-        }
-      });
-      return res;
-    },
-    getOrdersPermissions: state => {
-      let res = [];
-      state.payload.permissions.forEach(element => {
-        if (element.name === "Clientes") {
-          res = element.subModules
-        }
-      });
-      return res;
+    getPermissions: (state) => (moduleName) => {
+      let permissions = state.payload.permissions
+        .filter(item => item.name === moduleName)
+        .map(item => item.subModules)
+      return (permissions.length > 0) ? permissions[0] : []
     },
     getCurrBranch: state => {
       return state.payload.curr_branch;
