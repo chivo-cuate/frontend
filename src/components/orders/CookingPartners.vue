@@ -2,8 +2,7 @@
   <v-container>
     <v-card tile class="pb-4">
       <v-card-title :class="`title ${$store.getters.getThemeColor} white--text`" primary-title>
-        <v-icon class="white--text">mdi-account</v-icon>Elaboradores para esta
-        pantalla
+        <v-icon class="white--text">mdi-account</v-icon>Elaboradores para esta pantalla
       </v-card-title>
 
       <v-layout>
@@ -58,6 +57,7 @@ export default {
   props: ["orders"],
   mounted() {
     this.cooks = this.$store.getters.getCurrentBranchCooks;
+    console.log(this.cooks)
     let myID = this.$store.getters.getUserID;
     let myUserIndex = this.cooks.findIndex(obj => parseInt(obj.id) === myID);
     if (myUserIndex >= 0) {
@@ -91,7 +91,7 @@ export default {
     },
 
     setChosenCooks() {
-      this.$emit('setChosenCooks', this.chosenCooks)
+      this.$emit("setChosenCooks", this.chosenCooks);
     }
   }
 };

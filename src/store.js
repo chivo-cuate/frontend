@@ -39,7 +39,7 @@ export default new Vuex.Store({
       state.authRouteRequested = authRouteRequested
     },
     setChosenCooks(state, chosen_cooks) {
-      state.chosen_cooks = chosen_cooks
+      state.chosen_cooks = chosen_cooks ? chosen_cooks : []
     },
     logout(state) {
       state.authRouteRequested = null
@@ -104,7 +104,8 @@ export default new Vuex.Store({
       return state.chosen_cooks.map(obj => obj.id)
     },
     getCurrentBranchCooks: state => {
-      return state.payload.is_guest ? [] : state.payload.cooks[state.payload.curr_branch.id].users
+      return state.isCook
+        ? state.payload.cooks[state.payload.curr_branch.id].users : []
     },
     getPayload: state => {
       return state.payload

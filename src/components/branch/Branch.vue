@@ -5,7 +5,7 @@
         <v-card>
           <v-list dense>
             <v-list-item
-              v-for="(item, index) in $store.getters.getPermissions('Sucursales')"
+              v-for="(item, index) in $store.getters.getPermissions('Mi Sucursal')"
               :to="item.slug"
               :key="`action-${index}`"
             >
@@ -45,7 +45,7 @@ export default {
     currAction: null
   }),
   
-  components: { Index, Stock, DailyMenu, Assets },
+  components: { Index, Stock, DailyMenu },
 
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
@@ -60,7 +60,7 @@ export default {
 
       if (action !== 'inicio') {
         let validRoute = false;
-        this.$store.getters.getPermissions("Sucursales").forEach(element => {
+        this.$store.getters.getPermissions("Mi Sucursal").forEach(element => {
           let actionAux = element.slug.substring(element.slug.lastIndexOf("/") + 1);
           if (actionAux === action) {
             validRoute = true;

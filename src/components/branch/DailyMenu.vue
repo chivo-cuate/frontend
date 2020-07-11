@@ -81,7 +81,7 @@
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 md6>
-                        <v-text-field outlined v-model="editedItem.grams" label="Cantidad"></v-text-field>
+                        <v-text-field outlined v-model="editedItem.grams" label="Medida"></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -241,7 +241,7 @@ export default {
       headers: [
         { text: "Producto", value: "asset_name", align: "left" },
         { text: "Precio", value: "price", align: "left" },
-        { text: "Cantidad", value: "grams", align: "left" },
+        { text: "Medida", value: "qty_with_measure", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ],
       measureUnits: [],
