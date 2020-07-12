@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar
+  <!-- <v-snackbar
     :timeout="5000"
     :right="true"
     :bottom="true"
@@ -11,6 +11,22 @@
     <v-btn text @click.native="snackbar = false">
       <v-icon small>close</v-icon>
     </v-btn>
+  </v-snackbar>-->
+
+  <v-snackbar
+    v-model="snackbar"
+    :timeout="7000"
+    :right="true"
+    :bottom="true"
+    :color="operationMessageType"
+  >
+    <v-icon small class="white--text fa">info</v-icon>
+    {{ operationMessage }}
+    <template v-slot:action="{ attrs }">
+      <v-btn x-small color="white" text v-bind="attrs" @click="snackbar = false">
+        <v-icon small>close</v-icon>
+      </v-btn>
+    </template>
   </v-snackbar>
 </template>
 

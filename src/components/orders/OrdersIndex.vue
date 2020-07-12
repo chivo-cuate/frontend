@@ -86,7 +86,7 @@ import CookingPartners from "@/components/orders/CookingPartners";
 export default {
   data() {
     return {
-      loadingInitialData: true,
+      loadingInitialData: false,
       loadingData: false,
       cooksEnabled: true,
       tables: [],
@@ -152,15 +152,6 @@ export default {
     }
   },
   mounted() {
-    if (
-      (this.permissions.canList || this.permissions.canViewPending) &&
-      this.$store.getters.getCurrBranch
-    ) {
-      this.timer = setInterval(this.getDataFromApi, 5000);
-      this.getDataFromApi();
-    } else {
-      this.loadingInitialData = false;
-    }
     this.$root.$emit("resetNotifications");
   },
   beforeRouteLeave(to, from, next) {
@@ -227,7 +218,11 @@ export default {
     },
 
     setChosenCooks(chosenCooks) {
+
+      this.timer = setInterval(this.getDataFromApi, 5000);
+
       this.$store.commit("setChosenCooks", chosenCooks);
+      
       let cookIds = this.$store.getters.getChosenCooksIDs
       let config = {
         url: "auth/marcar-elaboradores-autenticados",
@@ -238,6 +233,7 @@ export default {
           branch_id: this.$store.getters.getCurrBranchID
         }
       };
+
       this.$refs.axios.submit(config);
     }
   }

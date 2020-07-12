@@ -195,8 +195,10 @@ export default {
 
     handleHttpResponse(event) {
       this.loading = false;
+      
       if (event.data.result.code !== 500) {
         var response = event.data.result.response;
+        
         if (response.code === "success") {
           this.$store.commit("updatePayload", response.data);
           var redirect = this.$store.getters.getAuthRouteRequested;

@@ -27,6 +27,7 @@
             <Index v-if="currAction === 'inicio'" />
             <Stock v-if="currAction === 'almacen'" class="animated fadeIn" />
             <DailyMenu v-if="currAction === 'menu-diario'" class="animated fadeIn" />
+            <MyUsers v-if="currAction === 'usuarios-sucursal'" class="animated fadeIn" />
           </v-card>
         </v-flex>
       </v-flex>
@@ -38,6 +39,7 @@
 import Index from "@/components/branch/Index";
 import Stock from "@/components/branch/Stock";
 import DailyMenu from "@/components/branch/DailyMenu";
+import MyUsers from "@/components/branch/MyUsers";
 
 export default {
   data: () => ({
@@ -45,7 +47,7 @@ export default {
     currAction: null
   }),
   
-  components: { Index, Stock, DailyMenu },
+  components: { Index, Stock, DailyMenu, MyUsers },
 
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);

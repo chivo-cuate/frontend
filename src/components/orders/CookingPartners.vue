@@ -56,8 +56,7 @@ export default {
   },
   props: ["orders"],
   mounted() {
-    this.cooks = this.$store.getters.getCurrentBranchCooks;
-    console.log(this.cooks)
+    this.cooks = this.$store.getters.getPayload.cooks[this.$store.getters.getCurrBranchID]
     let myID = this.$store.getters.getUserID;
     let myUserIndex = this.cooks.findIndex(obj => parseInt(obj.id) === myID);
     if (myUserIndex >= 0) {

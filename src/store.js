@@ -39,11 +39,10 @@ export default new Vuex.Store({
       state.authRouteRequested = authRouteRequested
     },
     setChosenCooks(state, chosen_cooks) {
-      state.chosen_cooks = chosen_cooks ? chosen_cooks : []
+      state.payload.chosen_cooks = chosen_cooks ? chosen_cooks : []
     },
     logout(state) {
       state.authRouteRequested = null
-      state.chosen_cooks = []
       state.payload = {
         is_guest: true,
         user_id: null,
@@ -54,6 +53,7 @@ export default new Vuex.Store({
         permissions: [],
         roles: [],
         cooks: [],
+        chosen_cooks: [],
       }
     }
   },
@@ -71,7 +71,8 @@ export default new Vuex.Store({
       return state.payload.roles.includes("Mesero")
     },
     isCook: state => {
-      return state.payload.roles.includes("Elaborador")
+      let cookRole = state.payload.roles.filter(item => item.includes("Elaborador"))
+      return cookRole.length > 0
     },
     getUserPermissions: state => {
       return state.payload.permissions
@@ -98,14 +99,10 @@ export default new Vuex.Store({
       return state.payload.cooks
     },
     getChosenCooks: state => {
-      return state.chosen_cooks
+      return state.payload.chosen_cooks
     },
     getChosenCooksIDs: state => {
-      return state.chosen_cooks.map(obj => obj.id)
-    },
-    getCurrentBranchCooks: state => {
-      return state.isCook
-        ? state.payload.cooks[state.payload.curr_branch.id].users : []
+      return state.payload.chosen_cooks ? state.payload.chosen_cooks.map(obj => obj.id) : []
     },
     getPayload: state => {
       return state.payload

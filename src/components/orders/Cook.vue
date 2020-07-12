@@ -7,7 +7,7 @@
             :src="require(cook.sex === 'F' ? `@/assets/img/cheff_f.png` : `@/assets/img/cheff_m.png`)"
             width="70px"
           ></v-img>
-          <v-chip label dark class="mt-1 cyan darken-3">{{`${cook.first_name} ${cook.last_name}`}}</v-chip>
+          <v-chip label dark class="mt-1 cyan darken-3">{{`${cook.full_name}`}}</v-chip>
         </div>
         <v-divider></v-divider>
         <template v-if="cook.current_order">
@@ -55,6 +55,8 @@
 <script>
 export default {
   props: ["cook"],
-  mounted() {}
+  mounted() {
+    console.log(this.cook)
+  }
 };
 </script>
