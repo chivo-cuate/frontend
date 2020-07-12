@@ -114,7 +114,7 @@
 
               <v-dialog width="400" v-model="dlgChangePassword" persistent>
                 <v-card>
-                  <v-card-title class="headline grey lighten-2">Cambiar contrase&ntilde;a</v-card-title>
+                  <v-card-title class="subtitle grey lighten-2">Cambiar contrase&ntilde;a</v-card-title>
                   <v-container pt-5 pr-10 pb-5 pl-10>
                     <v-form @submit.prevent ref="passwordForm" v-model="passwordValidationStatus">
                       <v-layout row wrap>
@@ -176,7 +176,7 @@
 
               <!--<v-dialog width="500" v-model="uploadDlg" persistent>
                 <v-card>
-                  <v-card-title class="headline grey lighten-2">
+                  <v-card-title class="subtitle grey lighten-2">
                     Upload file
                     <v-spacer></v-spacer>
                     <a @click="uploadDlg = false">

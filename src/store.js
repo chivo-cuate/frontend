@@ -68,7 +68,8 @@ export default new Vuex.Store({
       return state.payload.roles.includes("Gerente de Sucursal")
     },
     isWaiter: state => {
-      return state.payload.roles.includes("Mesero")
+      let cookRole = state.payload.roles.filter(item => item.includes("Mesero"))
+      return cookRole.length > 0
     },
     isCook: state => {
       let cookRole = state.payload.roles.filter(item => item.includes("Elaborador"))

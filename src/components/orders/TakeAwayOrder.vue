@@ -9,7 +9,7 @@
 
         <v-menu close-on-click offset-y transition="fade-transition" bottom open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn class="mt-4" width="120" :class="order.gui_attribs.icon_color" v-on="on">
+            <v-btn class="mt-6" width="120" :class="order.gui_attribs.icon_color" v-on="on">
               <v-layout row>
                 <v-flex xs12>
                   <v-icon size="20" class="white--text">{{ order.gui_attribs.icon }}</v-icon>

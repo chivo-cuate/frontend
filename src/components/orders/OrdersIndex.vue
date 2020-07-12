@@ -1,10 +1,6 @@
 <template>
   <v-flex xs12>
-    <VProgress
-      v-if="loadingInitialData"
-      message="Cargando"
-      class="text-center"
-    />
+    <VProgress v-if="loadingInitialData" message="Cargando" class="text-center" />
     <template v-else>
       <template v-if="!this.$store.getters.getCurrBranch">
         <v-container>
@@ -22,8 +18,8 @@
                 class="animated flash"
               >
                 Debe seleccionar una sucursal para poder usar esta
-                p&aacute;gina</v-alert
-              >
+                p&aacute;gina
+              </v-alert>
             </v-flex>
           </v-layout>
         </v-container>
@@ -41,16 +37,14 @@
               border="left"
               icon="warning"
               class="animated flash"
-              >No existen elaboradores habilitados para el men&uacute; de hoy.
-              Solo podr&aacute;n ser procesadas las &oacute;rdenes que no
-              involucren alimentos elaborados.</v-alert
             >
+              No existen elaboradores habilitados para el men&uacute; de hoy.
+              Solo podr&aacute;n ser procesadas las &oacute;rdenes que no
+              involucren alimentos elaborados.
+            </v-alert>
           </v-flex>
         </v-container>
-        <v-flex
-          class="animated fadeIn"
-          :style="cooksEnabled ? '' : 'margin-top: -30px;'"
-        >
+        <v-flex class="animated fadeIn" :style="cooksEnabled ? '' : 'margin-top: -30px'">
           <Tables
             v-if="permissions.canList"
             ref="tablesComp"
@@ -66,7 +60,12 @@
             </template>
             <template v-else>
               <PendingOrders :orders="pendingOrders" />
-              <Cooks @setResponse="setResponse($event)" />
+              <Cooks
+                @setResponse="setResponse($event)"
+                @disableTimer="disableTimer()"
+                @enableTimer="enableTimer()"
+                @setChosenCooks="setChosenCooks($event)"
+              />
             </template>
           </template>
         </v-flex>
@@ -78,15 +77,15 @@
 </template>
 
 <script>
-import Tables from "@/components/orders/Tables";
-import PendingOrders from "@/components/orders/PendingOrders";
-import Cooks from "@/components/orders/Cooks";
-import CookingPartners from "@/components/orders/CookingPartners";
+import Tables from "@/components/orders/Tables"
+import PendingOrders from "@/components/orders/PendingOrders"
+import Cooks from "@/components/orders/Cooks"
+import CookingPartners from "@/components/orders/CookingPartners"
 
 export default {
   data() {
     return {
-      loadingInitialData: false,
+      loadingInitialData: true,
       loadingData: false,
       cooksEnabled: true,
       tables: [],
@@ -104,13 +103,14 @@ export default {
         canViewPending: false,
         canCook: false,
         canCheckout: false
-      }
-    };
+      },
+      timerEnabled: false
+    }
   },
   components: { Tables, PendingOrders, Cooks, CookingPartners },
   computed: {
     compCooksNotChosen() {
-      return (this.$store.getters.getChosenCooks.length === 0)
+      return this.$store.getters.getChosenCooks.length === 0
     }
   },
   created() {
@@ -118,90 +118,108 @@ export default {
       permissions.perms.forEach(perm => {
         switch (perm.text) {
           case "Listar":
-            this.permissions.canList = true;
-            break;
+            this.permissions.canList = true
+            break
           case "Crear OPC":
-            this.permissions.canCreateOPC = true;
-            break;
+            this.permissions.canCreateOPC = true
+            break
           case "Crear OPL":
-            this.permissions.canCreateOPL = true;
-            break;
+            this.permissions.canCreateOPL = true
+            break
           case "Editar":
-            this.permissions.canEdit = true;
-            break;
+            this.permissions.canEdit = true
+            break
           case "Cancelar":
-            this.permissions.canDelete = true;
-            break;
+            this.permissions.canDelete = true
+            break
           case "Elaborar OPC":
           case "Elaborar OPL":
-            this.permissions.canCook = true;
-            break;
+            this.permissions.canCook = true
+            break
           case "Ver pendientes":
-            this.permissions.canViewPending = true;
-            break;
+            this.permissions.canViewPending = true
+            break
           case "Cerrar cuenta":
-            this.permissions.canCheckout = true;
-            break;
+            this.permissions.canCheckout = true
+            break
           default:
-            break;
+            break
         }
-      });
-    });
+      })
+    })
     if (!(this.permissions.canList || this.permissions.canViewPending)) {
-      this.$router.push("/403");
+      this.$router.push("/403")
     }
   },
   mounted() {
-    this.$root.$emit("resetNotifications");
+    this.$root.$emit("resetNotifications")
+    if (this.$store.getters.isWaiter || this.$store.getters.getChosenCooksIDs.length > 0) {
+      this.enableTimer()
+    }
+    this.getDataFromApi()
   },
   beforeRouteLeave(to, from, next) {
-    this.$root.$emit("resetNotifications");
-    next();
+    this.$root.$emit("resetNotifications")
+    next()
   },
   methods: {
+    disableTimer() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timerEnabled = false
+      }
+    },
+
+    enableTimer() {
+      if (!this.timerEnabled) {
+        this.timer = setInterval(this.getDataFromApi, 5000)
+        this.timerEnabled = true
+      }
+    },
+
     setResponse(response) {
-      this.tables = response.data.tables;
-      this.takeAwayOrders = response.data.takeaway_orders;
-      this.assets = response.data.assets;
-      this.pendingOrders = response.data.orders;
-      this.cooks = response.data.cooks;
-      this.cooksEnabled = response.data.cooks_enabled;
-      this.$store.commit("setChosenCooks", this.cooks);
-      this.$root.$emit("setNotifications", response.data.notifications);
+      this.tables = response.data.tables
+      this.takeAwayOrders = response.data.takeaway_orders
+      this.assets = response.data.assets
+      this.pendingOrders = response.data.orders
+      this.cooks = response.data.cooks
+      this.cooksEnabled = response.data.cooks_enabled
+      this.$store.commit("setChosenCooks", this.cooks)
+      this.$root.$emit("setNotifications", response.data.notifications)
     },
 
     handleHttpResponse(event) {
-      this.loadingData = false;
-      this.loadingInitialData = false;
+      this.loadingData = false
+      this.loadingInitialData = false
 
       if (event.data.result.code === 200) {
-        var response = event.data.result.response;
-        this.operationMessage = response.msg;
-        this.operationMessageType = response.code;
+        var response = event.data.result.response
+        this.operationMessage = response.msg
+        this.operationMessageType = response.code
 
         switch (event.url.substring(event.url.lastIndexOf("/") + 1)) {
           case "listar":
             if (response.code === "success") {
-              this.setResponse(response);
+              this.setResponse(response)
               if (this.$refs.tablesComp) {
-                this.$refs.tablesComp.updateCurrTableAndOrders(response);
+                this.$refs.tablesComp.updateCurrTableAndOrders(response)
               }
             }
-            break;
+            break
           case "ver-pendientes":
             if (response.code === "success") {
-              this.setResponse(response);
+              this.setResponse(response)
             }
-            break;
+            break
           default:
-            break;
+            break
         }
       }
     },
 
     getDataFromApi() {
       if (!this.loadingData) {
-        this.loadingData = true;
+        this.loadingData = true
         let config = {
           url: this.permissions.canList
             ? "ordenes/listar"
@@ -210,19 +228,17 @@ export default {
             branch_id: this.$store.getters.getCurrBranchID,
             cooks: this.$store.getters.getChosenCooksIDs.join()
           }
-        };
+        }
         if (this.$refs.axios) {
-          this.$refs.axios.submit(config);
+          this.$refs.axios.submit(config)
         }
       }
     },
 
     setChosenCooks(chosenCooks) {
+      this.enableTimer()
+      this.$store.commit("setChosenCooks", chosenCooks)
 
-      this.timer = setInterval(this.getDataFromApi, 5000);
-
-      this.$store.commit("setChosenCooks", chosenCooks);
-      
       let cookIds = this.$store.getters.getChosenCooksIDs
       let config = {
         url: "auth/marcar-elaboradores-autenticados",
@@ -232,10 +248,10 @@ export default {
           cook_ids: cookIds,
           branch_id: this.$store.getters.getCurrBranchID
         }
-      };
+      }
 
-      this.$refs.axios.submit(config);
+      this.$refs.axios.submit(config)
     }
   }
-};
+}
 </script>

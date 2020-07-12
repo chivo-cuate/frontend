@@ -25,11 +25,12 @@
           <v-toolbar-title class="success--text uppercase">Mis elaboradores</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
+          <v-btn @click="getDataFromApi()" color="success" text><v-icon>mdi-refresh</v-icon></v-btn>
 
           <v-dialog v-model="dlgUpdateItem" max-width="300px" persistent>
             <v-card>
               <v-card-title>
-                <span class="headline">Desconectar usuario</span>
+                <span class="subtitle">Desconectar usuario</span>
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
@@ -76,7 +77,7 @@
         </v-tooltip>
       </template>
       <template v-slot:item.is_online="{ item }">
-        <v-icon class="mr-2" :color="item.is_online == 'No' ? 'red' : 'green'">mdi-account</v-icon>
+        <v-icon class="mr-2" :color="item.is_online == 'No' ? 'red' : 'green'">mdi-checkbox-blank-circle</v-icon>
       </template>
       <template v-slot:loading>
         <VProgress class="text-center" />
@@ -144,7 +145,8 @@ export default {
     },
 
     getDataFromApi() {
-      this.loadingItems = true;
+      this.loadingItems = true
+      this.items = []
       var config = {
         url: "usuarios-sucursal/listar",
         params: {

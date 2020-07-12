@@ -18,7 +18,7 @@
         :class="`${$store.getters.getThemeColor} white--text mt-4 mr-4`"
         @click="setEditedTable('add')"
       >
-        <v-icon></v-icon>Nueva
+        <v-icon>mdi-clipboard-check</v-icon>Nueva
       </v-btn>
     </v-layout>
 

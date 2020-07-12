@@ -2,7 +2,7 @@
   <v-menu v-if="ordersPerms > 0 && $store.getters.getCurrBranch" offset-y transition="fade-transition" bottom open-on-hover>
     <template v-slot:activator="{ on }">
       <v-btn color="primary" text v-on="on">
-        <v-icon :class="`${color} fa`">people</v-icon>
+        <v-icon :class="`${color} fa`">mdi-account</v-icon>
         <span :class="`${color} fa`">Clientes</span>
         <v-icon :class="color">arrow_drop_down</v-icon>
       </v-btn>

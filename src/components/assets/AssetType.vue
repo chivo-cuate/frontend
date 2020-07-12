@@ -41,7 +41,7 @@
             </template>
             <v-card>
               <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
+                <span class="subtitle">{{ formTitle }}</span>
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
@@ -117,7 +117,7 @@
           <v-dialog v-model="dlgDeleteItem" max-width="300px" persistent>
             <v-card>
               <v-card-title>
-                <span class="headline">Eliminar elemento</span>
+                <span class="subtitle">Eliminar elemento</span>
               </v-card-title>
               <v-card-text>
                 <v-container grid-list-md>
@@ -188,7 +188,7 @@
                               <v-card>
                                 <v-card-title>
                                   <span
-                                    class="headline"
+                                    class="subtitle"
                                   >{{ `${editedIngredientIndex >= 0 ? 'Editar' : 'Adicionar'} ingrediente` }}</span>
                                 </v-card-title>
                                 <v-card-text>

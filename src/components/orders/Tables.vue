@@ -538,6 +538,7 @@ export default {
           params: {
             id: this.editedOrder.id,
             table_number: this.editedTable.table_number,
+            cooks: this.$store.getters.getChosenCooksIDs.join(),
             branch_id: this.$store.getters.getCurrBranchID
           }
         };
