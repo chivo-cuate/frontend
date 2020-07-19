@@ -38,7 +38,7 @@
               icon="warning"
               class="animated flash"
             >
-              No existen elaboradores habilitados para el men&uacute; de hoy.
+              No existen elaboradores autenticados para el men&uacute; de hoy.
               Solo podr&aacute;n ser procesadas las &oacute;rdenes que no
               involucren alimentos elaborados.
             </v-alert>

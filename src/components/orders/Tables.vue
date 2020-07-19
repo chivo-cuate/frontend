@@ -139,7 +139,6 @@
                     item-value="id"
                     label="Producto"
                     no-data-text="No hay resultados"
-                    @change="removeDuplicateAssets()"
                   >
                     <template v-slot:item="data">
                       <v-list-item-content>
@@ -441,10 +440,10 @@ export default {
 
     removeAsset(index) {
       this.editedAssets.splice(index, 1);
-      this.removeDuplicateAssets();
+      //this.removeDuplicateAssets();
     },
 
-    removeDuplicateAssets() {
+    /* removeDuplicateAssets() {
       let res = [];
       for (let i = 0; i < this.editedAssetsLength; i++) {
         this.editedAssets[i].price = this.getAssetById(
@@ -464,16 +463,16 @@ export default {
         }
       }
       this.editedAssets = res;
-    },
+    }, */
 
     addAsset() {
-      this.removeDuplicateAssets();
+      //this.removeDuplicateAssets();
       this.editedAsset = { quantity: 1, finished: "0" };
       this.editedAssets.push(this.editedAsset);
     },
 
     sendOrder() {
-      this.removeDuplicateAssets();
+      //this.removeDuplicateAssets();
       if (!this.handlingOrder) {
         this.handlingOrder = true;
         var config = {
