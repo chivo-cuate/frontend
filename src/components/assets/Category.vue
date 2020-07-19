@@ -3,9 +3,11 @@
     <v-data-table
       :headers="headers"
       :items="items"
+      :search="search"
       :page.sync="page"
       :items-per-page="10"
       :loading="loadingItems"
+      no-results-text="No hay resultados"
       :footer-props="{
         itemsPerPageText: 'Elementos por página',
         itemsPerPageOptions: [
@@ -22,13 +24,20 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text uppercase">{{apiUrl}}</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+          ></v-text-field>
+
           <v-spacer></v-spacer>
 
           <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
             <template v-slot:activator="{ on }">
               <v-btn
+                small
                 :disabled="loadingItems || updatingItem"
                 :color="$store.getters.getThemeColor"
                 dark
@@ -36,7 +45,7 @@
                 v-on="on"
                 @click="showDlgAddEdit(null)"
               >
-                <v-icon small>add</v-icon>
+                <v-icon small class="ml-1">add</v-icon>
               </v-btn>
             </template>
             <v-card>
@@ -59,32 +68,18 @@
                         <v-autocomplete
                           outlined
                           :rules="requiredRules"
-                          v-model="editedItem.measure_unit_id"
-                          :items="measureUnits"
+                          v-model="editedItem.measure_unit_type_id"
+                          :items="measureUnitTypes"
                           item-text="name"
                           item-value="id"
-                          label="Unidad de medida"
+                          label="Se mide en"
                           no-data-text="No hay resultados"
-                        >
-                        </v-autocomplete>
-                      </v-flex>
-                      <v-flex xs12 v-if="apiUrl === 'productos'">
-                        <v-autocomplete
-                          outlined
-                          :rules="requiredRules"
-                          v-model="editedItem.category_id"
-                          :items="categories"
-                          item-text="name"
-                          item-value="id"
-                          label="Categoría"
-                          no-data-text="No hay resultados"
-                        >
-                        </v-autocomplete>
+                        ></v-autocomplete>
                       </v-flex>
                     </v-layout>
-                    <v-layout wrap v-if="editedItem.id > 0">
+                    <v-layout wrap>
                       <v-flex xs12>
-                        <v-checkbox v-model="editedItem.status" label="Activo"></v-checkbox>
+                        <v-checkbox v-model="editedItem.needs_cooking" label="Se elabora"></v-checkbox>
                       </v-flex>
                     </v-layout>
                   </v-form>
@@ -114,7 +109,7 @@
             </v-card>
           </v-dialog>
 
-          <v-dialog v-model="dlgDeleteItem" max-width="300px" persistent>
+          <v-dialog v-model="dlgDeleteItem" max-width="400px" persistent>
             <v-card>
               <v-card-title>
                 <span class="subtitle">Eliminar elemento</span>
@@ -227,7 +222,7 @@
                                             outlined
                                             :rules="requiredRules"
                                             v-model="editedIngredient.measure_unit_id"
-                                            :items="measureUnits"
+                                            :items="measureUnitTypes"
                                             item-value="id"
                                             item-text="name"
                                             label="U/M"
@@ -356,6 +351,7 @@ export default {
       editedIngredientIndex: -1,
       editedIngredient: {},
       validForm: false,
+      search: "",
       requiredRules: [v => !!v || "Dato obligatorio"],
       numberRules: [
         v => !!v || "Dato obligatorio",
@@ -364,19 +360,13 @@ export default {
       items: [],
       ingredients: [],
       categories: [],
-      measureUnits: [],
+      measureUnitTypes: [],
       updatingItem: false,
       deletingItem: false,
       headers: [
         { text: "Nombre", value: "name", align: "left" },
-        { text: "Estado", value: "status_name", align: "left" },
-        { text: "Categoría", value: "category_name", align: "left" },
-        { text: "Acciones", value: "action", align: "left", sortable: false }
-      ],
-      ingredientsHeaders: [
-        { text: "Ingrediente", value: "name", align: "left" },
-        { text: "Cantidad", value: "quantity", align: "left" },
-        { text: "U/M", value: "measure_unit_name", align: "left" },
+        { text: "Se mide en", value: "measure_unit_type", align: "left" },
+        { text: "Se elabora", value: "needs_cooking_desc", align: "left" },
         { text: "Acciones", value: "action", align: "left", sortable: false }
       ]
     };
@@ -438,9 +428,7 @@ export default {
 
     updateScopeObjects(response) {
       this.items = response.data[0];
-      this.ingredients = response.data[1];
-      this.measureUnits = response.data[2];
-      this.categories = response.data[3];
+      this.measureUnitTypes = response.data[1];
     },
 
     getDataFromApi() {
@@ -448,8 +436,7 @@ export default {
       this.items = [];
       var config = {
         url: `${this.apiUrl}/listar`,
-        params: {
-        }
+        params: {}
       };
       this.$refs.axios.submit(config);
     },
@@ -471,7 +458,7 @@ export default {
           {},
           {
             id: -1,
-            name: null,
+            name: null
           }
         );
       }
@@ -493,7 +480,7 @@ export default {
           params: {
             id: this.editedItem.id
           },
-          snackbar: true,
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -502,6 +489,8 @@ export default {
     save() {
       if (!this.updatingItem) {
         this.updatingItem = true;
+        this.editedItem.needs_cooking = this.editedItem.needs_cooking ? 1 : 0;
+
         var config = {
           method: "post",
           url:
@@ -511,8 +500,9 @@ export default {
           params: {
             item: this.editedItem
           },
-          snackbar: true,
+          snackbar: true
         };
+
         this.$refs.axios.submit(config);
       }
     },
@@ -525,9 +515,9 @@ export default {
           url: `${this.apiUrl}/editar-ingredientes`,
           params: {
             id: this.editedItem.id,
-            ingredients: this.editedIngredients,
+            ingredients: this.editedIngredients
           },
-          snackbar: true,
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -553,60 +543,7 @@ export default {
     },
 
     getMeasureUnitById(itemId) {
-      return this.measureUnits.find(obj => obj.id === itemId);
-    },
-
-    getIngredientById(itemId) {
-      return this.ingredients.find(obj => obj.id === itemId);
-    },
-
-    removeDuplicateIngredients() {
-      let res = [];
-      for (let i = 0; i < this.editedIngredients.length; i++) {
-        let index = res.findIndex(
-          obj =>
-            obj.component_id === this.editedIngredients[i].component_id &&
-            obj.measure_unit_id === this.editedIngredients[i].measure_unit_id
-        );
-        if (index >= 0) {
-          res[index].quantity =
-            parseInt(res[index].quantity) +
-            parseInt(this.editedIngredients[i].quantity);
-        } else {
-          res.push(this.editedIngredients[i]);
-        }
-      }
-      this.editedIngredients = res;
-    },
-
-    saveIngredient() {
-      this.editedIngredient.name = this.getIngredientById(
-        this.editedIngredient.component_id
-      ).name;
-      this.editedIngredient.measure_unit_name = this.getMeasureUnitById(
-        this.editedIngredient.measure_unit_id
-      ).name;
-      if (this.editedIngredientIndex > -1) {
-        this.editedIngredients[
-          this.editedIngredientIndex
-        ].component_id = this.editedIngredient.component_id;
-        this.editedIngredients[
-          this.editedIngredientIndex
-        ].name = this.editedIngredient.name;
-        this.editedIngredients[
-          this.editedIngredientIndex
-        ].measure_unit_id = this.editedIngredient.measure_unit_id;
-        this.editedIngredients[
-          this.editedIngredientIndex
-        ].measure_unit_name = this.editedIngredient.measure_unit_name;
-        this.editedIngredients[
-          this.editedIngredientIndex
-        ].quantity = this.editedIngredient.quantity;
-      } else {
-        this.editedIngredients.push(this.editedIngredient);
-      }
-      this.removeDuplicateIngredients();
-      this.dlgEditIngredient = false;
+      return this.measureUnitTypes.find(obj => obj.id === itemId);
     }
   }
 };

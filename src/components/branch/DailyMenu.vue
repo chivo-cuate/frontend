@@ -36,7 +36,7 @@
                 v-on="on"
                 @click="addItem()"
               >
-                <v-icon small>add</v-icon>Adicionar producto
+                <v-icon small>add</v-icon> producto
               </v-btn>
             </template>
             <v-card>

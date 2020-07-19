@@ -29,6 +29,7 @@
             <Stock v-if="currAction === 'almacen'" class="animated fadeIn" />
             <AssetType :apiUrl="currAction" v-if="currAction === 'productos'" class="animated fadeIn" />
             <DailyMenu v-if="currAction === 'menu-diario'" class="animated fadeIn" />
+            <Category :apiUrl="currAction" v-if="currAction === 'categorias'" class="animated fadeIn" />
           </v-card>
         </v-flex>
       </v-flex>
@@ -39,6 +40,7 @@
 <script>
 import Index from "@/components/assets/Index";
 import AssetType from "@/components/assets/AssetType";
+import Category from "@/components/assets/Category";
 
 export default {
   data: () => ({
@@ -47,7 +49,7 @@ export default {
     permissions: []
   }),
   
-  components: { Index, AssetType },
+  components: { Index, AssetType, Category },
 
   beforeRouteUpdate(to, from, next) {
     this.verifyAction(to.params.action);
