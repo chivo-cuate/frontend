@@ -11,7 +11,7 @@
             :headers="headers"
             hide-default-footer
             :items="items"
-            :no-data-text="'No hay elementos'"
+            no-data-text="No hay elementos"
             class="elevation-1"
           ></v-data-table>
         </v-container>
@@ -26,6 +26,8 @@
 
 <script>
 export default {
+  data: {
+  },
   props: ["visible", "width", "title", "headers", "items"]
 };
 </script>

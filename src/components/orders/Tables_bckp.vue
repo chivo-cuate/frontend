@@ -275,7 +275,7 @@ export default {
         { text: "Categoría", value: "group" },
         { text: "Producto", value: "name" },
         { text: "Precio", value: "price" },
-        { text: "Cantidad", value: "grams" }
+        { text: "Medida", value: "grams" }
       ],
       viewOrderHeaders: [
         { text: "Producto", value: "name" },

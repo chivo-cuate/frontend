@@ -259,7 +259,7 @@ export default {
         { text: "Categoría", value: "category_name" },
         { text: "Producto", value: "name" },
         { text: "Precio", value: "price" },
-        { text: "Cantidad", value: "grams" }
+        { text: "Medida", value: "grams" }
       ],
       viewOrderHeaders: [
         { text: "Producto", value: "name" },
@@ -309,6 +309,7 @@ export default {
       this.assets.forEach(asset => {
         let categoryAssets = asset[1]
         categoryAssets.forEach(categoryAsset => {
+          categoryAsset.grams += " " + categoryAsset.measure_unit
           res.push(categoryAsset)
         })
       })

@@ -6,6 +6,8 @@
       :page.sync="page"
       :items-per-page="10"
       :loading="loadingItems"
+      :search="search"
+      no-results-text="No hay resultados"
       :footer-props="{
         itemsPerPageText: 'Elementos por página',
         itemsPerPageOptions: [
@@ -22,8 +24,16 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text uppercase">Usuarios</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+            :disabled="loadingItems"
+            :clearable="true"
+          ></v-text-field>
+
           <v-spacer></v-spacer>
 
           <v-dialog v-model="dlgUpdateItem" max-width="700px" persistent>
@@ -287,12 +297,6 @@
       <template v-slot:no-data>No se han encontrado elementos.</template>
     </v-data-table>
 
-    <!--<div class="text-center pt-2">
-      <v-pagination v-model="page" :length="pageCount" :color="$store.getters.getThemeColor" next-icon="chevron_right" prev-icon="chevron_left" class="mt-2"></v-pagination>
-      <v-flex lg2 offset-lg5>
-      </v-flex>
-    </div>-->
-
     <AxiosComponent ref="axios" v-on:finish="handleHttpResponse($event)" />
   </v-flex>
 </template>
@@ -302,6 +306,7 @@ export default {
   data() {
     return {
       dlgUpdateItem: false,
+      search: "",
       dlgDeleteItem: false,
       page: 1,
       pageCount: 0,

@@ -6,6 +6,8 @@
       :page.sync="page"
       :items-per-page="10"
       :loading="loadingItems"
+      :search="search"
+      no-results-text="No hay resultados"
       :footer-props="{
         itemsPerPageText: 'Elementos por página',
         itemsPerPageOptions: [
@@ -22,8 +24,16 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text">ALMACEN</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+            :disabled="loadingItems"
+            :clearable="true"
+          ></v-text-field>
+
           <v-spacer></v-spacer>
 
           <v-dialog v-model="dlgUpdateItem" max-width="550px" persistent>
@@ -191,6 +201,7 @@
 export default {
   data() {
     return {
+      search: "",
       dlgUpdateItem: false,
       dlgDeleteItem: false,
       page: 1,

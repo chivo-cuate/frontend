@@ -6,6 +6,8 @@
       :page.sync="page"
       :items-per-page="10"
       :loading="loadingItems"
+      :search="search"
+      no-results-text="No hay resultados"
       :footer-props="{
         itemsPerPageText: 'Elementos por página',
         itemsPerPageOptions: [
@@ -22,8 +24,16 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title class="success--text uppercase">{{apiUrl}}</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Buscar"
+            single-line
+            hide-details
+            :disabled="loadingItems"
+            :clearable="true"
+          ></v-text-field>
+
           <v-spacer></v-spacer>
 
           <v-dialog v-model="dlgUpdateItem" max-width="500px" persistent>
@@ -65,8 +75,7 @@
                           item-value="id"
                           label="Unidad de medida"
                           no-data-text="No hay resultados"
-                        >
-                        </v-autocomplete>
+                        ></v-autocomplete>
                       </v-flex>
                       <v-flex xs12 v-if="apiUrl === 'productos'">
                         <v-autocomplete
@@ -78,8 +87,7 @@
                           item-value="id"
                           label="Categoría"
                           no-data-text="No hay resultados"
-                        >
-                        </v-autocomplete>
+                        ></v-autocomplete>
                       </v-flex>
                     </v-layout>
                     <v-layout wrap v-if="editedItem.id > 0">
@@ -163,6 +171,8 @@
                         :headers="ingredientsHeaders"
                         class="elevation-1"
                         :items-per-page="5"
+                        :search="searchIngredient"
+                        no-results-text="No hay resultados"
                         :footer-props="{
                           itemsPerPageText: 'Elementos por página',
                           showFirstLastPage: false
@@ -171,8 +181,16 @@
                       >
                         <template v-slot:top>
                           <v-toolbar flat color="white">
-                            <v-toolbar-title class="success--text">Ingredientes</v-toolbar-title>
-                            <v-divider class="mx-4" inset vertical></v-divider>
+                            <v-text-field
+                              v-model="searchIngredient"
+                              append-icon="mdi-magnify"
+                              label="Buscar"
+                              single-line
+                              hide-details
+                              :disabled="loadingItems"
+                              :clearable="true"
+                            ></v-text-field>
+
                             <v-spacer></v-spacer>
 
                             <v-dialog v-model="dlgEditIngredient" max-width="350px" persistent>
@@ -343,6 +361,8 @@ export default {
   data() {
     return {
       validIngredientForm: false,
+      search: "",
+      searchIngredient: "",
       dlgUpdateItem: false,
       dlgDeleteItem: false,
       dlgIngredients: false,
@@ -448,8 +468,7 @@ export default {
       this.items = [];
       var config = {
         url: `${this.apiUrl}/listar`,
-        params: {
-        }
+        params: {}
       };
       this.$refs.axios.submit(config);
     },
@@ -471,7 +490,7 @@ export default {
           {},
           {
             id: -1,
-            name: null,
+            name: null
           }
         );
       }
@@ -493,7 +512,7 @@ export default {
           params: {
             id: this.editedItem.id
           },
-          snackbar: true,
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -511,7 +530,7 @@ export default {
           params: {
             item: this.editedItem
           },
-          snackbar: true,
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }
@@ -525,9 +544,9 @@ export default {
           url: `${this.apiUrl}/editar-ingredientes`,
           params: {
             id: this.editedItem.id,
-            ingredients: this.editedIngredients,
+            ingredients: this.editedIngredients
           },
-          snackbar: true,
+          snackbar: true
         };
         this.$refs.axios.submit(config);
       }

@@ -3,10 +3,10 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :search="search"
       :page.sync="page"
       :items-per-page="10"
       :loading="loadingItems"
+      :search="search"
       no-results-text="No hay resultados"
       :footer-props="{
         itemsPerPageText: 'Elementos por página',
