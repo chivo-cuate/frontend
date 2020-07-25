@@ -103,7 +103,6 @@
               <v-flex xs12 v-for="(asset, index) in assets" :key="`add-asset-${index}`">
                 <v-btn
                   small
-                  max-width
                   @click="addAsset(index)"
                   style="width: 100%"
                   :disabled="editedAssetsLength > 0 && !validAssetForm"
