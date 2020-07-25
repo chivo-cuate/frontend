@@ -8,10 +8,15 @@
     />
 
     <v-card tile v-if="perms.canCreateOPC">
-      <v-card-title :class="`title ${$store.getters.getThemeColor} white--text`" primary-title>
+      <v-card-title
+        :class="`title ${$store.getters.getThemeColor} white--text`"
+        primary-title
+      >
         <v-icon class="white--text">local_dining</v-icon>Mesas disponibles
         <v-spacer></v-spacer>
-        <v-btn text class="white--text" @click="showDlgMenu()">Ver men&uacute;</v-btn>
+        <v-btn text class="white--text" @click="showDlgMenu()"
+          >Ver men&uacute;</v-btn
+        >
       </v-card-title>
 
       <v-layout wrap text-center mt-8 pb-2>
@@ -20,7 +25,11 @@
           :key="`table-${tableIndex}`"
           class="animated fadeIn mr-5 ml-5 text-center"
         >
-          <Table :table="table" :perms="perms" @setEditedTable="setEditedTable($event)" />
+          <Table
+            :table="table"
+            :perms="perms"
+            @setEditedTable="setEditedTable($event)"
+          />
         </v-flex>
       </v-layout>
 
@@ -43,74 +52,71 @@
     />
 
     <SimpleTableDlg
-      @close="dlgViewOrder = false"
-      :visible="dlgViewOrder"
-      :width="500"
-      :title="'Productos'"
-      :headers="viewOrderHeaders"
-      :items="compEditedAssetsInfo"
-    />
+        @close="dlgViewOrder = false"
+        :visible="dlgViewOrder"
+        :width="500"
+        :title="'Productos'"
+        :headers="viewOrderHeaders"
+        :items="compEditedAssetsInfo"
+      />
 
-    <YesNoDlg
-      @yes="checkout()"
-      @no="dlgCheckout = false"
-      :visible="dlgCheckout"
-      :width="500"
-      :title="'Cerrar orden'"
-      :question="
+      <YesNoDlg
+        @yes="checkout()"
+        @no="dlgCheckout = false"
+        :visible="dlgCheckout"
+        :width="500"
+        :title="'Cerrar orden'"
+        :question="
           `Se dispone a cerrar la cuenta # ${editedOrder.order_number} ${editedOrder.order_type_id === 1 ? `de la mesa ${editedOrder.table_number}` : `para llevar`} con un monto de:`
         "
-      :chip="compOrderPrice"
-      :processing="handlingOrder"
-    />
+        :chip="compOrderPrice"
+        :processing="handlingOrder"
+      />
 
-    <YesNoDlg
-      @yes="cancelOrder()"
-      @no="dlgCancelOrder = false"
-      :visible="dlgCancelOrder"
-      :width="350"
-      :title="'Cancelar orden'"
-      :question="
+      <YesNoDlg
+        @yes="cancelOrder()"
+        @no="dlgCancelOrder = false"
+        :visible="dlgCancelOrder"
+        :width="350"
+        :title="'Cancelar orden'"
+        :question="
           `Se dispone a cancelar la orden # ${editedOrder.order_number} ${editedOrder.order_type_id === 1 ? `de la mesa ${editedOrder.table_number}` : `para llevar`} con un monto de:`
         "
-      :chip="compOrderPrice"
-      :processing="handlingOrder"
-    />
+        :chip="compOrderPrice"
+        :processing="handlingOrder"
+      />
 
-    <YesNoDlg
-      @yes="serveProducts()"
-      @no="dlgServeProducts = false"
-      :visible="dlgServeProducts"
-      :width="350"
-      :title="'Servir productos'"
-      :question="
+      <YesNoDlg
+        @yes="serveProducts()"
+        @no="dlgServeProducts = false"
+        :visible="dlgServeProducts"
+        :width="350"
+        :title="'Servir productos'"
+        :question="
           `Se dispone a servir los productos de la orden # ${this
             .editedOrderIndex + 1} de la mesa ${editedTable.table_number}.`
         "
-      :chip="null"
-      :processing="handlingOrder"
-    />
+        :chip="null"
+        :processing="handlingOrder"
+      />
 
     <v-dialog v-model="dlgEditOrder" width="500" persistent>
       <v-card>
         <v-card-title
           :class="`headline ${$store.getters.getThemeColor} white--text`"
           primary-title
-        >Mesa {{ editedTable.table_number }}</v-card-title>
+          >Mesa {{ editedTable.table_number }}</v-card-title
+        >
         <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap mb-3>
-              <v-flex xs12 v-for="(asset, index) in assets" :key="`add-asset-${index}`">
+              <v-flex xs12>
                 <v-btn
-                  small
-                  max-width
-                  @click="addAsset(index)"
-                  style="width: 100%"
+                  @click="addAsset()"
                   :disabled="editedAssetsLength > 0 && !validAssetForm"
                   :class="`${$store.getters.getThemeColor} white--text`"
                 >
-                  <v-icon>mdi-food</v-icon>
-                  {{ asset[0] }}
+                  <v-icon>mdi-food</v-icon>Agregar
                 </v-btn>
               </v-flex>
             </v-layout>
@@ -127,7 +133,7 @@
                     :rules="requiredRules"
                     v-model="editedAssetAux.asset_id"
                     :readonly="editedAssetAux.finished === '1'"
-                    :items="getAssetsByCategoryName(editedAssetAux)"
+                    :items="assets"
                     :item-color="$store.getters.getThemeColor"
                     item-text="name"
                     item-value="id"
@@ -136,10 +142,15 @@
                   >
                     <template v-slot:item="data">
                       <v-list-item-content>
-                        <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                        <v-list-item-title
+                          v-html="data.item.name"
+                        ></v-list-item-title>
                         <v-list-item-subtitle
                           v-html="
-                            `Precio: $${data.item.price}` + ` (${data.item.grams} ${data.item.measure_unit})`
+                            `Precio: $${data.item.price}` +
+                              (data.item.grams
+                                ? ` (${data.item.grams} gramos)`
+                                : '')
                           "
                         ></v-list-item-subtitle>
                       </v-list-item-content>
@@ -172,7 +183,11 @@
                 </v-flex>
 
                 <v-flex xs12 sm2>
-                  <v-btn width="100%" class="error" @click="removeAsset(assetIndex)">
+                  <v-btn
+                    width="100%"
+                    class="error"
+                    @click="removeAsset(assetIndex)"
+                  >
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </v-flex>
@@ -212,7 +227,9 @@
             ></v-progress-circular>
             <span v-html="`${editedOrder.id ? 'Editar' : 'Agregar'}`"></span>
           </v-btn>
-          <v-btn color="error" text @click="dlgEditOrder = false">Cancelar</v-btn>
+          <v-btn color="error" text @click="dlgEditOrder = false"
+            >Cancelar</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -238,7 +255,6 @@ export default {
       editedOrdersListIndex: -1,
       editedOrder: {},
       editedOrderIndex: {},
-      categoryAssets: [],
       editedAssets: [],
       editedAsset: {},
       dailyMenu: [],
@@ -256,7 +272,7 @@ export default {
         v => v > 0 || "Dato incorrecto"
       ],
       dailyMenuHeaders: [
-        { text: "Categoría", value: "category_name" },
+        { text: "Categoría", value: "group" },
         { text: "Producto", value: "name" },
         { text: "Precio", value: "price" },
         { text: "Cantidad", value: "grams" }
@@ -304,16 +320,13 @@ export default {
     },
 
     compDailyMenu() {
-      let res = []
-
-      this.assets.forEach(asset => {
-        let categoryAssets = asset[1]
-        categoryAssets.forEach(categoryAsset => {
-          res.push(categoryAsset)
-        })
-      })
-
-      return res
+      let res = [];
+      this.assets.forEach(element => {
+        if (!(element.divider || element.header)) {
+          res.push(element);
+        }
+      });
+      return res;
     },
 
     compOrderPrice() {
@@ -332,17 +345,6 @@ export default {
     }
   },
   methods: {
-    getAssetsByCategoryName(asset) {
-      console.log('-------------------------------')
-      console.log(asset)
-      let categoryName = asset.category_name
-      let result = this.assets.filter(asset => {
-        return asset[0] === categoryName
-      })
-      console.log(result[0][1])
-      return result[0][1]
-    },
-
     closeDrwOrders() {
       this.drwOrders = false;
       this.editedOrders = [];
@@ -420,18 +422,10 @@ export default {
     },
 
     getAssetById(id) {
-      let result = {}
-
-      this.assets.forEach(asset => {
-        let categoryAssets = asset[1]
-
-        categoryAssets.forEach(categoryAsset => {
-          if (categoryAsset.id === id) {
-            result = categoryAsset
-          }
-        })
-      })
-      return result
+      let result = this.assets.find(obj => {
+        return obj.id === id;
+      });
+      return result;
     },
 
     getAssetPriceById(id, quantity) {
@@ -446,15 +440,39 @@ export default {
 
     removeAsset(index) {
       this.editedAssets.splice(index, 1);
+      //this.removeDuplicateAssets();
     },
 
-    addAsset(index) {
-      this.categoryAssets = this.assets[index][1];
-      this.editedAsset = { quantity: 1, finished: "0", category_name: this.assets[index][0] };
+    /* removeDuplicateAssets() {
+      let res = [];
+      for (let i = 0; i < this.editedAssetsLength; i++) {
+        this.editedAssets[i].price = this.getAssetById(
+          this.editedAssets[i].asset_id
+        ).price;
+        let index = res.findIndex(
+          obj =>
+            obj.asset_id === this.editedAssets[i].asset_id &&
+            obj.finished === "0"
+        );
+        if (index >= 0) {
+          res[index].quantity =
+            parseInt(res[index].quantity) +
+            parseInt(this.editedAssets[i].quantity);
+        } else {
+          res.push(this.editedAssets[i]);
+        }
+      }
+      this.editedAssets = res;
+    }, */
+
+    addAsset() {
+      //this.removeDuplicateAssets();
+      this.editedAsset = { quantity: 1, finished: "0" };
       this.editedAssets.push(this.editedAsset);
     },
 
     sendOrder() {
+      //this.removeDuplicateAssets();
       if (!this.handlingOrder) {
         this.handlingOrder = true;
         var config = {
