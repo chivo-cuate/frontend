@@ -178,6 +178,18 @@
                         </v-autocomplete>
                       </v-flex>
                     </v-layout>
+
+                    <v-layout wrap>
+                      <v-flex xs12 sm6>
+                        <v-autocomplete
+                          outlined
+                          :items="[{value: '10', text: 'Activo'}, {value: '0', text: 'Inactivo'}]"
+                          v-model="editedItem.status"
+                          label="Estado"
+                        ></v-autocomplete>
+                      </v-flex>
+                    </v-layout>
+                    
                   </v-form>
                 </v-container>
               </v-card-text>

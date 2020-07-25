@@ -333,13 +333,10 @@ export default {
   },
   methods: {
     getAssetsByCategoryName(asset) {
-      console.log('-------------------------------')
-      console.log(asset)
       let categoryName = asset.category_name
       let result = this.assets.filter(asset => {
         return asset[0] === categoryName
       })
-      console.log(result[0][1])
       return result[0][1]
     },
 
