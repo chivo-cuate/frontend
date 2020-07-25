@@ -57,7 +57,7 @@
                 <v-container grid-list-md>
                   <v-form @submit.prevent ref="form" v-model="validForm">
                     <v-layout wrap>
-                      <v-flex xs12 sm6>
+                      <v-flex xs12 sm8>
                         <v-text-field
                           :autofocus="true"
                           @keyup.enter="save()"
@@ -67,7 +67,7 @@
                           label="Nombre"
                         ></v-text-field>
                       </v-flex>
-                      <v-flex xs12 sm6>
+                      <v-flex xs12 sm4>
                         <v-text-field
                           type="number"
                           :rules="numberRules"
@@ -77,11 +77,19 @@
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
+                    
                     <v-layout wrap>
                       <v-flex xs12>
-                        <v-textarea outlined v-model="editedItem.description" label="Descripción"></v-textarea>
+                        <v-textarea rows="2" outlined v-model="editedItem.description" label="Descripción"></v-textarea>
                       </v-flex>
                     </v-layout>
+                    
+                    <v-layout wrap>
+                      <v-flex xs12>
+                        <v-textarea rows="2" outlined v-model="editedItem.network" label="Subredes separadas por coma (* para autorizar todo)"></v-textarea>
+                      </v-flex>
+                    </v-layout>
+                    
                     <v-layout wrap>
                       <v-flex xs12>
                         <v-autocomplete
